@@ -169,8 +169,10 @@ if not rawget(_G, "_drop_in") then
 
 		self._peer_joining_text:set_text("")
 		self._percentage_text:set_text("")
+		self._peer_info_text:set_text("")
 		self._peer_joining_text:hide()
 		self._percentage_text:hide()
+		self._peer_info_text:hide()
 	end
 end
 
