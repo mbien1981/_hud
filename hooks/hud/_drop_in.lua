@@ -8,10 +8,10 @@ if not rawget(_G, "_drop_in") then
 
 		self._ws = managers.gui_data:create_fullscreen_workspace()
 		self._panel = self._ws:panel():panel({
-			visible = false,
 			alpha = 1,
 			layer = 150,
 		})
+		self._sound_source = SoundDevice:create_source("hud")
 
 		self._colors = {
 			_black = Color.black,
@@ -29,7 +29,9 @@ if not rawget(_G, "_drop_in") then
 
 		self._background = self._hud_ws:rect({
 			color = self._colors._black,
-			alpha = 0.75,
+			visible = false,
+			alpha = 0,
+			layer = -1,
 		})
 
 		self._peer_joining_text = self._hud_ws:text({
@@ -91,6 +93,7 @@ if not rawget(_G, "_drop_in") then
 		end
 
 		self._active = id
+		self._sound_source:post_event("menu_enter")
 
 		local peer = managers.network:session():peer(id)
 		if not peer then
@@ -98,7 +101,15 @@ if not rawget(_G, "_drop_in") then
 			return
 		end
 
-		self._panel:set_visible(true)
+		-- self._panel:set_visible(true)
+		self._background:animate(function(o)
+			o:show()
+			_hud:animate_ui(1, function(p)
+				o:set_alpha(math.lerp(o:alpha(), 0.75, p))
+			end)
+		end)
+
+		self._peer_joining_text:show()
 		self._peer_joining_text:set_text(managers.localization:text("dialog_dropin_title", {
 			USER = peer:name(),
 		}))
@@ -115,6 +126,7 @@ if not rawget(_G, "_drop_in") then
 			return
 		end
 
+		self._percentage_text:show()
 		self._percentage_text:set_text(
 			string.format("%s %d%% (%.2fs)", managers.localization:text("dialog_wait"), progress, time_left)
 		)
@@ -139,12 +151,26 @@ if not rawget(_G, "_drop_in") then
 	end
 
 	function _drop_in:close(id)
+		if not self._initialized then
+			self:init()
+			return
+		end
+
 		self._active = nil
 		self._peers[id] = nil
-		self._panel:set_visible(false)
+
+		self._background:stop()
+		self._background:animate(function(o)
+			_hud:animate_ui(1, function(p)
+				o:set_alpha(math.lerp(o:alpha(), 0, p))
+			end)
+			o:hide()
+		end)
 
 		self._peer_joining_text:set_text("")
 		self._percentage_text:set_text("")
+		self._peer_joining_text:hide()
+		self._percentage_text:hide()
 	end
 end
 
