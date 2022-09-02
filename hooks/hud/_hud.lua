@@ -88,6 +88,10 @@ if not rawget(_G, "_hud") then
 			end
 		end
 	end
+
+	function _hud.conf(setting)
+		return D:conf(setting)
+	end
 end
 
 local module = ... or D:module("_hud")

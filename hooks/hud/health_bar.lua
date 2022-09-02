@@ -251,7 +251,7 @@ if _hud then
 			self._armor_timer:set_text(string.format("%.2fs", regen_timer))
 		end
 
-		self._armor_timer:set_visible(type(regen_timer) == "number")
+		self._armor_timer:set_visible((type(regen_timer) == "number") and _hud.conf("_hud_enable_armor_timer"))
 
 		-- we use dahm down counter instead of implementing a custom one.
 		self._downs:set_text(managers.hud._hud_health_downs:text())

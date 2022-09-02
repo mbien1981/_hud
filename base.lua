@@ -1,6 +1,9 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
+	includes = {
+		{ "mod_options", { type = "menu_options" } },
+	},
 })
 
 -- * libs
