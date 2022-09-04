@@ -8,6 +8,14 @@ module:add_localization_string("_hud_name_use_peer_color_help", {
 	english = "Sets your name color to match your chat color.",
 })
 
+module:add_localization_string("_hud_use_alt_armor", {
+	english = "Use alternative armor bar",
+})
+
+module:add_localization_string("_hud_enable_raw_armor_text", {
+	english = "Shows your armor bar in a completely separated bar",
+})
+
 module:add_localization_string("_hud_enable_raw_armor_text", {
 	english = "Enable raw armor text",
 })

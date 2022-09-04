@@ -1,6 +1,7 @@
 local module = ... or D:module("_hud")
 
 module:add_config_option("_hud_name_use_peer_color", false)
+module:add_config_option("_hud_use_alt_armor", false)
 module:add_config_option("_hud_enable_armor_timer", false)
 module:add_config_option("_hud_enable_raw_armor_text", false)
 module:add_config_option("_hud_use_custom_drop_in_panel", true)
@@ -17,6 +18,13 @@ module:add_menu_option("_hud_name_use_peer_color", {
 	type = "boolean",
 	text_id = "_hud_name_use_peer_color",
 	help_id = "_hud_name_use_peer_color_help",
+	localize = true,
+})
+
+module:add_menu_option("_hud_use_alt_armor", {
+	type = "boolean",
+	text_id = "_hud_use_alt_armor",
+	help_id = "_hud_use_alt_armor_help",
 	localize = true,
 })
 

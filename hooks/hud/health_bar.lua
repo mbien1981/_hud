@@ -113,7 +113,7 @@ if _hud then
 		self._downs = self._hud_ws:text({
 			text = "0",
 			font = "fonts/font_univers_530_bold",
-			font_size = 14,
+			font_size = 14 * tweak_data.scale.hud_mugshot_multiplier,
 			layer = 2,
 		})
 
@@ -121,7 +121,7 @@ if _hud then
 			text = "0.00s",
 			color = self._colors._armor,
 			font = "fonts/font_univers_530_bold",
-			font_size = 14,
+			font_size = 14 * tweak_data.scale.hud_mugshot_multiplier,
 			layer = 2,
 			visible = false,
 		})
@@ -130,7 +130,7 @@ if _hud then
 			text = "0",
 			color = self._colors._armor,
 			font = "fonts/font_univers_530_bold",
-			font_size = 14,
+			font_size = 14 * tweak_data.scale.hud_mugshot_multiplier,
 			layer = 2,
 			visible = false,
 		})
@@ -145,6 +145,16 @@ if _hud then
 			color = self._colors._armor,
 			w = 0,
 			h = 2,
+		})
+
+		self._armor_bg = self._hud_ws:rect({
+			color = self._colors._black,
+			h = 8,
+		})
+		self._alternative_armor_bar = self._hud_ws:rect({
+			color = self._colors._armor,
+			h = 8,
+			w = 0,
 		})
 
 		self:align_panels()
@@ -190,8 +200,15 @@ if _hud then
 		self._armor_bar:set_left(self._health_bg:left())
 		self._armor_bar:set_bottom(self._health_bg:bottom())
 
-		self._armor_timer:set_lefttop(self._armor_bar:leftbottom())
-		self._raw_armor:set_righttop(self._health_bg:rightbottom())
+		self._armor_bg:set_w(self._health_bg:w())
+		self._armor_bg:set_left(self._health_bg:left())
+		self._armor_bg:set_top(self._health_bg:bottom() + 4)
+
+		self._alternative_armor_bar:set_left(self._armor_bg:left())
+		self._alternative_armor_bar:set_top(self._armor_bg:top())
+
+		self._armor_timer:set_lefttop(self[self._use_alt_armor and "_armor_bg" or "_armor_bar"]:leftbottom())
+		self._raw_armor:set_righttop(self[self._use_alt_armor and "_armor_bg" or "_health_bg"]:rightbottom())
 
 		self._level:set_right(self._health_bg:right())
 	end
@@ -244,11 +261,18 @@ if _hud then
 			self._armor_bar:animate(function(o)
 				_hud:animate_ui(1, function(p)
 					o:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
+					self._alternative_armor_bar:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 				end)
 			end)
 
 			self._current_armor = current_armor
 		end
+
+		self._use_alt_armor = _hud.conf("_hud_use_alt_armor")
+
+		self._armor_bar:set_visible(not self._use_alt_armor)
+		self._armor_bg:set_visible(self._use_alt_armor)
+		self._alternative_armor_bar:set_visible(self._use_alt_armor)
 
 		self._raw_armor:set_visible(_hud.conf("_hud_enable_raw_armor_text"))
 		self._raw_armor:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
