@@ -86,7 +86,8 @@ if _hud then
 		self._state_icon = self._hud_ws:bitmap({
 			texture = icon,
 			texture_rect = texture_rect,
-			visible = false,
+			visible = true,
+			alpha = 0,
 			layer = 2,
 		})
 
@@ -256,6 +257,8 @@ if _hud then
 	end
 
 	function _health_panel:update_mugshot()
+		self._workspace_width = self._workspace_width or self._hud_ws:w()
+
 		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
 		if hud then
 			hud.health_panel:hide()
@@ -277,17 +280,48 @@ if _hud then
 		end
 
 		local state_icon = states[state or current_state] or nil
-
-		self._mugshot:set_alpha(state_icon and 0.5 or 1)
-
-		self._state_icon:set_visible(state_icon)
-
-		if not state_icon then
+		if self._state == state_icon then
 			return
 		end
 
-		local icon, texture_rect = tweak_data.hud_icons:get_icon_data(state_icon)
-		self._state_icon:set_image(icon, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
+		self._state = state_icon
+
+		self._state_icon:stop()
+		self._hud_ws:stop()
+
+		if state then
+			self._hud_ws:animate(function(o)
+				_hud:animate_ui(2, function(p)
+					o:set_w(math.lerp(o:w(), self._mugshot:w() + 8, p))
+				end)
+			end)
+		end
+
+		if state_icon then
+			local icon, texture_rect = tweak_data.hud_icons:get_icon_data(state_icon)
+			self._state_icon:set_image(icon, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
+
+			self._state_icon:animate(function(o)
+				_hud:animate_ui(2, function(p)
+					o:set_alpha(math.lerp(0, 1, p))
+					self._mugshot:set_alpha(math.lerp(1, 0.5, p))
+				end)
+			end)
+			return
+		end
+
+		self._state_icon:animate(function(o)
+			_hud:animate_ui(2, function(p)
+				o:set_alpha(math.lerp(1, 0, p))
+				self._mugshot:set_alpha(math.lerp(0.5, 1, p))
+			end)
+		end)
+
+		self._hud_ws:animate(function(o)
+			_hud:animate_ui(2, function(p)
+				o:set_w(math.lerp(o:w(), self._workspace_width, p))
+			end)
+		end)
 	end
 
 	function _health_panel:anim_take_damage()
