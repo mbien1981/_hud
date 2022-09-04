@@ -25,10 +25,11 @@ if _hud then
 
 		self._colors = {
 			_black = Color.black,
-			_grey = Color("ECECEC"),
-			_red = Color("b8392e"),
-			_green = Color(0.5, 1, 0.5),
-			_armor = Color("1e90ff"), -- dodger blue
+			_name = _hud.conf("_hud_name_color"),
+			_health = _hud.conf("_hud_health_color"),
+			_hurt = _hud.conf("_hud_hurt_color"),
+			_patch = _hud.conf("_hud_patch_color"),
+			_armor = _hud.conf("_hud_armor_color"),
 		}
 
 		self._current_health = 0
@@ -55,6 +56,8 @@ if _hud then
 		}
 
 		local peer = managers.network:session():local_peer()
+		self._peer = peer
+
 		local character = managers.criminals:local_character_name()
 		local mask_set = peer:mask_set()
 		local mask_id = mugshots[character]
@@ -123,6 +126,15 @@ if _hud then
 			visible = false,
 		})
 
+		self._raw_armor = self._hud_ws:text({
+			text = "0",
+			color = self._colors._armor,
+			font = "fonts/font_univers_530_bold",
+			font_size = 14,
+			layer = 2,
+			visible = false,
+		})
+
 		self._health_bg = self._hud_ws:rect({
 			color = self._colors._black,
 			h = 8,
@@ -139,21 +151,11 @@ if _hud then
 	end
 
 	function _health_panel:align_panels()
-		local _, _, w, h = self._name:text_rect()
-		self._name:set_w(w)
-		self._name:set_h(h)
-
-		local _, _, w, h = self._level:text_rect()
-		self._level:set_w(w)
-		self._level:set_h(h)
-
-		local _, _, w, h = self._downs:text_rect()
-		self._downs:set_w(w)
-		self._downs:set_h(h)
-
-		local _, _, w, h = self._armor_timer:text_rect()
-		self._armor_timer:set_w(w)
-		self._armor_timer:set_h(h)
+		_hud.update_text_rect(self._name)
+		_hud.update_text_rect(self._level)
+		_hud.update_text_rect(self._downs)
+		_hud.update_text_rect(self._armor_timer)
+		_hud.update_text_rect(self._raw_armor)
 
 		self._name:set_left(self._mugshot:right() + 4)
 
@@ -189,6 +191,7 @@ if _hud then
 		self._armor_bar:set_bottom(self._health_bg:bottom())
 
 		self._armor_timer:set_lefttop(self._armor_bar:leftbottom())
+		self._raw_armor:set_righttop(self._health_bg:rightbottom())
 
 		self._level:set_right(self._health_bg:right())
 	end
@@ -197,6 +200,10 @@ if _hud then
 		if not self._initialized then
 			self:init()
 		end
+
+		local _name_color = _hud.conf("_hud_name_use_peer_color") and tweak_data.chat_colors[self._peer:id()]
+			or self._colors._name
+		self._name:set_color(_name_color)
 
 		self._level:set_text(managers.experience:current_level())
 
@@ -224,9 +231,9 @@ if _hud then
 				_hud:animate_ui(1, function(p)
 					o:set_w(math.lerp(o:w(), self._health_bg:w() * health_percentage, p))
 
-					local health_color = ((health_percentage > 0.25) and self._colors._grey) or self._colors._red
-					local damage_color = lower and self._colors._red or self._colors._green
-					o:set_color(_hud:blend_colors(health_color, damage_color, p))
+					local health_color = ((health_percentage > 0.25) and self._colors._health) or self._colors._hurt
+					local damage_color = lower and self._colors._hurt or self._colors._patch
+					o:set_color(_hud.blend_colors(health_color, damage_color, p))
 				end)
 			end)
 
@@ -242,6 +249,9 @@ if _hud then
 
 			self._current_armor = current_armor
 		end
+
+		self._raw_armor:set_visible(_hud.conf("_hud_enable_raw_armor_text"))
+		self._raw_armor:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
 
 		local regen_timer = p_damage._regenerate_timer
 		if regen_timer then
@@ -359,6 +369,36 @@ if _hud then
 		end
 	end
 
+	function _health_panel:layout_chat()
+		if not managers.hud then
+			return
+		end
+
+		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
+		local full_hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN)
+		if not hud or not full_hud then
+			return
+		end
+
+		local hud_m = managers.hud
+		local mugshots = hud_m._hud.mugshots
+
+		if not next(mugshots) then
+			return
+		end
+
+		local state = full_hud:chat_output_state()
+		if state == "default" then
+			full_hud.panel
+				:child("textscroll")
+				:set_bottom(mugshots[#mugshots].panel:top() + hud_m._saferect_size.y * hud_m._workspace_size.h - 12)
+		else
+			full_hud.panel
+				:child("textscroll")
+				:set_bottom(hud.health_panel:bottom() + hud_m._saferect_size.y * hud_m._workspace_size.h - 4)
+		end
+	end
+
 	function _health_panel:update()
 		if not self._initialized then
 			self:init()
@@ -368,6 +408,7 @@ if _hud then
 		self:update_info()
 		self:update_mugshot()
 		self:layout_mugshots()
+		self:layout_chat()
 	end
 end
 

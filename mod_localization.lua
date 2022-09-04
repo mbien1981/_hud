@@ -1,5 +1,21 @@
 local module = ... or D:module("_hud")
 
+module:add_localization_string("_hud_name_use_peer_color", {
+	english = "Use peer color in custom health bar",
+})
+
+module:add_localization_string("_hud_name_use_peer_color_help", {
+	english = "Sets your name color to match your chat color.",
+})
+
+module:add_localization_string("_hud_enable_raw_armor_text", {
+	english = "Enable raw armor text",
+})
+
+module:add_localization_string("_hud_enable_raw_armor_text_help", {
+	english = "Shows a text that indicates your raw armor values.",
+})
+
 module:add_localization_string("_hud_enable_armor_timer", {
 	english = "Enable armor regen timer",
 })

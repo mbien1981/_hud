@@ -67,7 +67,7 @@ if not rawget(_G, "_hud") then
 		callback(1, TOTAL_T)
 	end
 
-	function _hud:blend_colors(c1, c2, blend)
+	function _hud.blend_colors(c1, c2, blend)
 		local result = {
 			r = (c1.r * blend) + (c2.r * (1 - blend)),
 			g = (c1.g * blend) + (c2.g * (1 - blend)),
@@ -75,6 +75,12 @@ if not rawget(_G, "_hud") then
 		}
 
 		return Color(result.r, result.g, result.b)
+	end
+
+	function _hud.update_text_rect(text)
+		local _, _, w, h = text:text_rect()
+		text:set_w(w)
+		text:set_h(h)
 	end
 
 	function _hud:get_class(class)
