@@ -11,7 +11,7 @@ if not rawget(_G, "_drop_in") then
 			alpha = 1,
 			layer = 150,
 		})
-		self._sound_source = SoundDevice:create_source("hud")
+		self._sound_source = SoundDevice:create_source("_drop_in")
 
 		self._colors = {
 			_black = Color.black,
