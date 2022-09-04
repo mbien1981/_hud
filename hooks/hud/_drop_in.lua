@@ -101,7 +101,7 @@ if not rawget(_G, "_drop_in") then
 			return
 		end
 
-		-- self._panel:set_visible(true)
+		self._background:stop()
 		self._background:animate(function(o)
 			o:show()
 			_hud:animate_ui(1, function(p)
@@ -126,6 +126,16 @@ if not rawget(_G, "_drop_in") then
 			return
 		end
 
+		if not self._background:visible() then
+			self._background:stop()
+			self._background:animate(function(o)
+				o:show()
+				_hud:animate_ui(1, function(p)
+					o:set_alpha(math.lerp(o:alpha(), 0.75, p))
+				end)
+			end)
+		end
+
 		self._percentage_text:show()
 		self._percentage_text:set_text(
 			string.format("%s %d%% (%.2fs)", managers.localization:text("dialog_wait"), progress, time_left)
@@ -135,14 +145,17 @@ if not rawget(_G, "_drop_in") then
 
 		local peer = managers.network:session():peer(id)
 		local deployable = managers.player:get_synced_kit_selection(peer:id(), "deployable")
-		local crew_bonus = managers.player:get_crew_bonus_by_peer(peer:id()) or { name_id = "debug_none" }
+		local crew_bonus = managers.player:get_crew_bonus_by_peer(peer:id())
 		self._peer_info_text:set_text(
 			string.format(
 				managers.localization:text("_hud_drop_in_peer_info"),
 				peer:level(),
 				managers.localization:text("menu_mask_" .. peer:mask_set()):pretty(true),
-				managers.localization:text(tweak_data.equipments[deployable].text_id):pretty(true),
-				managers.localization:text(tweak_data.upgrades.definitions[crew_bonus].name_id):pretty(true),
+				deployable and managers.localization:text(tweak_data.equipments[deployable].text_id):pretty(true)
+					or "None",
+				crew_bonus
+						and managers.localization:text(tweak_data.upgrades.definitions[crew_bonus].name_id):pretty(true)
+					or "None",
 				managers.localization:text(peer:waiting_for_player_ready() and "_hud_yes" or "_hud_no")
 			)
 		)
