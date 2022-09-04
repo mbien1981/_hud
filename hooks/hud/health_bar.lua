@@ -13,8 +13,8 @@ if _hud then
 			return
 		end
 
-		self._visible = false
 		self._initialized = true
+		self._visible = false
 
 		self._ws = managers.gui_data:create_fullscreen_workspace()
 		self._panel = self._ws:panel():panel({
@@ -33,8 +33,6 @@ if _hud then
 
 		self._current_health = 0
 		self._current_armor = 0
-
-		self._visible = false
 
 		self:setup_panels()
 	end
@@ -192,8 +190,6 @@ if _hud then
 		self._armor_timer:set_lefttop(self._armor_bar:leftbottom())
 
 		self._level:set_right(self._health_bg:right())
-
-		hud.health_panel:set_visible(false)
 	end
 
 	function _health_panel:update_info()
@@ -260,6 +256,11 @@ if _hud then
 	end
 
 	function _health_panel:update_mugshot()
+		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
+		if hud then
+			hud.health_panel:hide()
+		end
+
 		local states = {
 			bleed_out = "mugshot_downed",
 			incapacitated = "mugshot_downed",
@@ -292,7 +293,6 @@ if _hud then
 	function _health_panel:anim_take_damage()
 		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
 		if not hud then
-			self._visible = false
 			return
 		end
 
@@ -320,7 +320,8 @@ if _hud then
 
 			panel:set_bottom(y)
 			panel:set_left(self._panel:world_x())
-			panel:set_visible(self._visible)
+			panel:set_visible(panel:parent():visible())
+			panel:set_layer(-1150)
 		end
 	end
 
