@@ -222,7 +222,7 @@ if _hud then
 			or self._colors._name
 		self._name:set_color(_name_color)
 
-		self._level:set_text(managers.experience:current_level())
+		self._level:set_text(managers.experience:current_virtual_level(true)) --managers.experience:current_level()
 
 		-- * health and armor
 		local l_player = managers.player:player_unit()
