@@ -189,14 +189,12 @@ if not rawget(_G, "_drop_in") then
 	end
 end
 
---module:call_orig(HUDManager, "set_crosshair_visible", self, visible)
-
 local module = ... or D:module("_hud")
 
 local MenuManager = module:hook_class("MenuManager")
 module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
 	if not D:conf("_hud_use_custom_drop_in_panel") then
-		module:call_orig(MenuManager, "set_crosshair_visible", self, id, nick)
+		module:call_orig(MenuManager, "show_person_joining", self, id, nick)
 		return
 	end
 
@@ -210,13 +208,19 @@ module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
 end, false)
 
 module:hook(50, MenuManager, "close_person_joining", function(self, id)
+	if self.peer_join_start_t then
+		self.peer_join_start_t[id] = nil
+	end
+
 	if not D:conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "close_person_joining", self, id)
 		return
 	end
 
-	if self.peer_join_start_t then
-		self.peer_join_start_t[id] = nil
+	local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
+	if dlg then
+		managers.system_menu:close("user_dropin" .. id)
+		dlg = nil
 	end
 
 	local _drop_in = rawget(_G, "_drop_in")
@@ -226,16 +230,31 @@ module:hook(50, MenuManager, "close_person_joining", function(self, id)
 end, false)
 
 module:hook(50, MenuManager, "update_person_joining", function(self, id, progress)
+	local _drop_in = rawget(_G, "_drop_in")
 	if not D:conf("_hud_use_custom_drop_in_panel") then
+		if _drop_in and _drop_in._active then
+			_drop_in:close(id)
+
+			local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
+			if not dlg then
+				self:show_person_joining(id, managers.network:session():peer(id):name())
+			end
+		end
+
 		module:call_orig(MenuManager, "update_person_joining", self, id, progress)
 		return
+	end
+
+	local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
+	if dlg then
+		managers.system_menu:close("user_dropin" .. id)
+		dlg = nil
 	end
 
 	if self.peer_join_start_t and self.peer_join_start_t[id] then
 		local t = os.clock() - self.peer_join_start_t[id]
 		local time_left = (t / progress) * (100 - progress)
 
-		local _drop_in = rawget(_G, "_drop_in")
 		if _drop_in then
 			_drop_in:update_peer(id, progress, time_left)
 		end
