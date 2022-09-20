@@ -259,7 +259,7 @@ if _hud then
 
 		if self._current_armor ~= current_armor then
 			self._armor_bar:animate(function(o)
-				_hud:animate_ui(1, function(p)
+				_hud:animate_ui(0.2, function(p)
 					o:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 					self._alternative_armor_bar:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 				end)
