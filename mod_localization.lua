@@ -49,7 +49,7 @@ module:add_localization_string("_hud_drop_in_show_peer_info_help", {
 })
 
 module:add_localization_string("_hud_mod_list_title", {
-	english = "Gameplay altering mods:\n",
+	english = "Gameplay altering mods:%s",
 })
 
 module:add_localization_string("_hud_yes", {
