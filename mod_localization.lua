@@ -48,6 +48,10 @@ module:add_localization_string("_hud_drop_in_show_peer_info_help", {
 	english = "Shows loadout info about the joining peer.",
 })
 
+module:add_localization_string("_hud_mod_list_title", {
+	english = "Gameplay altering mods:\n",
+})
+
 module:add_localization_string("_hud_yes", {
 	english = "Yes",
 })

@@ -6,6 +6,15 @@ module:add_config_option("_hud_enable_armor_timer", false)
 module:add_config_option("_hud_enable_raw_armor_text", false)
 module:add_config_option("_hud_use_custom_drop_in_panel", true)
 module:add_config_option("_hud_drop_in_show_peer_info", true)
+module:add_config_option("_hud_mod_whitelist", {
+	["ovk_193"] = true,
+	["crybaby"] = true,
+	["overdrill7200"] = true,
+	["corpse_despawn"] = true,
+	["interact_toggle"] = true,
+	["restart_end_job"] = true,
+	["restore_deployables"] = true,
+})
 
 -- custom colors
 module:add_config_option("_hud_name_color", Color("ECECEC"))

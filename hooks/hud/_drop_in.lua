@@ -5,6 +5,7 @@ if not rawget(_G, "_drop_in") then
 		self._initialized = true
 		self._active = false
 		self._peers = {}
+		self._peer_mods = {}
 
 		self._ws = managers.gui_data:create_fullscreen_workspace()
 		self._panel = self._ws:panel():panel({
@@ -57,21 +58,22 @@ if not rawget(_G, "_drop_in") then
 			font_size = 20,
 		})
 
+		self._peer_mod_list = self._hud_ws:text({
+			text = "",
+			color = self._colors._grey,
+			font = "fonts/font_univers_530_bold",
+			font_size = 20,
+			align = "left",
+		})
+
 		self:align_panels()
 	end
 
 	function _drop_in:align_panels()
-		local _, _, w, h = self._percentage_text:text_rect()
-		self._percentage_text:set_w(w)
-		self._percentage_text:set_h(h)
-
-		local _, _, w, h = self._peer_joining_text:text_rect()
-		self._peer_joining_text:set_w(w)
-		self._peer_joining_text:set_h(h)
-
-		local _, _, w, h = self._peer_info_text:text_rect()
-		self._peer_info_text:set_w(w)
-		self._peer_info_text:set_h(h)
+		_hud.update_text_rect(self._percentage_text)
+		_hud.update_text_rect(self._peer_joining_text)
+		_hud.update_text_rect(self._peer_info_text)
+		_hud.update_text_rect(self._peer_mod_list)
 
 		self._percentage_text:set_center(self._hud_ws:center())
 
@@ -80,6 +82,8 @@ if not rawget(_G, "_drop_in") then
 
 		self._peer_info_text:set_left(self._peer_joining_text:left())
 		self._peer_info_text:set_top(self._percentage_text:bottom() + 24)
+
+		self._peer_mod_list:set_righttop(self._hud_ws:righttop())
 	end
 
 	function _drop_in:open(id)
@@ -160,6 +164,16 @@ if not rawget(_G, "_drop_in") then
 			)
 		)
 
+		if peer:has_dmf() then
+			local mod_list = self._peer_mods[peer:id()]
+			if mod_list and (mod_list ~= "") then
+				self._peer_mod_list:show()
+				self._peer_mod_list:set_text(
+					string.format(managers.localization:text("_hud_mod_list_title"), self._peer_mods[peer:id()])
+				)
+			end
+		end
+
 		self:align_panels()
 	end
 
@@ -171,6 +185,7 @@ if not rawget(_G, "_drop_in") then
 
 		self._active = nil
 		self._peers[id] = nil
+		self._peer_mods[id] = nil
 
 		self._background:stop()
 		self._background:animate(function(o)
@@ -183,9 +198,11 @@ if not rawget(_G, "_drop_in") then
 		self._peer_joining_text:set_text("")
 		self._percentage_text:set_text("")
 		self._peer_info_text:set_text("")
+		self._peer_mod_list:set_text("")
 		self._peer_joining_text:hide()
 		self._percentage_text:hide()
 		self._peer_info_text:hide()
+		self._peer_mod_list:hide()
 	end
 end
 
@@ -260,3 +277,25 @@ module:hook(50, MenuManager, "update_person_joining", function(self, id, progres
 		end
 	end
 end, false)
+
+-- https://gist.github.com/zneix/fb99059520fe94cfcfaaefe8d02af6db#file-user-lua-L739
+D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, function(peer, data_type, data)
+	if not _drop_in or type(data) ~= "table" then
+		return
+	end
+
+	if not _drop_in._initialized then
+		_drop_in:init()
+	end
+
+	local mod_list_str = ""
+
+	local whitelist = D:conf("_hud_drop_in_show_peer_info") or {}
+	for k, _ in pairs(data) do
+		if not whitelist[k] then
+			mod_list_str = string.format("%s\n%s", mod_list_str, k)
+		end
+	end
+
+	_drop_in._peer_mods[peer:id()] = mod_list_str
+end)
