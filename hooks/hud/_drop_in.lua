@@ -290,7 +290,7 @@ D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, funct
 
 	local mod_list_str = ""
 
-	local whitelist = D:conf("_hud_drop_in_show_peer_info") or {}
+	local whitelist = D:conf("_hud_mod_whitelist") or {}
 	for k, _ in pairs(data) do
 		if not whitelist[k] then
 			mod_list_str = string.format("%s\n%s", mod_list_str, k)
