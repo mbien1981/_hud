@@ -2,60 +2,75 @@ local module = ... or D:module("_hud")
 
 module:add_localization_string("_hud_name_use_peer_color", {
 	english = "Use peer color in custom health bar",
+	spanish = "Utilizar color del jugador en el panel de vida",
 })
 
 module:add_localization_string("_hud_name_use_peer_color_help", {
 	english = "Sets your name color to match your chat color.",
+	spanish = "Colorea tu nombre para que coincida con tu color de chat.",
 })
 
 module:add_localization_string("_hud_use_alt_armor", {
 	english = "Use alternative armor bar",
+	spanish = "Estilo alternativo para la barra de armadura",
 })
 
 module:add_localization_string("_hud_enable_raw_armor_text", {
 	english = "Shows your armor bar in a completely separated bar",
+	spanish = "Muestra tu armadura en una barra separada a la barra de vida.",
 })
 
 module:add_localization_string("_hud_enable_raw_armor_text", {
 	english = "Enable raw armor text",
+	spanish = "Mostrar valores de armadura en bruto",
 })
 
 module:add_localization_string("_hud_enable_raw_armor_text_help", {
 	english = "Shows a text that indicates your raw armor values.",
+	spanish = "Muestra un texto que indica los valores en bruto de tu armadura.",
 })
 
 module:add_localization_string("_hud_enable_armor_timer", {
 	english = "Enable armor regen timer",
+	spanish = "Mostrar tiempo de regeneración de armadura",
 })
 
 module:add_localization_string("_hud_enable_armor_timer_help", {
 	english = "Shows a timer that indicates the time remaining for your armor to regenerate.",
+	spanish = "Muestra un temporizador que indica el tiempo faltante para que tu armadura se regenere.",
 })
 
 module:add_localization_string("_hud_use_custom_drop_in_panel", {
-	english = "Use custom drop in panel",
+	english = "Use custom drop-in panel",
+	spanish = "Utilizar panel personalizado de entrada de jugador.",
 })
 
 module:add_localization_string("_hud_drop_in_peer_info", {
 	english = "Level: %d\nMask set: %s\nDeployable: %s\nCrew bonus: %s\nReady: %s",
+	spanish = "Nivel: %d\nSet de máscara: %s\nEquipamiento desplegable: %s\nBono de equipo: %s\nPreparado: %s",
 })
 
 module:add_localization_string("_hud_drop_in_show_peer_info", {
 	english = "Show peer info in drop in",
+	spanish = "Mostrar información del jugador mientras se une",
 })
 
 module:add_localization_string("_hud_drop_in_show_peer_info_help", {
 	english = "Shows loadout info about the joining peer.",
+	spanish = "Muestra información sobre el equipamiento del jugador que se esta uniendo a la partida.",
 })
 
 module:add_localization_string("_hud_mod_list_title", {
 	english = "Gameplay altering mods:%s",
+	spanish = "Mods que alteran el juego:%s",
 })
 
 module:add_localization_string("_hud_yes", {
 	english = "Yes",
+	spanish = "Sí",
 })
 
 module:add_localization_string("_hud_no", {
 	english = "No",
+	spanish = "No",
 })
