@@ -1,6 +1,7 @@
 local module = ... or D:module("_hud")
 
 module:add_config_option("_hud_name_use_peer_color", false)
+module:add_config_option("_hud_long_name_splitting", true)
 module:add_config_option("_hud_use_alt_armor", false)
 module:add_config_option("_hud_enable_armor_timer", false)
 module:add_config_option("_hud_enable_raw_armor_text", false)
@@ -27,6 +28,13 @@ module:add_menu_option("_hud_name_use_peer_color", {
 	type = "boolean",
 	text_id = "_hud_name_use_peer_color",
 	help_id = "_hud_name_use_peer_color_help",
+	localize = true,
+})
+
+module:add_menu_option("_hud_long_name_splitting", {
+	type = "boolean",
+	text_id = "_hud_long_name_splitting",
+	help_id = "_hud_long_name_splitting_help",
 	localize = true,
 })
 

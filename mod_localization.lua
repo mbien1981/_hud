@@ -1,5 +1,15 @@
 local module = ... or D:module("_hud")
 
+module:add_localization_string("_hud_long_name_splitting", {
+	english = "Display short player name",
+	spanish = "Mostrar nombre de usuario recortado",
+})
+
+module:add_localization_string("_hud_long_name_splitting_help", {
+	english = "Displays the only the longest word in your username if it exceeds the 16 character limit.",
+	spanish = "Muestra solo la palabra más larga de tu nombre de usuario si supera el límite de 16 caracteres.",
+})
+
 module:add_localization_string("_hud_name_use_peer_color", {
 	english = "Use peer color in custom health bar",
 	spanish = "Utilizar color del jugador en el panel de vida",

@@ -94,8 +94,22 @@ if _hud then
 			layer = 2,
 		})
 
+		local name = peer:name()
+		if _hud.conf("_hud_long_name_splitting") and utf8.len(name) > 16 then
+			local words = {}
+			name:gsub("([^%s]+)", function(w)
+				table.insert(words, w)
+			end)
+
+			table.sort(words, function(a, b)
+				return #a > #b
+			end)
+
+			name = words[1]
+		end
+
 		self._name = self._hud_ws:text({
-			text = peer:name(),
+			text = name,
 			font = "fonts/font_univers_530_bold",
 			font_size = 22,
 			x = 4,
