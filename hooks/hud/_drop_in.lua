@@ -145,7 +145,7 @@ if not rawget(_G, "_drop_in") then
 			string.format("%s %d%% (%.2fs)", managers.localization:text("dialog_wait"), progress, time_left)
 		)
 
-		self._peer_info_text:set_visible(D:conf("_hud_drop_in_show_peer_info"))
+		self._peer_info_text:set_visible(_hud.conf("_hud_drop_in_show_peer_info"))
 
 		local peer = managers.network:session():peer(id)
 		local deployable = managers.player:get_synced_kit_selection(peer:id(), "deployable")
@@ -210,7 +210,7 @@ local module = ... or D:module("_hud")
 
 local MenuManager = module:hook_class("MenuManager")
 module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
-	if not D:conf("_hud_use_custom_drop_in_panel") then
+	if not _hud.conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "show_person_joining", self, id, nick)
 		return
 	end
@@ -229,7 +229,7 @@ module:hook(50, MenuManager, "close_person_joining", function(self, id)
 		self.peer_join_start_t[id] = nil
 	end
 
-	if not D:conf("_hud_use_custom_drop_in_panel") then
+	if not _hud.conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "close_person_joining", self, id)
 		return
 	end
@@ -248,7 +248,7 @@ end, false)
 
 module:hook(50, MenuManager, "update_person_joining", function(self, id, progress)
 	local _drop_in = rawget(_G, "_drop_in")
-	if not D:conf("_hud_use_custom_drop_in_panel") then
+	if not _hud.conf("_hud_use_custom_drop_in_panel") then
 		if _drop_in and _drop_in._active then
 			_drop_in:close(id)
 
@@ -280,6 +280,7 @@ end, false)
 
 -- https://gist.github.com/zneix/fb99059520fe94cfcfaaefe8d02af6db#file-user-lua-L739
 D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, function(peer, data_type, data)
+	local _drop_in = rawget(_G, "_drop_in")
 	if not _drop_in or type(data) ~= "table" then
 		return
 	end
@@ -290,7 +291,7 @@ D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, funct
 
 	local mod_list_str = ""
 
-	local whitelist = D:conf("_hud_mod_whitelist") or {}
+	local whitelist = _hud.conf("_hud_mod_whitelist") or {}
 	for k, _ in pairs(data) do
 		if not whitelist[k] then
 			mod_list_str = string.format("%s\n%s", mod_list_str, k)
