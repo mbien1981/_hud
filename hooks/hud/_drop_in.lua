@@ -87,6 +87,10 @@ if not rawget(_G, "_drop_in") then
 	end
 
 	function _drop_in:open(id)
+		if not rawget(_G, "_hud") then
+			return
+		end
+
 		if not self._initialized then
 			self:init()
 		end
@@ -122,6 +126,10 @@ if not rawget(_G, "_drop_in") then
 	end
 
 	function _drop_in:update_peer(id, progress, time_left)
+		if not rawget(_G, "_hud") then
+			return
+		end
+
 		if not self._active then
 			self:open(id)
 		end
@@ -178,6 +186,10 @@ if not rawget(_G, "_drop_in") then
 	end
 
 	function _drop_in:close(id)
+		if not rawget(_G, "_hud") then
+			return
+		end
+
 		if not self._initialized then
 			self:init()
 			return
@@ -210,9 +222,9 @@ local module = ... or D:module("_hud")
 
 local MenuManager = module:hook_class("MenuManager")
 module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
-	if not _hud.conf("_hud_use_custom_drop_in_panel") then
+	local _hud = rawget(_G, "_hud")
+	if not _hud or _hud and not _hud.conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "show_person_joining", self, id, nick)
-		return
 	end
 
 	self.peer_join_start_t = self.peer_join_start_t or {}
@@ -229,9 +241,9 @@ module:hook(50, MenuManager, "close_person_joining", function(self, id)
 		self.peer_join_start_t[id] = nil
 	end
 
-	if not _hud.conf("_hud_use_custom_drop_in_panel") then
+	local _hud = rawget(_G, "_hud")
+	if not _hud or (_hud and not _hud.conf("_hud_use_custom_drop_in_panel")) then
 		module:call_orig(MenuManager, "close_person_joining", self, id)
-		return
 	end
 
 	local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
@@ -248,7 +260,9 @@ end, false)
 
 module:hook(50, MenuManager, "update_person_joining", function(self, id, progress)
 	local _drop_in = rawget(_G, "_drop_in")
-	if not _hud.conf("_hud_use_custom_drop_in_panel") then
+	local _hud = rawget(_G, "_hud")
+
+	if not _hud or (_hud and not _hud.conf("_hud_use_custom_drop_in_panel")) then
 		if _drop_in and _drop_in._active then
 			_drop_in:close(id)
 
