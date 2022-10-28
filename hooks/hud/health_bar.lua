@@ -232,6 +232,14 @@ if _hud then
 			self:init()
 		end
 
+		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
+		if not hud then
+			self._panel:hide()
+			return
+		end
+
+		self._panel:set_visible(hud.health_panel:parent():visible())
+
 		local _name_color = _hud.conf("_hud_name_use_peer_color") and tweak_data.chat_colors[self._peer:id()]
 			or self._colors._name
 		self._name:set_color(_name_color)
@@ -308,9 +316,11 @@ if _hud then
 		self._workspace_width = self._workspace_width or self._hud_ws:w()
 
 		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
-		if hud then
-			hud.health_panel:hide()
+		if not hud or not self._panel:visible() then
+			return
 		end
+
+		hud.health_panel:hide()
 
 		local states = {
 			bleed_out = "mugshot_downed",
