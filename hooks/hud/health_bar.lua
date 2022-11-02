@@ -196,7 +196,7 @@ if _hud then
 
 		self._visible = hud.panel:visible()
 
-		self._hud_ws:set_bottom(hud.panel:bottom())
+		self._hud_ws:set_world_bottom(hud.panel:world_bottom() - 8)
 		self._hud_ws:set_left(hud.health_panel:right() - self._mugshot:w() / 2)
 
 		self._gradient:set_size(self._hud_ws:w(), self._hud_ws:h())
@@ -415,7 +415,7 @@ if _hud then
 				or i == 3 and mugshots[2].panel:top() - 2 * tweak_data.scale.hud_health_multiplier
 
 			panel:set_bottom(y)
-			panel:set_left(self._panel:world_x())
+			panel:set_world_x(self._panel:world_x())
 			panel:set_visible(panel:parent():visible())
 			panel:set_layer(-1150)
 		end
