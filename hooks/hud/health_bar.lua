@@ -274,6 +274,8 @@ if _hud then
 					local damage_color = lower and self._colors._hurt or self._colors._patch
 					o:set_color(_hud.blend_colors(health_color, damage_color, p))
 				end)
+
+				o:set_w(self._health_bg:w() * health_percentage)
 			end)
 
 			self._current_health = current_health
@@ -285,6 +287,8 @@ if _hud then
 					o:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 					self._alternative_armor_bar:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 				end)
+
+				o:set_w(self._health_bg:w() * armor_percentage)
 			end)
 
 			self._current_armor = current_armor
