@@ -197,7 +197,7 @@ if _hud then
 		self._visible = hud.panel:visible()
 
 		self._hud_ws:set_world_bottom(hud.panel:world_bottom() - 8)
-		self._hud_ws:set_left(hud.health_panel:right() - self._mugshot:w() / 2)
+		self._hud_ws:set_world_left(hud.health_panel:world_right() - (self._mugshot:w() / 2))
 
 		self._gradient:set_size(self._hud_ws:w(), self._hud_ws:h())
 
