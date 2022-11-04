@@ -463,10 +463,6 @@ if RequiredScript == "lib/units/beings/player/playerdamage" then
 	local PlayerDamage = module:hook_class("PlayerDamage")
 	for _, func in pairs({ "damage_bullet", "damage_killzone", "damage_explosion" }) do
 		module:post_hook(50, PlayerDamage, func, function(...)
-			-- if not health_panel._initialized then
-				-- CustomHealthPanel:init()
-				-- return
-			-- end
 			CustomHealthPanel:anim_take_damage()
 		end, false)
 	end

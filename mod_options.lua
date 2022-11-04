@@ -75,8 +75,14 @@ module:add_menu_option("_hud_drop_in_show_peer_info", {
 })
 
 module:add_menu_option("_hud_reload_panel_divider", { type = "divider", size = 15 })
-module:add_menu_option("_hud_reload_panel", {
+module:add_menu_option("_hud_reload_timer", {
 	type = "boolean",
-	text_id = "_hud_reload_panel",
+	text_id = "_hud_reload_timer",
+	localize = true,
+})
+
+module:add_menu_option("_hud_shotgun_fire_timer", {
+	type = "boolean",
+	text_id = "_hud_shotgun_fire_timer",
 	localize = true,
 })

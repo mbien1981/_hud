@@ -75,9 +75,14 @@ module:add_localization_string("_hud_mod_list_title", {
 	spanish = "Mods que alteran el juego:%s",
 })
 
-module:add_localization_string("_hud_reload_panel", {
-	english = "Show custom reload panel",
-	spanish = "Mostrar panel de recarga",
+module:add_localization_string("_hud_reload_timer", {
+	english = "Show reload timer",
+	spanish = "Mostrar el tiempo de recarga",
+})
+
+module:add_localization_string("_hud_shotgun_fire_timer", {
+	english = "Show shotgun fire timer",
+	spanish = "Mostrar el tiempo de disparo de escopetas",
 })
 
 module:add_localization_string("_hud_yes", {
