@@ -1,18 +1,8 @@
-local is_playing = function()
-	return BaseNetworkHandler._gamestate_filter.any_ingame_playing[game_state_machine:last_queued_state_name()]
-end
-
-local _hud = rawget(_G, "_hud")
-if _hud then
-	_hud._classes["_health_panel"] = {}
-
-	local _health_panel = _hud._classes["_health_panel"]
-
-	function _health_panel:init()
-		if not is_playing() then
-			return
-		end
-
+local _sdk = rawget(_G, "_sdk")
+local _updator = rawget(_G, "_updator")
+if not rawget(_G, "CustomHealthPanel") then
+	rawset(_G, "CustomHealthPanel", {})
+	function CustomHealthPanel:init()
 		self._initialized = true
 		self._visible = false
 
@@ -25,11 +15,11 @@ if _hud then
 
 		self._colors = {
 			_black = Color.black,
-			_name = _hud.conf("_hud_name_color"),
-			_health = _hud.conf("_hud_health_color"),
-			_hurt = _hud.conf("_hud_hurt_color"),
-			_patch = _hud.conf("_hud_patch_color"),
-			_armor = _hud.conf("_hud_armor_color"),
+			_name = D:conf("_hud_name_color"),
+			_health = D:conf("_hud_health_color"),
+			_hurt = D:conf("_hud_hurt_color"),
+			_patch = D:conf("_hud_patch_color"),
+			_armor = D:conf("_hud_armor_color"),
 		}
 
 		self._current_health = 0
@@ -38,12 +28,7 @@ if _hud then
 		self:setup_panels()
 	end
 
-	function _health_panel:setup_panels()
-		if not self._initialized then
-			self:init()
-			return
-		end
-
+	function CustomHealthPanel:setup_panels()
 		self._panel:clear()
 
 		self._hud_ws = self._panel:panel()
@@ -95,7 +80,7 @@ if _hud then
 		})
 
 		local name = peer:name()
-		if _hud.conf("_hud_long_name_splitting") and utf8.len(name) > 16 then
+		if D:conf("_hud_long_name_splitting") and utf8.len(name) > 16 then
 			local words = {}
 			name:gsub("([^%s]+)", function(w)
 				table.insert(words, w)
@@ -174,12 +159,12 @@ if _hud then
 		self:align_panels()
 	end
 
-	function _health_panel:align_panels()
-		_hud.update_text_rect(self._name)
-		_hud.update_text_rect(self._level)
-		_hud.update_text_rect(self._downs)
-		_hud.update_text_rect(self._armor_timer)
-		_hud.update_text_rect(self._raw_armor)
+	function CustomHealthPanel:align_panels()
+		_sdk:update_text_rect(self._name)
+		_sdk:update_text_rect(self._level)
+		_sdk:update_text_rect(self._downs)
+		_sdk:update_text_rect(self._armor_timer)
+		_sdk:update_text_rect(self._raw_armor)
 
 		self._name:set_left(self._mugshot:right() + 4)
 
@@ -227,7 +212,7 @@ if _hud then
 		self._level:set_right(self._health_bg:right())
 	end
 
-	function _health_panel:update_info()
+	function CustomHealthPanel:update_info()
 		if not self._initialized then
 			self:init()
 		end
@@ -240,7 +225,7 @@ if _hud then
 
 		self._panel:set_visible(hud.health_panel:parent():visible())
 
-		local _name_color = _hud.conf("_hud_name_use_peer_color") and tweak_data.chat_colors[self._peer:id()]
+		local _name_color = D:conf("_hud_name_use_peer_color") and tweak_data.chat_colors[self._peer:id()]
 			or self._colors._name
 		self._name:set_color(_name_color)
 
@@ -267,12 +252,12 @@ if _hud then
 
 			self._health_bar:stop()
 			self._health_bar:animate(function(o)
-				_hud:animate_ui(1, function(p)
+				_sdk:animate_ui(1, function(p)
 					o:set_w(math.lerp(o:w(), self._health_bg:w() * health_percentage, p))
 
 					local health_color = ((health_percentage > 0.25) and self._colors._health) or self._colors._hurt
 					local damage_color = lower and self._colors._hurt or self._colors._patch
-					o:set_color(_hud.blend_colors(health_color, damage_color, p))
+					o:set_color(_sdk:blend_colors(health_color, damage_color, p))
 				end)
 
 				o:set_w(self._health_bg:w() * health_percentage)
@@ -283,7 +268,7 @@ if _hud then
 
 		if self._current_armor ~= current_armor then
 			self._armor_bar:animate(function(o)
-				_hud:animate_ui(0.2, function(p)
+				_sdk:animate_ui(0.2, function(p)
 					o:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 					self._alternative_armor_bar:set_w(math.lerp(o:w(), self._health_bg:w() * armor_percentage, p))
 				end)
@@ -294,13 +279,13 @@ if _hud then
 			self._current_armor = current_armor
 		end
 
-		self._use_alt_armor = _hud.conf("_hud_use_alt_armor")
+		self._use_alt_armor = D:conf("_hud_use_alt_armor")
 
 		self._armor_bar:set_visible(not self._use_alt_armor)
 		self._armor_bg:set_visible(self._use_alt_armor)
 		self._alternative_armor_bar:set_visible(self._use_alt_armor)
 
-		self._raw_armor:set_visible(_hud.conf("_hud_enable_raw_armor_text"))
+		self._raw_armor:set_visible(D:conf("_hud_enable_raw_armor_text"))
 		self._raw_armor:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
 
 		local regen_timer = p_damage._regenerate_timer
@@ -308,7 +293,7 @@ if _hud then
 			self._armor_timer:set_text(string.format("%.2fs", regen_timer))
 		end
 
-		self._armor_timer:set_visible((type(regen_timer) == "number") and _hud.conf("_hud_enable_armor_timer"))
+		self._armor_timer:set_visible((type(regen_timer) == "number") and D:conf("_hud_enable_armor_timer"))
 
 		-- we use dahm down counter instead of implementing a custom one.
 		self._downs:set_text(managers.hud._hud_health_downs:text())
@@ -316,7 +301,7 @@ if _hud then
 		self:align_panels()
 	end
 
-	function _health_panel:update_mugshot()
+	function CustomHealthPanel:update_mugshot()
 		self._workspace_width = self._workspace_width or self._hud_ws:w()
 
 		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
@@ -353,7 +338,7 @@ if _hud then
 
 		if state then
 			self._hud_ws:animate(function(o)
-				_hud:animate_ui(2, function(p)
+				_sdk:animate_ui(2, function(p)
 					o:set_w(math.lerp(o:w(), self._mugshot:w() + 8, p))
 				end)
 			end)
@@ -364,7 +349,7 @@ if _hud then
 			self._state_icon:set_image(icon, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
 
 			self._state_icon:animate(function(o)
-				_hud:animate_ui(2, function(p)
+				_sdk:animate_ui(2, function(p)
 					o:set_alpha(math.lerp(0, 1, p))
 					self._mugshot:set_alpha(math.lerp(1, 0.5, p))
 				end)
@@ -373,20 +358,20 @@ if _hud then
 		end
 
 		self._state_icon:animate(function(o)
-			_hud:animate_ui(2, function(p)
+			_sdk:animate_ui(2, function(p)
 				o:set_alpha(math.lerp(1, 0, p))
 				self._mugshot:set_alpha(math.lerp(0.5, 1, p))
 			end)
 		end)
 
 		self._hud_ws:animate(function(o)
-			_hud:animate_ui(2, function(p)
+			_sdk:animate_ui(2, function(p)
 				o:set_w(math.lerp(o:w(), self._workspace_width, p))
 			end)
 		end)
 	end
 
-	function _health_panel:anim_take_damage()
+	function CustomHealthPanel:anim_take_damage()
 		local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
 		if not hud then
 			return
@@ -395,7 +380,7 @@ if _hud then
 		self._gradient:animate(hud.mugshot_damage_taken)
 	end
 
-	function _health_panel:layout_mugshots()
+	function CustomHealthPanel:layout_mugshots()
 		if not managers.hud then
 			return
 		end
@@ -421,7 +406,7 @@ if _hud then
 		end
 	end
 
-	function _health_panel:layout_chat()
+	function CustomHealthPanel:layout_chat()
 		if not managers.hud then
 			return
 		end
@@ -451,7 +436,7 @@ if _hud then
 		end
 	end
 
-	function _health_panel:update()
+	function CustomHealthPanel:update()
 		if not self._initialized then
 			self:init()
 			return
@@ -462,6 +447,14 @@ if _hud then
 		self:layout_mugshots()
 		self:layout_chat()
 	end
+	
+	_updator:add(function()
+		if not _sdk:is_playing() then
+			return
+		end
+
+		CustomHealthPanel:update()
+	end, "_hud_health_update")
 end
 
 local module = ... or D:module("_hud")
@@ -470,13 +463,11 @@ if RequiredScript == "lib/units/beings/player/playerdamage" then
 	local PlayerDamage = module:hook_class("PlayerDamage")
 	for _, func in pairs({ "damage_bullet", "damage_killzone", "damage_explosion" }) do
 		module:post_hook(50, PlayerDamage, func, function(...)
-			local _hud = rawget(_G, "_hud")
-			if _hud then
-				local _health_panel = _hud:get_class("_health_panel")
-				if _health_panel then
-					_health_panel:anim_take_damage()
-				end
-			end
+			-- if not health_panel._initialized then
+				-- CustomHealthPanel:init()
+				-- return
+			-- end
+			CustomHealthPanel:anim_take_damage()
 		end, false)
 	end
 end

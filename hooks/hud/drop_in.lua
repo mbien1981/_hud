@@ -1,7 +1,13 @@
-if not rawget(_G, "_drop_in") then
-	rawset(_G, "_drop_in", {})
+local _sdk = rawget(_G, "_sdk")
 
-	function _drop_in:init()
+if not rawget(_G, "CustomDropInPanel") then
+	rawset(_G, "CustomDropInPanel", {})
+
+	function CustomDropInPanel:init()
+		if not _sdk:is_playing() then
+			return
+		end
+
 		self._initialized = true
 		self._active = false
 		self._peers = {}
@@ -23,7 +29,7 @@ if not rawget(_G, "_drop_in") then
 		self:setup_panels()
 	end
 
-	function _drop_in:setup_panels()
+	function CustomDropInPanel:setup_panels()
 		self._panel:clear()
 
 		self._hud_ws = self._panel:panel()
@@ -69,12 +75,11 @@ if not rawget(_G, "_drop_in") then
 		self:align_panels()
 	end
 
-	function _drop_in:align_panels()
-		local _hud = rawget(_G, "_hud")
-		_hud.update_text_rect(self._percentage_text)
-		_hud.update_text_rect(self._peer_joining_text)
-		_hud.update_text_rect(self._peer_info_text)
-		_hud.update_text_rect(self._peer_mod_list)
+	function CustomDropInPanel:align_panels()
+		_sdk:update_text_rect(self._percentage_text)
+		_sdk:update_text_rect(self._peer_joining_text)
+		_sdk:update_text_rect(self._peer_info_text)
+		_sdk:update_text_rect(self._peer_mod_list)
 
 		self._percentage_text:set_center(self._hud_ws:center())
 
@@ -87,7 +92,7 @@ if not rawget(_G, "_drop_in") then
 		self._peer_mod_list:set_righttop(self._hud_ws:righttop())
 	end
 
-	function _drop_in:open(id)
+	function CustomDropInPanel:open(id)
 		if not self._initialized then
 			self:init()
 		end
@@ -109,7 +114,7 @@ if not rawget(_G, "_drop_in") then
 		self._background:stop()
 		self._background:animate(function(o)
 			o:show()
-			_G._hud:animate_ui(1, function(p)
+			_sdk:animate_ui(1, function(p)
 				o:set_alpha(math.lerp(o:alpha(), 0.75, p))
 			end)
 		end)
@@ -122,8 +127,7 @@ if not rawget(_G, "_drop_in") then
 		self:align_panels()
 	end
 
-	function _drop_in:update_peer(id, progress, time_left)
-		local _hud = rawget(_G, "_hud")
+	function CustomDropInPanel:update_peer(id, progress, time_left)
 		if not self._active then
 			self:open(id)
 		end
@@ -136,7 +140,7 @@ if not rawget(_G, "_drop_in") then
 			self._background:stop()
 			self._background:animate(function(o)
 				o:show()
-				_hud:animate_ui(1, function(p)
+				_sdk:animate_ui(1, function(p)
 					o:set_alpha(math.lerp(o:alpha(), 0.75, p))
 				end)
 			end)
@@ -147,7 +151,7 @@ if not rawget(_G, "_drop_in") then
 			string.format("%s %d%% (%.2fs)", managers.localization:text("dialog_wait"), progress, time_left)
 		)
 
-		self._peer_info_text:set_visible(_hud.conf("_hud_drop_in_show_peer_info"))
+		self._peer_info_text:set_visible(D:conf("_hud_drop_in_show_peer_info"))
 
 		local peer = managers.network:session():peer(id)
 		local deployable = managers.player:get_synced_kit_selection(peer:id(), "deployable")
@@ -179,8 +183,7 @@ if not rawget(_G, "_drop_in") then
 		self:align_panels()
 	end
 
-	function _drop_in:close(id)
-		local _hud = rawget(_G, "_hud")
+	function CustomDropInPanel:close(id)
 		if not self._initialized then
 			self:init()
 			return
@@ -192,7 +195,7 @@ if not rawget(_G, "_drop_in") then
 
 		self._background:stop()
 		self._background:animate(function(o)
-			_hud:animate_ui(1, function(p)
+			_sdk:animate_ui(1, function(p)
 				o:set_alpha(math.lerp(o:alpha(), 0, p))
 			end)
 			o:hide()
@@ -209,11 +212,11 @@ if not rawget(_G, "_drop_in") then
 	end
 end
 
+-- * hooking
 local module = ... or D:module("_hud")
-
 local MenuManager = module:hook_class("MenuManager")
 module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
-	if not _hud or (_hud and not _hud.conf("_hud_use_custom_drop_in_panel")) then
+	if not D:conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "show_person_joining", self, id, nick)
 		return
 	end
@@ -221,10 +224,7 @@ module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
 	self.peer_join_start_t = self.peer_join_start_t or {}
 	self.peer_join_start_t[id] = os.clock()
 
-	local _drop_in = rawget(_G, "_drop_in")
-	if _drop_in then
-		_drop_in:open(id)
-	end
+	CustomDropInPanel:open(id)
 end, false)
 
 module:hook(50, MenuManager, "close_person_joining", function(self, id)
@@ -232,8 +232,7 @@ module:hook(50, MenuManager, "close_person_joining", function(self, id)
 		self.peer_join_start_t[id] = nil
 	end
 
-	local _hud = rawget(_G, "_hud")
-	if not _hud or (_hud and not _hud.conf("_hud_use_custom_drop_in_panel")) then
+	if D:conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "close_person_joining", self, id)
 		return
 	end
@@ -244,24 +243,13 @@ module:hook(50, MenuManager, "close_person_joining", function(self, id)
 		dlg = nil
 	end
 
-	local _drop_in = rawget(_G, "_drop_in")
-	if _drop_in then
-		_drop_in:close(id)
-	end
+	CustomDropInPanel:close(id)
 end, false)
 
 module:hook(50, MenuManager, "update_person_joining", function(self, id, progress)
-	local _hud = rawget(_G, "_hud")
-	local _drop_in = rawget(_G, "_drop_in")
-
-	if not _hud then
-		module:call_orig(MenuManager, "update_person_joining", self, id, progress)
-		return
-	end
-
-	if not _hud.conf("_hud_use_custom_drop_in_panel") then
-		if _drop_in and _drop_in._active then
-			_drop_in:close(id)
+	if not D:conf("_hud_use_custom_drop_in_panel") then
+		if CustomDropInPanel._active then
+			CustomDropInPanel:close(id)
 
 			local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
 			if not dlg then
@@ -283,32 +271,27 @@ module:hook(50, MenuManager, "update_person_joining", function(self, id, progres
 		local t = os.clock() - self.peer_join_start_t[id]
 		local time_left = (t / progress) * (100 - progress)
 
-		if _drop_in then
-			_drop_in:update_peer(id, progress, time_left)
-		end
+		CustomDropInPanel:update_peer(id, progress, time_left)
 	end
 end, false)
 
 -- https://gist.github.com/zneix/fb99059520fe94cfcfaaefe8d02af6db#file-user-lua-L739
-D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, function(peer, data_type, data)
-	local _hud = rawget(_G, "_hud")
-	local _drop_in = rawget(_G, "_drop_in")
-	if not _hud or not _drop_in or type(data) ~= "table" then
+D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, function(peer, _, data)
+	if type(data) ~= "table" then
 		return
 	end
 
-	if not _drop_in._initialized then
-		_drop_in:init()
+	if not CustomDropInPanel._initialized then
+		CustomDropInPanel:init()
 	end
 
 	local mod_list_str = ""
-
-	local whitelist = _hud.conf("_hud_mod_whitelist") or {}
+	local whitelist = D:conf("_hud_mod_whitelist") or {}
 	for k, _ in pairs(data) do
 		if not whitelist[k] then
 			mod_list_str = string.format("%s\n%s", mod_list_str, k)
 		end
 	end
 
-	_drop_in._peer_mods[peer:id()] = mod_list_str
+	CustomDropInPanel._peer_mods[peer:id()] = mod_list_str
 end)

@@ -25,7 +25,7 @@ module:add_localization_string("_hud_use_alt_armor", {
 	spanish = "Estilo alternativo para la barra de armadura",
 })
 
-module:add_localization_string("_hud_enable_raw_armor_text", {
+module:add_localization_string("_hud_use_alt_armor_help", {
 	english = "Shows your armor bar in a completely separated bar",
 	spanish = "Muestra tu armadura en una barra separada a la barra de vida.",
 })
@@ -73,6 +73,11 @@ module:add_localization_string("_hud_drop_in_show_peer_info_help", {
 module:add_localization_string("_hud_mod_list_title", {
 	english = "Gameplay altering mods:%s",
 	spanish = "Mods que alteran el juego:%s",
+})
+
+module:add_localization_string("_hud_reload_panel", {
+	english = "Show custom reload panel",
+	spanish = "Mostrar panel de recarga",
 })
 
 module:add_localization_string("_hud_yes", {

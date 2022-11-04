@@ -7,6 +7,8 @@ module:add_config_option("_hud_enable_armor_timer", false)
 module:add_config_option("_hud_enable_raw_armor_text", false)
 module:add_config_option("_hud_use_custom_drop_in_panel", true)
 module:add_config_option("_hud_drop_in_show_peer_info", true)
+module:add_config_option("_hud_enable_kill_feed", true)
+module:add_config_option("_hud_kill_feed_max_rows", 6)
 module:add_config_option("_hud_mod_whitelist", {
 	["ovk_193"] = true,
 	["crybaby"] = true,
@@ -24,13 +26,13 @@ module:add_config_option("_hud_hurt_color", Color("b8392e"))
 module:add_config_option("_hud_patch_color", Color(0.5, 1, 0.5))
 module:add_config_option("_hud_armor_color", Color("1e90ff"))
 
+-- menu nodes
 module:add_menu_option("_hud_name_use_peer_color", {
 	type = "boolean",
 	text_id = "_hud_name_use_peer_color",
 	help_id = "_hud_name_use_peer_color_help",
 	localize = true,
 })
-
 module:add_menu_option("_hud_long_name_splitting", {
 	type = "boolean",
 	text_id = "_hud_long_name_splitting",
@@ -38,20 +40,19 @@ module:add_menu_option("_hud_long_name_splitting", {
 	localize = true,
 })
 
+module:add_menu_option("_hud_armor_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_use_alt_armor", {
 	type = "boolean",
 	text_id = "_hud_use_alt_armor",
 	help_id = "_hud_use_alt_armor_help",
 	localize = true,
 })
-
 module:add_menu_option("_hud_enable_armor_timer", {
 	type = "boolean",
 	text_id = "_hud_enable_armor_timer",
 	help_id = "_hud_enable_armor_timer_help",
 	localize = true,
 })
-
 module:add_menu_option("_hud_enable_raw_armor_text", {
 	type = "boolean",
 	text_id = "_hud_enable_raw_armor_text",
@@ -59,6 +60,7 @@ module:add_menu_option("_hud_enable_raw_armor_text", {
 	localize = true,
 })
 
+module:add_menu_option("_hud_drop_in_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_use_custom_drop_in_panel", {
 	type = "boolean",
 	text_id = "_hud_use_custom_drop_in_panel",
@@ -69,5 +71,12 @@ module:add_menu_option("_hud_drop_in_show_peer_info", {
 	type = "boolean",
 	text_id = "_hud_drop_in_show_peer_info",
 	help_id = "_hud_drop_in_show_peer_info_help",
+	localize = true,
+})
+
+module:add_menu_option("_hud_reload_panel_divider", { type = "divider", size = 15 })
+module:add_menu_option("_hud_reload_panel", {
+	type = "boolean",
+	text_id = "_hud_reload_panel",
 	localize = true,
 })

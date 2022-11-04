@@ -1,6 +1,7 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
+	dependency = "_sdk",
 	includes = {
 		{ "mod_localization", { type = "localization" } },
 		{ "mod_options", { type = "menu_options" } },
@@ -19,8 +20,12 @@ module:hook_post_require("lib/setups/setup", "hooks/lib/gui_data/setup")
 
 -- * hud
 module:hook_post_require("lib/managers/menumanager", "hooks/hud/_drop_in")
-module:hook_post_require("lib/managers/hudmanager", "hooks/hud/_hud")
+
+module:hook_post_require("lib/managers/hudmanager", "hooks/hud/reload_timer")
+
 module:hook_post_require("lib/managers/hudmanager", "hooks/hud/health_bar")
 module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/hud/health_bar")
+
+module:hook_post_require("lib/setups/gamesetup", "hooks/hud/deployable_spy")
 
 return module
