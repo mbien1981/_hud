@@ -1,9 +1,8 @@
-local _sdk = rawget(_G, "_sdk")
-
 if not rawget(_G, "CustomDropInPanel") then
 	rawset(_G, "CustomDropInPanel", {})
 
 	function CustomDropInPanel:init()
+		local _sdk = rawget(_G, "_sdk")
 		if not _sdk:is_playing() then
 			return
 		end
@@ -11,7 +10,7 @@ if not rawget(_G, "CustomDropInPanel") then
 		self._initialized = true
 		self._active = false
 		self._peers = {}
-		self._peer_mods = {}
+		self._peer_mods = self._peer_mods or {}
 
 		self._ws = managers.gui_data:create_fullscreen_workspace()
 		self._panel = self._ws:panel():panel({
@@ -76,6 +75,7 @@ if not rawget(_G, "CustomDropInPanel") then
 	end
 
 	function CustomDropInPanel:align_panels()
+		local _sdk = rawget(_G, "_sdk")
 		_sdk:update_text_rect(self._percentage_text)
 		_sdk:update_text_rect(self._peer_joining_text)
 		_sdk:update_text_rect(self._peer_info_text)
@@ -137,6 +137,7 @@ if not rawget(_G, "CustomDropInPanel") then
 		end
 
 		if not self._background:visible() then
+			local _sdk = rawget(_G, "_sdk")
 			self._background:stop()
 			self._background:animate(function(o)
 				o:show()
@@ -193,6 +194,7 @@ if not rawget(_G, "CustomDropInPanel") then
 		self._peers[id] = nil
 		self._peer_mods[id] = nil
 
+		local _sdk = rawget(_G, "_sdk")
 		self._background:stop()
 		self._background:animate(function(o)
 			_sdk:animate_ui(1, function(p)
@@ -232,7 +234,7 @@ module:hook(50, MenuManager, "close_person_joining", function(self, id)
 		self.peer_join_start_t[id] = nil
 	end
 
-	if D:conf("_hud_use_custom_drop_in_panel") then
+	if not D:conf("_hud_use_custom_drop_in_panel") then
 		module:call_orig(MenuManager, "close_person_joining", self, id)
 		return
 	end
@@ -281,8 +283,13 @@ D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, funct
 		return
 	end
 
-	if not CustomDropInPanel._initialized then
-		CustomDropInPanel:init()
+	local drop_in = rawget(_G, "CustomDropInPanel")
+	if not drop_in then
+		return
+	end
+
+	if not drop_in._initialized then
+		drop_in:init()
 	end
 
 	local mod_list_str = ""
@@ -293,5 +300,6 @@ D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, funct
 		end
 	end
 
-	CustomDropInPanel._peer_mods[peer:id()] = mod_list_str
+	drop_in._peer_mods = drop_in._peer_mods or {}
+	drop_in._peer_mods[peer:id()] = mod_list_str
 end)
