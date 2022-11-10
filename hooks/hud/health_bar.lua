@@ -53,13 +53,13 @@ if not rawget(_G, "CustomHealthPanel") then
 		local image, rect = tweak_data.hud_icons:get_icon_data(mugshot)
 
 		self._gradient = self._hud_ws:gradient({
-			layer = 0,
 			gradient_points = {
 				0,
 				Color(0.4, 0, 0, 0),
 				1,
 				Color(0, 0, 0, 0),
 			},
+			layer = -1,
 		})
 
 		self._mugshot = self._hud_ws:bitmap({
@@ -97,6 +97,7 @@ if not rawget(_G, "CustomHealthPanel") then
 			text = name,
 			font = "fonts/font_univers_530_bold",
 			font_size = 22,
+			layer = 1,
 			x = 4,
 			y = 4,
 		})
@@ -105,6 +106,7 @@ if not rawget(_G, "CustomHealthPanel") then
 			text = "0",
 			font = "fonts/font_univers_530_bold",
 			font_size = 16,
+			layer = 1,
 			x = 4,
 			y = 4,
 		})
@@ -121,7 +123,7 @@ if not rawget(_G, "CustomHealthPanel") then
 			color = self._colors._armor,
 			font = "fonts/font_univers_530_bold",
 			font_size = 14 * tweak_data.scale.hud_mugshot_multiplier,
-			layer = 2,
+			layer = 1,
 			visible = false,
 		})
 
@@ -130,28 +132,32 @@ if not rawget(_G, "CustomHealthPanel") then
 			color = self._colors._armor,
 			font = "fonts/font_univers_530_bold",
 			font_size = 14 * tweak_data.scale.hud_mugshot_multiplier,
-			layer = 2,
+			layer = 1,
 			visible = false,
 		})
 
 		self._health_bg = self._hud_ws:rect({
 			color = self._colors._black,
+			layer = 1,
 			h = 8,
 		})
-		self._health_bar = self._hud_ws:rect({ h = 8, w = 0 })
+		self._health_bar = self._hud_ws:rect({ layer = 2, h = 8, w = 0 })
 
 		self._armor_bar = self._hud_ws:rect({
 			color = self._colors._armor,
+			layer = 3,
 			w = 0,
 			h = 2,
 		})
 
 		self._armor_bg = self._hud_ws:rect({
 			color = self._colors._black,
+			layer = 1,
 			h = 8,
 		})
 		self._alternative_armor_bar = self._hud_ws:rect({
 			color = self._colors._armor,
+			layer = 2,
 			h = 8,
 			w = 0,
 		})
@@ -447,7 +453,7 @@ if not rawget(_G, "CustomHealthPanel") then
 		self:layout_mugshots()
 		self:layout_chat()
 	end
-	
+
 	_updator:add(function()
 		if not _sdk:is_playing() then
 			return
