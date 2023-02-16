@@ -123,6 +123,7 @@ if not rawget(_G, "DeployableSpy") then
 
 		local camera = self:get_camera()
 		if not camera then
+			item.text:set_alpha(0)
 			return
 		end
 
@@ -166,10 +167,6 @@ if not rawget(_G, "DeployableSpy") then
 	end
 
 	function DeployableSpy:update()
-		if not (self:get_camera()) then
-			return
-		end
-
 		if not next(self._deployables) then
 			return
 		end
