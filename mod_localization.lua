@@ -1,5 +1,15 @@
 local module = ... or D:module("_hud")
 
+module:add_localization_string("_hud_scaling", {
+	english = "HUD Scale",
+	spanish = "Escala del HUD",
+})
+
+module:add_localization_string("_hud_font_scaling", {
+	english = "HUD Font Scale",
+	spanish = "Escala de la fuente del HUD",
+})
+
 module:add_localization_string("_hud_long_name_splitting", {
 	english = "Display short player name",
 	spanish = "Mostrar nombre de usuario recortado",

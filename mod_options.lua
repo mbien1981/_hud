@@ -1,5 +1,8 @@
 local module = ... or D:module("_hud")
 
+module:add_config_option("_hud_scaling", 1.2)
+module:add_config_option("_hud_font_scaling", 1.2)
+
 module:add_config_option("_hud_name_use_peer_color", false)
 module:add_config_option("_hud_long_name_splitting", true)
 module:add_config_option("_hud_use_alt_armor", false)
@@ -27,6 +30,26 @@ module:add_config_option("_hud_patch_color", Color(0.5, 1, 0.5))
 module:add_config_option("_hud_armor_color", Color("1e90ff"))
 
 -- menu nodes
+module:add_menu_option("_hud_scaling", {
+	type = "slider",
+	min = 0.5,
+	max = 5.0,
+	step = 0.05,
+	value_accuracy = 2,
+	show_value = true,
+	text_id = "_hud_scaling",
+})
+module:add_menu_option("_hud_font_scaling", {
+	type = "slider",
+	min = 0.5,
+	max = 5.0,
+	step = 0.05,
+	value_accuracy = 2,
+	show_value = true,
+	text_id = "_hud_font_scaling",
+})
+
+module:add_menu_option("_hud_health_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_name_use_peer_color", {
 	type = "boolean",
 	text_id = "_hud_name_use_peer_color",
