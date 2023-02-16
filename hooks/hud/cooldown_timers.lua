@@ -61,7 +61,8 @@ if not rawget(_G, "CustomTimerPanel") then
 	end
 
 	function CustomTimerPanel:update_gui(show)
-		if self._max_t and show then
+		local ct = self._current_timer and self._current_timer >= -0.5
+		if ct and self._max_t and show then
 			self._panel:show()
 
 			self._timer_text:set_text(string.format("%.2fs", self._current_timer))
