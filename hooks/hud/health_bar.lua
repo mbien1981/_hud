@@ -31,15 +31,10 @@ function TestHealthPanel:init()
 		panel = hud_scale * font_scale * 0.75,
 	}
 
+	self._sdk = _G._sdk
+
 	self:setup_panels()
-
-	_G._updator:add(function()
-		if not _G._sdk:is_playing() then
-			return
-		end
-
-		self:update()
-	end, "_hud_health_update")
+	_G._updator:add(callback(self, self, "update"), "_hud_health_update")
 end
 
 function TestHealthPanel:setup_panels()
@@ -176,11 +171,11 @@ function TestHealthPanel:create_health_and_armor()
 end
 
 function TestHealthPanel:_layout()
-	_G._sdk:update_text_rect(self._player_downs)
-	_G._sdk:update_text_rect(self._player_name)
-	_G._sdk:update_text_rect(self._player_level)
-	_G._sdk:update_text_rect(self._armor_regen_timer)
-	_G._sdk:update_text_rect(self._armor_value)
+	self._sdk:update_text_rect(self._player_downs)
+	self._sdk:update_text_rect(self._player_name)
+	self._sdk:update_text_rect(self._player_level)
+	self._sdk:update_text_rect(self._armor_regen_timer)
+	self._sdk:update_text_rect(self._armor_value)
 
 	self.main_panel:set_w((self._mugshot:w() + 8) + (176 * self.scales.panel))
 	self.main_panel:set_h(self._mugshot:h() + 8)
@@ -301,12 +296,12 @@ function TestHealthPanel:update_health_and_armor()
 
 		self._health_bar:stop()
 		self._health_bar:animate(function(o)
-			_G._sdk:animate_ui(1, function(p)
+			self._sdk:animate_ui(1, function(p)
 				o:set_w(math.lerp(o:w(), self._health_background:w() * health_percentage, p))
 
 				local health_color = ((health_percentage > 0.25) and self.colors.health) or self.colors.hurt
 				local damage_color = lower and self.colors.hurt or self.colors.patch
-				o:set_color(_G._sdk:blend_colors(health_color, damage_color, p))
+				o:set_color(self._sdk:blend_colors(health_color, damage_color, p))
 			end)
 
 			o:set_w(self._health_bg:w() * health_percentage)
@@ -317,7 +312,7 @@ function TestHealthPanel:update_health_and_armor()
 
 	if self.data.current_armor ~= current_armor then
 		self._armor_bar:animate(function(o)
-			_G._sdk:animate_ui(0.2, function(p)
+			self._sdk:animate_ui(0.2, function(p)
 				o:set_w(math.lerp(o:w(), self._armor_background:w() * armor_percentage, p))
 				self._alternative_armor_bar:set_w(math.lerp(o:w(), self._armor_background:w() * armor_percentage, p))
 			end)
@@ -378,7 +373,7 @@ function TestHealthPanel:update_mugshot()
 
 	if state then
 		self.main_panel:animate(function(o)
-			_G._sdk:animate_ui(2, function(p)
+			self._sdk:animate_ui(2, function(p)
 				o:set_w(math.lerp(o:w(), self._mugshot:w() + 8, p))
 			end)
 		end)
@@ -389,7 +384,7 @@ function TestHealthPanel:update_mugshot()
 		self._mugshot_status:set_image(icon, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
 
 		self._mugshot_status:animate(function(o)
-			_G._sdk:animate_ui(2, function(p)
+			self._sdk:animate_ui(2, function(p)
 				o:set_alpha(math.lerp(0, 1, p))
 				self._mugshot:set_alpha(math.lerp(1, 0.5, p))
 			end)
@@ -398,14 +393,14 @@ function TestHealthPanel:update_mugshot()
 	end
 
 	self._mugshot_status:animate(function(o)
-		_G._sdk:animate_ui(2, function(p)
+		self._sdk:animate_ui(2, function(p)
 			o:set_alpha(math.lerp(1, 0, p))
 			self._mugshot:set_alpha(math.lerp(0.5, 1, p))
 		end)
 	end)
 
 	self.main_panel:animate(function(o)
-		_G._sdk:animate_ui(2, function(p)
+		self._sdk:animate_ui(2, function(p)
 			o:set_w(math.lerp(o:w(), self._workspace_width, p))
 		end)
 	end)
@@ -468,6 +463,10 @@ function TestHealthPanel:layout_vanilla_chat()
 end
 
 function TestHealthPanel:update()
+	if not self._sdk:is_playing() then
+		return
+	end
+
 	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
 	if not hud then
 		return self._panel:hide()
