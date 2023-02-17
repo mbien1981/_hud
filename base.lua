@@ -9,12 +9,6 @@ local module = DMod:new("_hud", {
 	},
 })
 
-rawset(_G, "_hud_path", ModPath)
-
-D:register_keybind("_hud_debug", "f2", function()
-	dofile(_hud_path .. "binds/debug.lua")
-end)
-
 -- * libs
 module:hook_pre_require("lib/entry", "hooks/lib/gui_data/gui_data")
 module:hook_post_require("lib/setups/setup", "hooks/lib/gui_data/setup")
