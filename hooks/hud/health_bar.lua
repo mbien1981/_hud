@@ -224,15 +224,19 @@ function TestHealthPanel:get_player_name()
 	local name = self.data.peer:name()
 	if D:conf("_hud_long_name_splitting") and utf8.len(name) > 16 then
 		local words = {}
-		name:gsub("([^%s]+)", function(w)
+		name:gsub("([^%s_%-+]+)", function(w)
 			table.insert(words, w)
 		end)
 
-		table.sort(words, function(a, b)
-			return #a > #b
-		end)
-
-		name = words[1]
+		local longest_n, longest_i = 0, 1
+		for i = 1, #words do
+			local n = #words[i]
+			if n > longest_n then
+				longest_i = i
+				longest_n = n
+			end
+		end
+		name = words[longest_i]
 	end
 
 	return name
