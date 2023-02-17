@@ -60,7 +60,7 @@ if not rawget(_G, "DeployableSpy") then
 		self._ws = managers.gui_data:create_fullscreen_workspace()
 		self._panel = self._ws:panel():panel({
 			name = "bag_spy_panel",
-			layer = 0,
+			layer = -100,
 			alpha = 1,
 			visible = true,
 		})
