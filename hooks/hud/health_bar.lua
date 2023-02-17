@@ -110,7 +110,7 @@ function TestHealthPanel:create_player_data()
 	self._player_level = self.main_panel:text({
 		text = "0",
 		font = self.font,
-		font_size = 14 * self.scales.hud * self.scales.font,
+		font_size = 11 * self.scales.hud * self.scales.font, -- 12 is still to big imo
 		layer = 1,
 		x = 4,
 		y = 4,
@@ -119,7 +119,7 @@ function TestHealthPanel:create_player_data()
 	self._player_downs = self.main_panel:text({
 		text = "0",
 		font = self.font,
-		font_size = 14 * self.scales.hud * self.scales.font,
+		font_size = 11 * self.scales.hud * self.scales.font,
 		layer = 2,
 	})
 
@@ -128,7 +128,7 @@ function TestHealthPanel:create_player_data()
 		text = "0",
 		color = self.colors.armor,
 		font = self.font,
-		font_size = 14 * self.scales.hud * self.scales.font,
+		font_size = 11 * self.scales.hud * self.scales.font,
 		layer = 1,
 	})
 
@@ -136,7 +136,7 @@ function TestHealthPanel:create_player_data()
 		text = "0.00s",
 		color = self.colors.armor,
 		font = self.font,
-		font_size = 14 * self.scales.hud * self.scales.font,
+		font_size = 11 * self.scales.hud * self.scales.font,
 		layer = 1,
 	})
 end
@@ -262,11 +262,11 @@ function TestHealthPanel:update_scaling()
 	self._mugshot_status:set_w(self.data.mugshot_status_rect[3] * self.scales.panel)
 	self._mugshot_status:set_h(self.data.mugshot_status_rect[4] * self.scales.panel)
 
-	self._player_downs:set_font_size(14 * self.scales.hud * self.scales.font)
+	self._player_downs:set_font_size(11 * self.scales.hud * self.scales.font)
 	self._player_name:set_font_size(14 * self.scales.hud * self.scales.font)
-	self._player_level:set_font_size(14 * self.scales.hud * self.scales.font)
-	self._armor_regen_timer:set_font_size(14 * self.scales.hud * self.scales.font)
-	self._armor_value:set_font_size(14 * self.scales.hud * self.scales.font)
+	self._player_level:set_font_size(11 * self.scales.hud * self.scales.font)
+	self._armor_regen_timer:set_font_size(11 * self.scales.hud * self.scales.font)
+	self._armor_value:set_font_size(11 * self.scales.hud * self.scales.font)
 end
 
 function TestHealthPanel:update_player_data()
@@ -331,7 +331,7 @@ function TestHealthPanel:update_health_and_armor()
 	self._alternative_armor_bar:set_visible(use_alt_armor)
 
 	self._armor_value:set_visible(D:conf("_hud_enable_raw_armor_text"))
-	self._armor_value:set_text(string.format("%.02f", p_damage._armor * 10 or 0))
+	self._armor_value:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
 
 	local regen_timer = p_damage._regenerate_timer
 	if regen_timer then
