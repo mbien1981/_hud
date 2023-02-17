@@ -16,7 +16,7 @@ module:hook_post_require("lib/setups/setup", "hooks/lib/gui_data/setup")
 -- * hud
 module:hook_post_require("lib/managers/menumanager", "hooks/hud/drop_in")
 
-module:hook_post_require("lib/managers/hudmanager", "hooks/hud/cooldown_timers")
+module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/state_timer")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/health_bar")
 module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/hud/health_bar")
