@@ -324,6 +324,9 @@ function TestHealthPanel:update_health_and_armor()
 		self.data.current_armor = current_armor
 	end
 
+	-- we use the dahm down counter instead of implementing a custom one.
+	self._player_downs:set_text(managers.hud._hud_health_downs:text())
+
 	local use_alt_armor = D:conf("_hud_use_alt_armor")
 
 	self._armor_bar:set_visible(not use_alt_armor)
