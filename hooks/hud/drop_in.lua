@@ -139,9 +139,7 @@ function CustomDropInClass:update_peer(peer_id, progress, time_left)
 		local mod_list = self.data.mods[peer:id()]
 		if mod_list and (mod_list ~= "") then
 			self._peer_mods:show()
-			self._peer_mods:set_text(
-				string.format(managers.localization:text("_hud_mod_list_title"), mod_list)
-			)
+			self._peer_mods:set_text(string.format(managers.localization:text("_hud_mod_list_title"), mod_list))
 		end
 	end
 
