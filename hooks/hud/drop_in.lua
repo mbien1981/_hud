@@ -254,10 +254,6 @@ if RequiredScript == "lib/managers/menumanager" then
 			return
 		end
 
-		if not drop_in then
-			return
-		end
-
 		local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
 		if dlg then
 			managers.system_menu:close("user_dropin" .. id)
@@ -280,10 +276,6 @@ if RequiredScript == "lib/managers/menumanager" then
 			return
 		end
 
-		if not drop_in then
-			return
-		end
-
 		self.peer_join_start_t = self.peer_join_start_t or {}
 		self.peer_join_start_t[id] = os.clock()
 
@@ -298,10 +290,6 @@ if RequiredScript == "lib/managers/menumanager" then
 		local drop_in = rawget(_G, "CustomDropInPanel")
 		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
 			module:call_orig(MenuManager, "close_person_joining", self, id)
-			return
-		end
-
-		if not drop_in then
 			return
 		end
 
