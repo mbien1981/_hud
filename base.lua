@@ -21,6 +21,9 @@ module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/state_
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/health_bar")
 module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/hud/health_bar")
 
-module:hook_post_require("lib/setups/gamesetup", "hooks/hud/deployable_spy")
+module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/deployable_spy")
+module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/hud/deployable_spy")
+module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/hud/deployable_spy")
+module:hook_post_require("lib/units/equipment/sentry_gun/sentrygunbase", "hooks/hud/deployable_spy")
 
 return module
