@@ -64,7 +64,7 @@ function TestHealthPanel:create_mugshot()
 
 	local mask_id = mugshot_ids[managers.criminals:local_character_name()]
 	local mask_set = tweak_data.mask_sets[self.data.peer:mask_set()][mask_id]
-	local image, texture_rect = tweak_data.hud_icons:get_icon_data(mask_set and mask_set.mask_icon or "mask_clown2")
+	local image, texture_rect = tweak_data.hud_icons:get_icon_data(mask_set and mask_set.mask_icon or "mugshot_random")
 	self._mugshot = self.main_panel:bitmap({
 		texture = image,
 		texture_rect = texture_rect,
@@ -273,7 +273,10 @@ function TestHealthPanel:update_player_data()
 	self._player_name:set_color(self:get_name_color())
 
 	self._player_level:set_text(
-		managers.experience[D:conf("hud_prefer_virtual_reps") and "current_virtual_level" or "current_level"](managers.experience, true)
+		managers.experience[D:conf("hud_prefer_virtual_reps") and "current_virtual_level" or "current_level"](
+			managers.experience,
+			true
+		)
 	)
 end
 
