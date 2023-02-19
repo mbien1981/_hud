@@ -9,11 +9,6 @@ local module = DMod:new("_hud", {
 	},
 })
 
--- * libs
-module:hook_pre_require("lib/entry", "hooks/lib/gui_data/gui_data")
-module:hook_post_require("lib/setups/setup", "hooks/lib/gui_data/setup")
-
--- * hud
 module:hook_post_require("lib/managers/menumanager", "hooks/hud/drop_in")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/state_timer")
