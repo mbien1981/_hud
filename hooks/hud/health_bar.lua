@@ -434,6 +434,14 @@ function TestHealthPanel:layout_team_mugshots()
 		panel:set_world_x(self._panel:world_x())
 		panel:set_visible(panel:parent():visible())
 		panel:set_layer(-1150)
+
+		-- DorentuZ' direct_messaging marker
+		if alive(mugshot.selection_marker) then
+			local w = mugshot.selection_marker:w()
+			local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
+			mugshot.selection_marker:set_shape(panel_x, panel_y, w, panel_h)
+			mugshot.panel:set_x(panel_x + w)
+		end
 	end
 end
 
