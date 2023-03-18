@@ -60,6 +60,11 @@ module:add_localization_string("_hud_enable_armor_timer_help", {
 	spanish = "Muestra un temporizador que indica el tiempo faltante para que tu armadura se regenere.",
 })
 
+module:add_localization_string("_hud_enable_custom_ammo_panel", {
+	english = "Use custom ammo panel",
+	spanish = "Utilizar indicador de munición personalizado.",
+})
+
 module:add_localization_string("_hud_use_custom_drop_in_panel", {
 	english = "Use custom drop-in panel",
 	spanish = "Utilizar panel personalizado de entrada de jugador.",

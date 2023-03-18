@@ -8,6 +8,7 @@ module:add_config_option("_hud_long_name_splitting", true)
 module:add_config_option("_hud_use_alt_armor", false)
 module:add_config_option("_hud_enable_armor_timer", false)
 module:add_config_option("_hud_enable_raw_armor_text", false)
+module:add_config_option("_hud_enable_custom_ammo_panel", true)
 module:add_config_option("_hud_use_custom_drop_in_panel", true)
 module:add_config_option("_hud_drop_in_show_peer_info", true)
 module:add_config_option("_hud_enable_kill_feed", true)
@@ -80,6 +81,13 @@ module:add_menu_option("_hud_enable_raw_armor_text", {
 	type = "boolean",
 	text_id = "_hud_enable_raw_armor_text",
 	help_id = "_hud_enable_raw_armor_text_help",
+	localize = true,
+})
+
+module:add_menu_option("_hud_ammo_panel_divider", { type = "divider", size = 15 })
+module:add_menu_option("_hud_enable_custom_ammo_panel", {
+	type = "boolean",
+	text_id = "_hud_enable_custom_ammo_panel",
 	localize = true,
 })
 

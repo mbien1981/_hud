@@ -13,6 +13,9 @@ local module = DMod:new("_hud", {
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/drop_in")
 module:hook_post_require("lib/managers/menumanager", "hooks/hud/drop_in")
 
+module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/ammo_panel")
+module:hook_post_require("lib/managers/hudmanager", "hooks/hud/ammo_panel")
+
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/state_timer")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/health_bar")
