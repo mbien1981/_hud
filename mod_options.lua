@@ -13,6 +13,7 @@ module:add_config_option("_hud_use_custom_drop_in_panel", true)
 module:add_config_option("_hud_drop_in_show_peer_info", true)
 module:add_config_option("_hud_enable_kill_feed", true)
 module:add_config_option("_hud_kill_feed_max_rows", 6)
+module:add_config_option("_hud_mod_list_position", "topright")
 module:add_config_option("_hud_mod_whitelist", {
 	["ovk_193"] = true,
 	["crybaby"] = true,
@@ -103,6 +104,20 @@ module:add_menu_option("_hud_drop_in_show_peer_info", {
 	text_id = "_hud_drop_in_show_peer_info",
 	help_id = "_hud_drop_in_show_peer_info_help",
 	localize = true,
+})
+module:add_menu_option("_hud_mod_list_position", {
+	type = "multi_choice",
+	text_id = "_hud_mod_list_position",
+	choices = {
+		{ "leftbottom", "_hud_leftbottom" },
+		{ "lefttop", "_hud_lefttop" },
+		{ "centertop", "_hud_centertop" },
+		{ "righttop", "_hud_righttop" },
+		{ "centerright", "_hud_centerright" },
+		{ "rightbottom", "_hud_rightbottom" },
+		{ "centerbottom", "_hud_centerbottom" },
+	},
+	default_value = "topright",
 })
 
 module:add_menu_option("_hud_reload_panel_divider", { type = "divider", size = 15 })

@@ -89,7 +89,41 @@ function CustomDropInClass:_layout()
 	self._peer_info:set_left(self._peer_name:left())
 	self._peer_info:set_top(self._progress:bottom() + 24)
 
-	self._peer_mods:set_righttop(self.main_panel:right() - 5, self.main_panel:top())
+	local setting = D:conf("_hud_mod_list_position")
+	if setting == "leftbottom" then
+		self._peer_mods:set_leftbottom(self.main_panel:left() + 5, self.main_panel:bottom() - 5)
+		return
+	end
+
+	if setting == "lefttop" then
+		self._peer_mods:set_lefttop(self.main_panel:left() + 5, self.main_panel:top() + 5)
+		return
+	end
+
+	if setting == "centertop" then
+		self._peer_mods:set_top(self.main_panel:top() + 5)
+		self._peer_mods:set_center_x(self.main_panel:center_x())
+	end
+
+	if setting == "righttop" then
+		self._peer_mods:set_righttop(self.main_panel:right() - 5, self.main_panel:top() + 5)
+		return
+	end
+
+	if setting == "centerright" then
+		self._peer_mods:set_center_y(self.main_panel:center_y())
+		self._peer_mods:set_right(self.main_panel:right() - 5)
+	end
+
+	if setting == "rightbottom" then
+		self._peer_mods:set_rightbottom(self.main_panel:right() - 5, self.main_panel:bottom() - 5)
+		return
+	end
+
+	if setting == "centerbottom" then
+		self._peer_mods:set_bottom(self.main_panel:bottom() - 5)
+		self._peer_mods:set_center_x(self.main_panel:center_x())
+	end
 end
 
 function CustomDropInClass:update_peer(peer_id, progress, time_left)

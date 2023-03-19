@@ -85,6 +85,11 @@ module:add_localization_string("_hud_drop_in_show_peer_info_help", {
 	spanish = "Muestra información sobre el equipamiento del jugador que se esta uniendo a la partida.",
 })
 
+module:add_localization_string("_hud_mod_list_position", {
+	english = "Player mod list position",
+	spanish = "Posición de la lista de mods del jugador",
+})
+
 module:add_localization_string("_hud_mod_list_title", {
 	english = "Gameplay altering mods:%s",
 	spanish = "Mods que alteran el juego:%s",
@@ -108,4 +113,39 @@ module:add_localization_string("_hud_yes", {
 module:add_localization_string("_hud_no", {
 	english = "No",
 	spanish = "No",
+})
+
+module:add_localization_string("_hud_leftbottom", {
+	english = "Bottom Left",
+	spanish = "Abajo a la izquierda",
+})
+
+module:add_localization_string("_hud_lefttop", {
+	english = "Top Left",
+	spanish = "Arriba a la izquierda",
+})
+
+module:add_localization_string("_hud_centertop", {
+	english = "Center Top",
+	spanish = "Centrado arriba",
+})
+
+module:add_localization_string("_hud_righttop", {
+	english = "Top Right",
+	spanish = "Arriba a la derecha",
+})
+
+module:add_localization_string("_hud_centerright", {
+	english = "Center Right",
+	spanish = "Centrado a la derecha",
+})
+
+module:add_localization_string("_hud_rightbottom", {
+	english = "Bottom Right",
+	spanish = "Abajo a la derecha",
+})
+
+module:add_localization_string("_hud_centerbottom", {
+	english = "Center Bottom",
+	spanish = "Centrado abajo",
 })
