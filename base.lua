@@ -1,13 +1,14 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = 2.4,
+	version = "1.3.1",
 	allow_globals = true,
 	dependency = "_sdk",
 	includes = {
 		{ "mod_localization", { type = "localization" } },
 		{ "mod_options", { type = "menu_options" } },
 	},
+	update = { id = "_hud", url = "https://raw.githubusercontent.com/mbien1981/dahm-modules/main/version.json" },
 })
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/hud/drop_in")
