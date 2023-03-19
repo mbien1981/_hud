@@ -19,6 +19,7 @@ end
 function CustomAmmoPanelClass:add_weapon(data)
 	local weapon_tweak_data = data.unit:base():weapon_tweak_data()
 	local i = weapon_tweak_data.use_data.selection_index
+	self:remove_weapon(i)
 
 	local icon, texture_rect = tweak_data.hud_icons:get_icon_data(weapon_tweak_data.hud_icon)
 	local bitmap = self._panel:bitmap({
@@ -67,21 +68,26 @@ function CustomAmmoPanelClass:add_weapon(data)
 	clip:set_center(total:center())
 	clip:set_right(total:left() - 4)
 
-	self._weapons[i] = {
-		icon = bitmap,
-		total = total,
-		clip = clip,
-	}
+	self._weapons[i] = { icon = bitmap, total = total, clip = clip }
+end
+
+function CustomAmmoPanelClass:remove_weapon(i)
+	local weapon = self._weapons[i]
+	if not weapon then
+		return
+	end
+
+	weapon.icon:parent():remove(weapon.icon)
+	weapon.total:parent():remove(weapon.total)
+	weapon.clip:parent():remove(weapon.clip)
+
+	self._weapons[i] = nil
 end
 
 function CustomAmmoPanelClass:clear_weapons()
-	for _, weapon in pairs(self._weapons) do
-		self._panel:remove(weapon.icon)
-		self._panel:remove(weapon.total)
-		self._panel:remove(weapon.clip)
+	for i, _ in pairs(self._weapons) do
+		self:remove_weapon(i)
 	end
-
-	self._weapons = {}
 end
 
 function CustomAmmoPanelClass:update()
@@ -91,9 +97,9 @@ function CustomAmmoPanelClass:update()
 
 	local config = D:conf("_hud_enable_custom_ammo_panel")
 	self._panel:set_visible(config)
-    self._hud.weapon_panel:set_visible(not config)
-    -- self._hud.weapon_name:set_visible(not config)
-    self._hud.ammo_panel:set_visible(not config)
+	self._hud.weapon_panel:set_visible(not config)
+	-- self._hud.weapon_name:set_visible(not config)
+	self._hud.ammo_panel:set_visible(not config)
 
 	if not self._panel:visible() then
 		return
@@ -137,13 +143,6 @@ function CustomAmmoPanelClass:update_weapon(weapon, weapon_base, selected)
 end
 
 local module = ... or D:module("_hud")
-if RequiredScript == "lib/states/ingamewaitingforplayers" then
-	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
-	module:post_hook(50, IngameWaitingForPlayersState, "at_exit", function(...)
-		rawset(_G, "CustomAmmoPanel", CustomAmmoPanelClass:new())
-	end, false)
-end
-
 if RequiredScript == "lib/managers/hudmanager" then
 	local HUDManager = module:hook_class("HUDManager")
 	module:post_hook(HUDManager, "add_weapon", function(self, data)
