@@ -136,6 +136,7 @@ function CustomAmmoPanelClass:update_weapon(weapon, weapon_base, selected)
 	weapon.total:set_color(color_total:with_alpha(color_alpha))
 end
 
+local module = ... or D:module("_hud")
 if RequiredScript == "lib/states/ingamewaitingforplayers" then
 	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
 	module:post_hook(50, IngameWaitingForPlayersState, "at_exit", function(...)
