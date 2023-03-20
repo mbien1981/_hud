@@ -10,6 +10,10 @@ module:add_localization_string("_hud_font_scaling", {
 	spanish = "Escala de la fuente del HUD",
 })
 
+module:add_localization_string("_hud_use_custom_health_panel", {
+	english = "Use custom health panel",
+	spanish = "Usar panel de vida personalizado",
+})
 module:add_localization_string("_hud_long_name_splitting", {
 	english = "Display short player name",
 	spanish = "Mostrar nombre de usuario recortado",

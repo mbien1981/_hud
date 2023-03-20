@@ -3,6 +3,7 @@ local module = ... or D:module("_hud")
 module:add_config_option("_hud_scaling", 1.2)
 module:add_config_option("_hud_font_scaling", 1.2)
 
+module:add_config_option("_hud_use_custom_health_panel", true)
 module:add_config_option("_hud_name_use_peer_color", false)
 module:add_config_option("_hud_long_name_splitting", true)
 module:add_config_option("_hud_use_alt_armor", false)
@@ -11,8 +12,6 @@ module:add_config_option("_hud_enable_raw_armor_text", false)
 module:add_config_option("_hud_enable_custom_ammo_panel", true)
 module:add_config_option("_hud_use_custom_drop_in_panel", true)
 module:add_config_option("_hud_drop_in_show_peer_info", true)
-module:add_config_option("_hud_enable_kill_feed", true)
-module:add_config_option("_hud_kill_feed_max_rows", 6)
 module:add_config_option("_hud_mod_list_position", "topright")
 module:add_config_option("_hud_mod_whitelist", {
 	["ovk_193"] = true,
@@ -52,6 +51,12 @@ module:add_menu_option("_hud_font_scaling", {
 })
 
 module:add_menu_option("_hud_health_divider", { type = "divider", size = 15 })
+module:add_menu_option("_hud_use_custom_health_panel", {
+	type = "boolean",
+	text_id = "_hud_use_custom_health_panel",
+	help_id = "_hud_use_custom_health_panel_help",
+	localize = true,
+})
 module:add_menu_option("_hud_name_use_peer_color", {
 	type = "boolean",
 	text_id = "_hud_name_use_peer_color",

@@ -1,10 +1,7 @@
 TestHealthPanel = class()
 function TestHealthPanel:init()
-	self._ws = managers.gui_data:create_fullscreen_workspace()
-	self._panel = self._ws:panel():panel({
-		alpha = 1,
-		layer = -100,
-	})
+	self._hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
+	self._panel = self._hud.panel:panel({ layer = -100 })
 
 	self.visible = false
 	self.font = "fonts/font_univers_530_bold"
@@ -416,26 +413,24 @@ function TestHealthPanel:layout_team_mugshots()
 		return
 	end
 
-	local hud = managers.hud:script(PlayerBase.PLAYER_HUD)
-	if not hud then
+	if not self._hud then
 		return
 	end
 
 	local mugshots = managers.hud._hud.mugshots
 	for i, mugshot in ipairs(mugshots) do
 		local panel = mugshot.panel
-		local height = panel:h()
 
-		local y = ((i == 1) and (self.main_panel:world_y() - height - 4))
+		local y = ((i == 1) and (self.main_panel:world_y() - 4))
 			or i == 2 and mugshots[1].panel:top() - 2 * tweak_data.scale.hud_health_multiplier
 			or i == 3 and mugshots[2].panel:top() - 2 * tweak_data.scale.hud_health_multiplier
 
 		panel:set_bottom(y)
-		panel:set_world_x(self._panel:world_x())
+		panel:set_left(self._panel:left())
 		panel:set_visible(panel:parent():visible())
 		panel:set_layer(-1150)
 
-		-- DorentuZ' direct_messaging marker
+		-- DorentuZ` direct_messaging marker
 		if alive(mugshot.selection_marker) then
 			local w = mugshot.selection_marker:w()
 			local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
@@ -480,16 +475,34 @@ function TestHealthPanel:update()
 		return
 	end
 
-	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
-	if not hud then
+	if not self._hud then
 		return self._panel:hide()
 	end
 
-	hud.health_panel:hide()
+	if not D:conf("_hud_use_custom_health_panel") then
+		if self._panel:visible() then
+			self._panel:hide()
+			self._hud.health_panel:show()
+			managers.hud:_layout_mugshots()
+			managers.hud:_layout_chat_output()
 
-	self._panel:set_visible(hud.health_panel:parent():visible())
-	self.main_panel:set_world_bottom(hud.panel:world_bottom() - 8)
-	self.main_panel:set_world_left(hud.health_panel:world_right() - (self._mugshot:w() / 2))
+			for _, mugshot in ipairs(managers.hud._hud.mugshots or {}) do
+				-- DorentuZ` direct_messaging marker
+				if alive(mugshot.selection_marker) then
+					local w = mugshot.selection_marker:w()
+					local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
+					mugshot.selection_marker:set_shape(panel_x, panel_y, w, panel_h)
+					mugshot.panel:set_x(panel_x + w)
+				end
+			end
+		end
+		return
+	end
+
+	self._panel:show()
+	self.main_panel:set_world_bottom(self._panel:bottom())
+	self.main_panel:set_left(self._panel:left())
+	self._hud.health_panel:hide()
 
 	self:update_scaling()
 	self:update_player_data()
@@ -507,12 +520,11 @@ function TestHealthPanel:update()
 end
 
 function TestHealthPanel:anim_take_damage()
-	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD)
-	if not hud then
+	if not self._hud then
 		return
 	end
 
-	self._background:animate(hud.mugshot_damage_taken)
+	self._background:animate(self._hud.mugshot_damage_taken)
 end
 
 local module = ... or D:module("_hud")
