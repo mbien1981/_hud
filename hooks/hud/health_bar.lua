@@ -500,7 +500,13 @@ function TestHealthPanel:update()
 	end
 
 	self._panel:show()
-	self.main_panel:set_world_bottom(self._panel:bottom())
+
+	local target_bottom = self._panel:bottom()
+	local xp_hud = managers.hud:script(Idstring("guis/experience_hud"))
+	if xp_hud then
+		target_bottom = managers.hud._xp_hud_hidden and self._panel:bottom() or xp_hud.experience_panel:top() - 10
+	end
+	self.main_panel:set_world_bottom(target_bottom)
 	self.main_panel:set_left(self._panel:left())
 	self._hud.health_panel:hide()
 
