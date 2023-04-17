@@ -27,5 +27,6 @@ module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/
 
 module:hook_post_require("lib/managers/gameplaycentralmanager", "hooks/peer_contours")
 module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
+module:hook_post_require("lib/network/handlers/unitnetworkhandler", "hooks/name_labels")
 
 return module
