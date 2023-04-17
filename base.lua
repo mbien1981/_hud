@@ -1,9 +1,9 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.3.5",
+	version = "1.4.0",
 	allow_globals = true,
-	dependency = "_sdk",
+	dependencies = { "_sdk", "hud" },
 	includes = {
 		{ "mod_localization", { type = "localization" } },
 		{ "mod_options", { type = "menu_options" } },
@@ -24,6 +24,8 @@ module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/health_b
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/deployable_spy")
-module:hook_post_require("lib/units/equipment/sentry_gun/sentrygunbase", "hooks/deployable_spy")
+
+module:hook_post_require("lib/managers/gameplaycentralmanager", "hooks/peer_contours")
+module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
 
 return module

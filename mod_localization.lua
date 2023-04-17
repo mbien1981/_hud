@@ -153,3 +153,13 @@ module:add_localization_string("_hud_centerbottom", {
 	english = "Center Bottom",
 	spanish = "Centrado abajo",
 })
+
+module:add_localization_string("_hud_use_custom_name_labels", {
+	english = "Use custom name labels",
+	spanish = "Utilizar etiquetas de vida personalizadas",
+})
+
+module:add_localization_string("_hud_peer_contour_colors", {
+	english = "Color code player contours",
+	spanish = "Utilizar colores de jugador en los contornos",
+})

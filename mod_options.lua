@@ -22,6 +22,8 @@ module:add_config_option("_hud_mod_whitelist", {
 	["restart_end_job"] = true,
 	["restore_deployables"] = true,
 })
+module:add_config_option("_hud_use_custom_name_labels", true)
+module:add_config_option("_hud_peer_contour_colors", true)
 
 -- custom colors
 module:add_config_option("_hud_name_color", Color("ECECEC"))
@@ -29,6 +31,7 @@ module:add_config_option("_hud_health_color", Color("ECECEC"))
 module:add_config_option("_hud_hurt_color", Color("b8392e"))
 module:add_config_option("_hud_patch_color", Color(0.5, 1, 0.5))
 module:add_config_option("_hud_armor_color", Color("1e90ff"))
+module:add_config_option("_hud_ai_contour_color", Color(0.1, 1, 0.5))
 
 -- menu nodes
 module:add_menu_option("_hud_scaling", {
@@ -48,6 +51,18 @@ module:add_menu_option("_hud_font_scaling", {
 	value_accuracy = 2,
 	show_value = true,
 	text_id = "_hud_font_scaling",
+})
+
+module:add_menu_option("_hud_label_divider", { type = "divider", size = 15 })
+module:add_menu_option("_hud_use_custom_name_labels", {
+	type = "boolean",
+	text_id = "_hud_use_custom_name_labels",
+	localize = true,
+})
+module:add_menu_option("_hud_peer_contour_colors", {
+	type = "boolean",
+	text_id = "_hud_peer_contour_colors",
+	localize = true,
 })
 
 module:add_menu_option("_hud_health_divider", { type = "divider", size = 15 })
@@ -122,7 +137,7 @@ module:add_menu_option("_hud_mod_list_position", {
 		{ "rightbottom", "_hud_rightbottom" },
 		{ "centerbottom", "_hud_centerbottom" },
 	},
-	default_value = "topright",
+	default_value = "righttop",
 })
 
 module:add_menu_option("_hud_reload_panel_divider", { type = "divider", size = 15 })
