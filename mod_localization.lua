@@ -69,6 +69,14 @@ module:add_localization_string("_hud_enable_custom_ammo_panel", {
 	spanish = "Utilizar indicador de munición personalizado.",
 })
 
+module:add_localization_string("_hud_enable_deployable_spy", {
+	english = "Enable deployable spy",
+})
+
+module:add_localization_string("_hud_enable_deployable_spy_help", {
+	english = "Show remaining bag charges and sentry gun ammo and health.",
+})
+
 module:add_localization_string("_hud_use_custom_drop_in_panel", {
 	english = "Use custom drop-in panel",
 	spanish = "Utilizar panel personalizado de entrada de jugador.",
@@ -120,12 +128,12 @@ module:add_localization_string("_hud_no", {
 })
 
 module:add_localization_string("_hud_leftbottom", {
-	english = "Bottom Left",
+	english = "Left Bottom",
 	spanish = "Abajo a la izquierda",
 })
 
 module:add_localization_string("_hud_lefttop", {
-	english = "Top Left",
+	english = "Left Top",
 	spanish = "Arriba a la izquierda",
 })
 

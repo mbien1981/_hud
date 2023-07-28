@@ -160,7 +160,7 @@ function DeployableSpyClass:update_items()
 end
 
 function DeployableSpyClass:update()
-	if not self._sdk:player() then
+	if not self._sdk:player() or not D:conf("_hud_enable_deployable_spy") then
 		self._panel:hide()
 		return
 	end
