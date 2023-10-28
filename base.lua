@@ -1,10 +1,11 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.4.2",
+	version = "1.5",
 	allow_globals = true,
 	dependencies = { "_sdk", "hud" },
 	includes = {
+		{ "mod_hooks" },
 		{ "mod_localization", { type = "localization" } },
 		{ "mod_options", { type = "menu_options" } },
 	},
@@ -20,6 +21,7 @@ module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/state_time
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/health_bar")
 module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/health_bar")
+module:hook_post_require("lib/managers/hudmanager", "hooks/inventory")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_spy")
