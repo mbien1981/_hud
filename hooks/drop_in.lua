@@ -90,40 +90,31 @@ function CustomDropInClass:_layout()
 	self._peer_info:set_top(self._progress:bottom() + 24)
 
 	local setting = D:conf("_hud_mod_list_position")
-	if setting == "leftbottom" then
-		self._peer_mods:set_leftbottom(self.main_panel:left() + 5, self.main_panel:bottom() - 5)
+	if self.current_position == setting then
 		return
 	end
 
-	if setting == "lefttop" then
-		self._peer_mods:set_lefttop(self.main_panel:left() + 5, self.main_panel:top() + 5)
-		return
-	end
+	local width, height = self._peer_info:shape()
+	local half_w, half_h = math.floor(width / 2), math.floor(height / 2)
+	local margin = 5
 
-	if setting == "centertop" then
-		self._peer_mods:set_top(self.main_panel:top() + 5)
-		self._peer_mods:set_center_x(self.main_panel:center_x())
-	end
+	local center_x, center_y = self.main_panel:center_x() - half_w, self.main_panel:center_y() - half_h
+	local left, right = self.main_panel:left() + margin, self.main_panel:right() - width - margin
+	local top, bottom = self.main_panel:top() + margin, self.main_panel:bottom() - height - margin
 
-	if setting == "righttop" then
-		self._peer_mods:set_righttop(self.main_panel:right() - 5, self.main_panel:top() + 5)
-		return
-	end
+	local positions = {
+		centertop = { x = center_x, y = top },
+		centerbottom = { x = center_x, y = bottom },
+		centerright = { x = right, y = center_y },
+		lefttop = { x = left, y = top },
+		leftbottom = { x = left, y = bottom },
+		righttop = { x = right, y = top },
+		rightbottom = { x = right, y = bottom },
+	}
 
-	if setting == "centerright" then
-		self._peer_mods:set_center_y(self.main_panel:center_y())
-		self._peer_mods:set_right(self.main_panel:right() - 5)
-	end
-
-	if setting == "rightbottom" then
-		self._peer_mods:set_rightbottom(self.main_panel:right() - 5, self.main_panel:bottom() - 5)
-		return
-	end
-
-	if setting == "centerbottom" then
-		self._peer_mods:set_bottom(self.main_panel:bottom() - 5)
-		self._peer_mods:set_center_x(self.main_panel:center_x())
-	end
+	local data = positions[setting] or positions.righttop
+	self._peer_mods:set_position(data.x, data.y)
+	self.current_position = setting
 end
 
 function CustomDropInClass:update_peer(peer_id, progress, time_left)
