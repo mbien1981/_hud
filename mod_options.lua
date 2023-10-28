@@ -1,8 +1,3 @@
---[[
-	I am not happy with how messy this file turned out to be.
-	I will implement my own settings menu for this mod in 1.5x
-]]
-
 local module = ... or D:module("_hud")
 
 local visibility_nodes = {
