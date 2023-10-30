@@ -27,6 +27,7 @@ local PlayerHealthPanel = class()
 function PlayerHealthPanel:init(super)
 	self.super = super
 
+	self._xp_hud = self.super:script(Idstring("guis/experience_hud"))
 	self._hud = self.super:script(PlayerBase.PLAYER_INFO_HUD)
 	self._panel = self._hud.panel:panel({ layer = -100 })
 
@@ -54,6 +55,11 @@ function PlayerHealthPanel:init(super)
 
 	self:update_settings()
 	self:setup_panels()
+
+	self._initialized = true
+	self:layout()
+	self:update_panel_visibility()
+
 	_G._updator:remove("teqerasoidjwqe")
 	_G._updator:add(callback(self, self, "update"), "teqerasoidjwqe")
 end
@@ -84,6 +90,7 @@ function PlayerHealthPanel:update_settings()
 	local selected_layout = D:conf("_hud_custom_health_panel_layout")
 	if var_cache.selected_layout ~= selected_layout then
 		var_cache.selected_layout = selected_layout
+
 		refresh_required = true
 	end
 
@@ -98,6 +105,8 @@ function PlayerHealthPanel:update_settings()
 	var_cache.use_name_splitting = D:conf("_hud_long_name_splitting")
 
 	if refresh_required then
+		self:layout()
+		self:update_panel_visibility()
 		self.data.current_health = 0
 		self.data.current_armor = 0
 	end
@@ -111,7 +120,6 @@ function PlayerHealthPanel:setup_panels()
 	self:create_mugshot()
 	self:create_player_data()
 	self:create_health_and_armor()
-	self:layout()
 end
 
 function PlayerHealthPanel:create_background()
@@ -312,6 +320,10 @@ function PlayerHealthPanel:create_health_and_armor()
 end
 
 function PlayerHealthPanel:update_panel_visibility()
+	if not self._initialized then
+		return
+	end
+
 	self.info_panels.player_name:set_visible(self:is_panel_open())
 	self.info_panels.player_level:set_visible(self:is_panel_open())
 	self.info_panels.player_downs:set_visible(self:is_panel_open())
@@ -616,10 +628,14 @@ function PlayerHealthPanel:layout_panel(panel, data)
 end
 
 function PlayerHealthPanel:layout()
+	if not self._initialized then
+		return
+	end
+
+	self.data.workspace_width = self.info_panels.mugshot:w() + 8 + (176 * self.scales.panel)
+
 	self.main_panel:set_h(self.info_panels.mugshot:h() + 8)
 	self.main_panel:child("panel_background"):set_size(self.main_panel:size())
-
-	self:update_panel_visibility()
 
 	local var_cache = self._cached_conf_vars
 	for _, category in ipairs(self:get_layout()[var_cache.selected_layout]) do
@@ -636,22 +652,21 @@ function PlayerHealthPanel:layout()
 		end
 	end
 
-	if var_cache.selected_layout ~= "vanilla" then
-		self.armor_health_panels.raid.health.background:set_w(self.main_panel:w() - self.info_panels.mugshot:w() - 12)
-		self.armor_health_panels.raid_alt.health.background:set_w(
-			self.main_panel:w()
-				- self.info_panels.mugshot:w()
-				- (var_cache.display_hp_ap and self.info_panels.base_text:w() or 0)
-				- 12
-		)
-		self.armor_health_panels.raid_alt.armor.background:set_w(
-			self.armor_health_panels.raid_alt.health.background:w()
-		)
-
+	if var_cache.selected_layout == "vanilla" then
+		self.armor_health_panels.vanilla.health.background:set_h(self.info_panels.mugshot:h())
 		return
 	end
 
-	self.armor_health_panels.vanilla.health.background:set_h(self.info_panels.mugshot:w())
+	local container = self.armor_health_panels
+	container.raid.health.background:set_w(self.data.workspace_width - self.info_panels.mugshot:w() - 12)
+
+	container.raid_alt.health.background:set_w(
+		self.data.workspace_width
+			- self.info_panels.mugshot:w()
+			- (var_cache.display_hp_ap and self.info_panels.base_text:w() or 0)
+			- 12
+	)
+	container.raid_alt.armor.background:set_w(container.raid_alt.health.background:w())
 end
 
 function PlayerHealthPanel:layout_team_mugshots()
@@ -747,7 +762,7 @@ function PlayerHealthPanel:get_name_color()
 end
 
 function PlayerHealthPanel:update_scaling()
-	if not alive(self.main_panel) then
+	if not self._initialized then
 		return
 	end
 
@@ -909,6 +924,8 @@ end
 function PlayerHealthPanel:close_panel()
 	self.data.is_open = false
 
+	self:update_panel_visibility()
+
 	self.main_panel:stop()
 	self.main_panel:animate(function(o)
 		self._sdk:animate_ui(2, function(p)
@@ -921,6 +938,8 @@ end
 
 function PlayerHealthPanel:open_panel()
 	self.data.is_open = true
+
+	self:update_panel_visibility()
 
 	self.main_panel:stop()
 	self.main_panel:animate(function(o)
@@ -936,7 +955,7 @@ function PlayerHealthPanel:open_panel()
 end
 
 function PlayerHealthPanel:anim_take_damage()
-	if not self._hud then
+	if not self._panel:visible() or not alive(self.main_panel) then
 		return
 	end
 
@@ -944,25 +963,15 @@ function PlayerHealthPanel:anim_take_damage()
 end
 
 function PlayerHealthPanel:update_mugshot()
-	self.data.workspace_width = self.info_panels.mugshot:w() + 8 + (176 * self.scales.panel)
-
 	if
-		not self.data.adjusting_width and self.main_panel:w() > self.data.workspace_width
+		self.main_panel:w() > self.data.workspace_width
 		or self:is_panel_open() and self.main_panel:w() < self.data.workspace_width
 	then
-		self.data.adjusting_width = true
-
 		self.main_panel:stop()
-		self.main_panel:animate(function(o)
-			self._sdk:animate_ui(1, function(p)
-				o:set_w(math.lerp(o:w(), self.data.workspace_width, p))
-			end)
-
-			o:set_w(self.data.workspace_width)
-			self.data.current_health = 0
-			self.data.current_armor = 0
-			self.data.adjusting_width = false
-		end)
+		self.main_panel:set_w(self.data.workspace_width)
+		self:layout()
+		self.data.current_health = 0
+		self.data.current_armor = 0
 	end
 
 	local states = {
@@ -1030,42 +1039,37 @@ function PlayerHealthPanel:update_mugshot()
 end
 
 function PlayerHealthPanel:update()
-	if not self._hud then
-		return self._panel:hide()
-	end
-
 	local var_cache = self._cached_conf_vars
-	if not var_cache.use_health_panel then
-		if self._panel:visible() then
-			self._panel:hide()
-			self._hud.health_panel:show()
-			managers.hud:_layout_mugshots()
-			managers.hud:_layout_chat_output()
+	if not var_cache.use_health_panel and self._panel:visible() then
+		self._panel:hide()
+		self._hud.health_panel:show()
+		managers.hud:_layout_mugshots()
+		managers.hud:_layout_chat_output()
 
-			for _, mugshot in ipairs(managers.hud._hud.mugshots or {}) do
-				-- DorentuZ` direct_messaging marker
-				if alive(mugshot.selection_marker) then
-					local w = mugshot.selection_marker:w()
-					local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
-					mugshot.selection_marker:set_shape(panel_x, panel_y, w, panel_h)
-					mugshot.panel:set_x(panel_x + w)
-				end
+		for _, mugshot in ipairs(managers.hud._hud.mugshots or {}) do
+			-- DorentuZ` direct_messaging marker
+			if alive(mugshot.selection_marker) then
+				local w = mugshot.selection_marker:w()
+				local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
+				mugshot.selection_marker:set_shape(panel_x, panel_y, w, panel_h)
+				mugshot.panel:set_x(panel_x + w)
 			end
 		end
 		return
 	end
 
-	self._panel:show()
+	if not self._panel:visible() then
+		self._panel:show()
+	end
 
 	local target_bottom = self._panel:bottom()
-	local xp_hud = managers.hud:script(Idstring("guis/experience_hud"))
-	if xp_hud then
-		target_bottom = managers.hud._xp_hud_hidden and self._panel:bottom() or xp_hud.experience_panel:top() - 10
+	if self._xp_hud then
+		target_bottom = self.super._xp_hud_hidden and self._panel:bottom() or self._xp_hud.experience_panel:top() - 10
 	end
 
 	if var_cache.selected_layout ~= "vanilla" and var_cache.use_inventory then
 		local inventory_panel = self.super._hud.inventory
-		if inventory_panel then
+		if inventory_panel and alive(inventory_panel.main_panel) then
 			target_bottom = target_bottom - inventory_panel.main_panel:h()
 		end
 	end
@@ -1076,15 +1080,10 @@ function PlayerHealthPanel:update()
 
 	self:update_player_data()
 	self:update_health_and_armor()
-	self:layout()
+	-- self:layout()
 
 	self:layout_team_mugshots()
 	self:layout_vanilla_chat()
-
-	if not self._panel:visible() then
-		return
-	end
-
 	self:update_mugshot()
 end
 
@@ -1097,33 +1096,19 @@ local module = ... or D:module("_hud")
 if RequiredScript == "lib/states/ingamewaitingforplayers" then
 	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
 	module:post_hook(50, IngameWaitingForPlayersState, "at_exit", function(...)
-		managers.hud._hud.health_panel = PlayerHealthPanel:new(managers.hud)
+		managers.hud._hud.custom_health_panel = PlayerHealthPanel:new(managers.hud)
 	end, false)
 end
-
--- if RequiredScript == "lib/managers/hudmanager" then
--- 	local HUDManager = module:hook_class("HUDManager")
--- 	-- deployables
--- 	module:post_hook(50, HUDManager, "_player_info_hud_layout", function(self, data)
--- 		if not self:alive(PlayerBase.PLAYER_INFO_HUD) then
--- 			return
--- 		end
-
--- 		if not self._hud.health_panel then
--- 			self._hud.health_panel = PlayerHealthPanel:new(self)
--- 		end
--- 	end, false)
--- end
 
 if RequiredScript == "lib/units/beings/player/playerdamage" then
 	local PlayerDamage = module:hook_class("PlayerDamage")
 	for _, func in pairs({ "damage_bullet", "damage_killzone", "damage_explosion" }) do
 		module:post_hook(50, PlayerDamage, func, function(...)
-			if not managers.hud._hud.health_panel then
+			if not managers.hud._hud.custom_health_panel then
 				return
 			end
 
-			managers.hud._hud.health_panel:anim_take_damage()
+			managers.hud._hud.custom_health_panel:anim_take_damage()
 		end, false)
 	end
 end

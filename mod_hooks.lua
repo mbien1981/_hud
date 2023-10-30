@@ -6,7 +6,7 @@ function module.on_option_change_hud_update(k, value, method, method_args)
 		return
 	end
 
-	local hud_panel = hudman._hud.health_panel
+	local hud_panel = hudman._hud.custom_health_panel
 	if hud_panel then
 		hud_panel:update_settings()
 	end

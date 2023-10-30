@@ -102,7 +102,7 @@ function PlayerInventoryPanel:layout_inventory()
 end
 
 function PlayerInventoryPanel:layout()
-	local health_panel = self.super._hud.health_panel
+	local health_panel = self.super._hud.custom_health_panel
 	if not health_panel then
 		return
 	end
@@ -123,7 +123,7 @@ function PlayerInventoryPanel:layout()
 		return
 	end
 
-	self.main_panel:set_w(health_main:w())
+	self.main_panel:set_w(health_panel.data.workspace_width or health_main:w())
 	self.main_panel:set_left(health_main:left())
 	self.main_panel:child("panel_background"):set_size(self.main_panel:size())
 	self.main_panel:child("panel_background"):show()
