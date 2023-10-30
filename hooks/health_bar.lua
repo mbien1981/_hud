@@ -1040,7 +1040,11 @@ end
 
 function PlayerHealthPanel:update()
 	local var_cache = self._cached_conf_vars
-	if not var_cache.use_health_panel and self._panel:visible() then
+	if not var_cache.use_health_panel then
+		if self._panel:visible() then
+			return
+		end
+
 		self._panel:hide()
 		self._hud.health_panel:show()
 		managers.hud:_layout_mugshots()
