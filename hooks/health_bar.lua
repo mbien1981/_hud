@@ -1041,7 +1041,7 @@ end
 function PlayerHealthPanel:update()
 	local var_cache = self._cached_conf_vars
 	if not var_cache.use_health_panel then
-		if self._panel:visible() then
+		if not self._panel:visible() then
 			return
 		end
 
