@@ -94,7 +94,7 @@ function CustomDropInClass:_layout()
 		return
 	end
 
-	local width, height = self._peer_info:shape()
+	local _, _, width, height = self._peer_mods:text_rect()
 	local half_w, half_h = math.floor(width / 2), math.floor(height / 2)
 	local margin = 5
 
@@ -160,11 +160,12 @@ function CustomDropInClass:update_peer(peer_id, progress, time_left)
 		)
 	)
 
-	if peer:has_dmf() then
+	if peer:has_dmf() and not self._peer_mods:visible() then
 		local mod_list = self.data.mods[peer:id()]
 		if mod_list and (mod_list ~= "") then
 			self._peer_mods:show()
 			self._peer_mods:set_text(string.format(managers.localization:text("_hud_mod_list_title"), mod_list))
+			self.current_position = nil
 		end
 	end
 
@@ -316,8 +317,7 @@ if RequiredScript == "lib/managers/menumanager" then
 			return
 		end
 
-		local dlg = managers.system_menu:get_dialog("user_dropin" .. id)
-		if dlg then
+		if managers.system_menu:get_dialog("user_dropin" .. id) then
 			managers.system_menu:close("user_dropin" .. id)
 		end
 
