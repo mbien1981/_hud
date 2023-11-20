@@ -49,6 +49,12 @@ local strings = {
 		english = "Shows a timer that indicates the time remaining for your armor to regenerate.",
 		spanish = "Muestra un temporizador que indica el tiempo restante para que tu armadura se regenere.",
 	},
+	["_hud_reposition_chat_input"] = {
+		english = "Reposition chat input panel",
+	},
+	["_hud_reposition_chat_input_help"] = {
+		english = "Move the chat input panel above the top player mugshot",
+	},
 	["_hud_use_custom_inventory_panel"] = {
 		english = "Use custom inventory panel",
 	},

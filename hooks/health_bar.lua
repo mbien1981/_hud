@@ -70,6 +70,14 @@ function PlayerHealthPanel:update_settings()
 	local refresh_required
 
 	var_cache.use_health_panel = D:conf("_hud_use_custom_health_panel")
+
+	if type(var_cache.use_bcl) ~= "boolean" then
+		local bcl = D:module("better_chat_location")
+		var_cache.use_bcl = bcl and bcl:enabled() or false
+	end
+
+	var_cache.reposition_chat_input = var_cache.use_bcl or D:conf("_hud_reposition_chat_input")
+
 	var_cache.use_inventory = D:conf("_hud_use_custom_health_panel") and D:conf("_hud_use_custom_inventory_panel")
 
 	local hud_scale = D:conf("_hud_scaling")
@@ -747,6 +755,14 @@ function PlayerHealthPanel:layout_vanilla_chat()
 	local say_text = full_hud.panel:child("say_text")
 	local input_panel = full_hud.panel:child("chat_input")
 
+	if not self._cached_conf_vars.reposition_chat_input then
+		input_panel:set_top(4)
+		say_text:set_center_y(input_panel:center_y())
+
+		full_hud.panel:child("textscroll"):set_bottom(target_y)
+		return
+	end
+
 	input_panel:set_bottom(target_y + (hud_m._saferect_size.y * hud_m._workspace_size.h))
 	say_text:set_center_y(input_panel:center_y())
 	full_hud.panel:child("textscroll"):set_bottom(input_panel:top() - 4)
@@ -1093,8 +1109,9 @@ function PlayerHealthPanel:update()
 
 		local say_text = full_hud.panel:child("say_text")
 		local input_panel = full_hud.panel:child("chat_input")
+		local text_scroll = full_hud.panel:child("textscroll")
 
-		input_panel:set_top(4)
+		input_panel:set_top((var_cache.use_bcl and text_scroll:bottom() + 4) or 4)
 		say_text:set_center_y(input_panel:center_y())
 		return
 	end
