@@ -668,6 +668,8 @@ function PlayerHealthPanel:layout()
 	self.main_panel:set_h(self.info_panels.mugshot:h() + 8)
 	self.main_panel:child("panel_background"):set_size(self.main_panel:size())
 
+	self:update_player_data()
+
 	local var_cache = self._cached_conf_vars
 	for _, category in ipairs(self:get_layout()[var_cache.selected_layout]) do
 		local info_panel = tablex.get(self.info_panels, category.name)
