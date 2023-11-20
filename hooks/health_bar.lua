@@ -791,7 +791,7 @@ end
 function PlayerHealthPanel:get_player_name()
 	local var_cache = self._cached_conf_vars
 	if var_cache.mugshot_name == "user_defined" then
-		return var_cache.custom_username
+		return not string.empty(var_cache.custom_username) and var_cache.custom_username or "<name>"
 	end
 
 	if var_cache.mugshot_name == "character_name" then
