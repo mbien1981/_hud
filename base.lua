@@ -1,7 +1,7 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.4.5",
+	version = "1.4.6",
 	allow_globals = true,
 	dependencies = { "_sdk", "hud" },
 	includes = {
