@@ -60,8 +60,8 @@ function PlayerHealthPanel:init(super)
 	self:layout()
 	self:update_panel_visibility()
 
-	_G._updator:remove("teqerasoidjwqe")
-	_G._updator:add(callback(self, self, "update"), "teqerasoidjwqe")
+	_G._updator:remove("health_bar_update")
+	_G._updator:add(callback(self, self, "update"), "health_bar_update")
 end
 
 function PlayerHealthPanel:update_settings()
