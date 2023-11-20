@@ -100,6 +100,12 @@ function PlayerHealthPanel:update_settings()
 		refresh_required = true
 	end
 
+	local display_armor_regen_timer = D:conf("_hud_display_armor_regen_timer")
+	if var_cache.display_armor_regen_timer ~= display_armor_regen_timer then
+		var_cache.display_armor_regen_timer = display_armor_regen_timer
+		refresh_required = true
+	end
+
 	var_cache.use_vrep = D:conf("hud_prefer_virtual_reps")
 	var_cache.name_use_peer_color = D:conf("_hud_name_use_peer_color")
 	var_cache.use_name_splitting = D:conf("_hud_long_name_splitting")
@@ -221,14 +227,14 @@ function PlayerHealthPanel:create_player_data()
 	}))
 
 	-- I don't know where to position this text in the vanilla and raid_alt layouts
-	-- self.info_panels.armor_timer = make_fine_text(self.main_panel:text({
-	-- 	name = "armor_timer",
-	-- 	text = "0",
-	-- 	font = self.font,
-	-- 	font_size = 11 * self.scales.hud * self.scales.font,
-	-- 	color = self.colors.armor,
-	-- 	layer = 1,
-	-- }))
+	self.info_panels.armor_timer = make_fine_text(self.main_panel:text({
+		name = "armor_timer",
+		text = "0.00s",
+		font = self.font,
+		font_size = 11 * self.scales.hud * self.scales.font,
+		color = self.colors.armor,
+		layer = 1,
+	}))
 end
 
 function PlayerHealthPanel:create_health_and_armor()
@@ -335,6 +341,7 @@ function PlayerHealthPanel:update_panel_visibility()
 	self.info_panels.armor_points:set_visible(
 		var_cache.display_hp_ap and (var_cache.selected_layout == "vanilla" or self:is_panel_open())
 	)
+	self.info_panels.armor_timer:set_visible(var_cache.selected_layout ~= "vanilla" and self:is_panel_open())
 
 	for layout, layout_data in pairs(self.armor_health_panels) do
 		for category, panels in pairs(layout_data) do
@@ -491,6 +498,13 @@ function PlayerHealthPanel:get_layout()
 					bar = { x = "_hud_raid_health_bg", bottom_y = "_hud_raid_health_bg" },
 				},
 			},
+			{
+				name = "armor_timer",
+				data = {
+					left_x = { child = "_hud_raid_health_bg" },
+					top = "_hud_raid_health_bg",
+				},
+			},
 		},
 		raid_alt = {
 			{
@@ -565,6 +579,13 @@ function PlayerHealthPanel:get_layout()
 				data = {
 					center_y = "_hud_raid_alt_armor_bg",
 					left_x = "base_text",
+				},
+			},
+			{
+				name = "armor_timer",
+				data = {
+					left_x = { child = "_hud_raid_alt_health_bg" },
+					top = "_hud_raid_alt_armor_bg",
 				},
 			},
 		},
@@ -719,16 +740,16 @@ function PlayerHealthPanel:layout_vanilla_chat()
 		return
 	end
 
-	local state = full_hud:chat_output_state()
-	if state == "default" then
-		full_hud.panel
-			:child("textscroll")
-			:set_bottom(mugshots[#mugshots].panel:top() + hud_m._saferect_size.y * hud_m._workspace_size.h - 12)
-	else
-		full_hud.panel
-			:child("textscroll")
-			:set_bottom(hud.health_panel:bottom() + hud_m._saferect_size.y * hud_m._workspace_size.h - 4)
-	end
+	local target_y = (
+		((full_hud:chat_output_state() == "default") and mugshots[#mugshots].panel:top()) or hud.health_panel:bottom()
+	) - 4
+
+	local say_text = full_hud.panel:child("say_text")
+	local input_panel = full_hud.panel:child("chat_input")
+
+	input_panel:set_bottom(target_y + (hud_m._saferect_size.y * hud_m._workspace_size.h))
+	say_text:set_center_y(input_panel:center_y())
+	full_hud.panel:child("textscroll"):set_bottom(input_panel:top() - 4)
 end
 
 function PlayerHealthPanel:get_player_name()
@@ -910,11 +931,16 @@ function PlayerHealthPanel:update_health_and_armor()
 	self.info_panels.health_points:set_text(string.format("%.0f", p_damage._health * 10 or 0))
 	self.info_panels.armor_points:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
 
-	-- local regen_timer = p_damage._regenerate_timer
-	-- if regen_timer then
-	-- 	self.info_panels.armor_timer:set_text(string.format("%.2fs", regen_timer))
-	-- end
-	-- self.info_panels.armor_timer:set_visible((type(regen_timer) == "number") and D:conf("_hud_enable_armor_timer"))
+	local regen_timer = p_damage._regenerate_timer
+	if regen_timer then
+		self.info_panels.armor_timer:set_text(string.format("%.2fs", regen_timer))
+	end
+
+	self.info_panels.armor_timer:set_visible(
+		(type(regen_timer) == "number")
+			and (var_cache.selected_layout ~= "vanilla")
+			and var_cache.display_armor_regen_timer
+	)
 end
 
 function PlayerHealthPanel:is_panel_open()
@@ -1059,6 +1085,17 @@ function PlayerHealthPanel:update()
 				mugshot.panel:set_x(panel_x + w)
 			end
 		end
+
+		local full_hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN)
+		if not full_hud then
+			return
+		end
+
+		local say_text = full_hud.panel:child("say_text")
+		local input_panel = full_hud.panel:child("chat_input")
+
+		input_panel:set_top(4)
+		say_text:set_center_y(input_panel:center_y())
 		return
 	end
 
@@ -1084,7 +1121,6 @@ function PlayerHealthPanel:update()
 
 	self:update_player_data()
 	self:update_health_and_armor()
-	-- self:layout()
 
 	self:layout_team_mugshots()
 	self:layout_vanilla_chat()

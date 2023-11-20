@@ -41,14 +41,14 @@ local strings = {
 		english = "Show text items that indicate your raw armor and health values.",
 		spanish = "Muestra textos que indican los valores armadura y vida.",
 	},
-	-- ["_hud_enable_armor_timer"] = {
-	-- 	english = "Enable armor regen timer",
-	-- 	spanish = "Mostrar tiempo de regeneración de armadura",
-	-- },
-	-- ["_hud_enable_armor_timer_help"] = {
-	-- 	english = "Shows a timer that indicates the time remaining for your armor to regenerate.",
-	-- 	spanish = "Muestra un temporizador que indica el tiempo restante para que tu armadura se regenere.",
-	-- },
+	["_hud_display_armor_regen_timer"] = {
+		english = "Display armor regen timer",
+		spanish = "Mostrar tiempo de regeneración de armadura",
+	},
+	["_hud_display_armor_regen_timer_help"] = {
+		english = "Shows a timer that indicates the time remaining for your armor to regenerate.",
+		spanish = "Muestra un temporizador que indica el tiempo restante para que tu armadura se regenere.",
+	},
 	["_hud_use_custom_inventory_panel"] = {
 		english = "Use custom inventory panel",
 	},

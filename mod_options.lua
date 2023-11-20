@@ -8,6 +8,7 @@ local visibility_nodes = {
 		"_hud_display_armor_and_health_values",
 		"_hud_inventory_divider",
 		"_hud_use_custom_inventory_panel",
+		"_hud_display_armor_regen_timer",
 	},
 	["_hud_use_custom_drop_in_panel"] = {
 		"_hud_drop_in_show_peer_info",
@@ -38,6 +39,18 @@ local function _hud_option_changed(k, value, old_value, old_value_was_user_set, 
 		end
 	end
 
+	if k == "_hud_custom_health_panel_layout" then
+		local child = _get_item("_hud_display_armor_regen_timer")
+		if child then
+			local visible = value ~= "vanilla"
+			local previous_visibility = child:visible()
+			child:set_visible(visible)
+			if visible ~= previous_visibility then
+				managers.menu:active_menu().logic:refresh_node()
+			end
+		end
+	end
+
 	-- update gui
 	module.on_option_change_hud_update(k, value, "menu", o and { virtual = o.is_virtual, persist = o.persist })
 
@@ -56,6 +69,11 @@ module:hook("OnModulePostBuildOptions", "OnModulePostBuildOptions__hud", functio
 			end
 		end
 	end
+
+	local armor_timer_toggle = _get_item("_hud_display_armor_regen_timer", node)
+	if armor_timer_toggle then
+		armor_timer_toggle:set_visible(_get_item("_hud_custom_health_panel_layout", node):value() ~= "vanilla")
+	end
 end)
 
 -- scaling settings
@@ -70,7 +88,7 @@ module:add_config_option("_hud_long_name_splitting", true)
 
 -- health panel armor
 module:add_config_option("_hud_display_armor_and_health_values", false)
--- module:add_config_option("_hud_enable_armor_timer", false)
+module:add_config_option("_hud_display_armor_regen_timer", false)
 
 -- inventory panel
 module:add_config_option("_hud_use_custom_inventory_panel", true)
@@ -177,12 +195,12 @@ module:add_menu_option("_hud_display_armor_and_health_values", {
 	help_id = "_hud_display_armor_and_health_values_help",
 	localize = true,
 })
--- module:add_menu_option("_hud_enable_armor_timer", {
--- 	type = "boolean",
--- 	text_id = "_hud_enable_armor_timer",
--- 	help_id = "_hud_enable_armor_timer_help",
--- 	localize = true,
--- })
+module:add_menu_option("_hud_display_armor_regen_timer", {
+	type = "boolean",
+	text_id = "_hud_display_armor_regen_timer",
+	help_id = "_hud_display_armor_regen_timer_help",
+	localize = true,
+})
 
 module:add_menu_option("_hud_inventory_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_use_custom_inventory_panel", {
