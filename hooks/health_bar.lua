@@ -114,9 +114,25 @@ function PlayerHealthPanel:update_settings()
 		refresh_required = true
 	end
 
-	var_cache.use_vrep = D:conf("hud_prefer_virtual_reps")
+	local use_vrep = D:conf("hud_prefer_virtual_reps")
+	if var_cache.use_vrep ~= use_vrep then
+		var_cache.use_vrep = use_vrep
+		refresh_required = true
+	end
+
+	local mugshot_name = D:conf("_hud_mugshot_name")
+	if var_cache.mugshot_name ~= mugshot_name then
+		var_cache.mugshot_name = mugshot_name
+		refresh_required = true
+	end
+
+	local custom_username = D:conf("_hud_custom_mugshot_name")
+	if var_cache.custom_username ~= custom_username then
+		var_cache.custom_username = custom_username
+		refresh_required = true
+	end
+
 	var_cache.name_use_peer_color = D:conf("_hud_name_use_peer_color")
-	var_cache.use_name_splitting = D:conf("_hud_long_name_splitting")
 
 	if refresh_required then
 		self:layout()
@@ -773,8 +789,17 @@ function PlayerHealthPanel:layout_vanilla_chat()
 end
 
 function PlayerHealthPanel:get_player_name()
+	local var_cache = self._cached_conf_vars
+	if var_cache.mugshot_name == "user_defined" then
+		return var_cache.custom_username
+	end
+
+	if var_cache.mugshot_name == "character_name" then
+		return managers.localization:text("debug_" .. managers.criminals:local_character_name())
+	end
+
 	local name = self.data.peer:name()
-	if self._cached_conf_vars.use_name_splitting and utf8.len(name) > 16 then
+	if var_cache.mugshot_name == "short_username" and utf8.len(name) > 16 then
 		local words = {}
 		name:gsub("([^%s_%-+]+)", function(w)
 			table.insert(words, w)

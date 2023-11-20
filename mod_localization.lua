@@ -58,13 +58,26 @@ local strings = {
 	["_hud_use_custom_inventory_panel"] = {
 		english = "Use custom inventory panel",
 	},
-	["_hud_long_name_splitting"] = {
-		english = "Display short player name",
-		spanish = "Mostrar nombre de usuario recortado",
+	["_hud_mugshot_name"] = {
+		english = "Mugshot name",
 	},
-	["_hud_long_name_splitting_help"] = {
-		english = "Displays the only the longest word in your username if it exceeds the 16 character limit.",
-		spanish = "Muestra solo la palabra más larga de tu nombre de usuario si supera el límite de 16 caracteres.",
+	["_hud_mugshot_name_help"] = {
+		english = "Select what to display as your username in the custom health panel.",
+	},
+	["_hud_character_name"] = {
+		english = "Character name",
+	},
+	["_hud_steam_username"] = {
+		english = "Steam username",
+	},
+	["_hud_short_username"] = {
+		english = "Shortened Steam username",
+	},
+	["_hud_custom_username"] = {
+		english = "Custom username",
+	},
+	["_hud_custom_mugshot_name"] = {
+		english = "Custom mugshot name",
 	},
 	["_hud_name_use_peer_color"] = {
 		english = "Use peer color in custom health bar",

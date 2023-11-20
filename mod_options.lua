@@ -3,8 +3,9 @@ local module = ... or D:module("_hud")
 local visibility_nodes = {
 	["_hud_use_custom_health_panel"] = {
 		"_hud_custom_health_panel_layout",
+		"_hud_mugshot_name",
+		"_hud_custom_mugshot_name",
 		"_hud_name_use_peer_color",
-		"_hud_long_name_splitting",
 		"_hud_display_armor_and_health_values",
 		"_hud_inventory_divider",
 		"_hud_use_custom_inventory_panel",
@@ -52,6 +53,18 @@ local function _hud_option_changed(k, value, old_value, old_value_was_user_set, 
 		end
 	end
 
+	if k == "_hud_mugshot_name" then
+		local child = _get_item("_hud_custom_mugshot_name")
+		if child then
+			local visible = value == "user_defined"
+			local previous_visibility = child:visible()
+			child:set_visible(visible)
+			if visible ~= previous_visibility then
+				managers.menu:active_menu().logic:refresh_node()
+			end
+		end
+	end
+
 	-- update gui
 	module.on_option_change_hud_update(k, value, "menu", o and { virtual = o.is_virtual, persist = o.persist })
 
@@ -71,8 +84,16 @@ module:hook("OnModulePostBuildOptions", "OnModulePostBuildOptions__hud", functio
 		end
 	end
 
+	local health_bar_toggle = _get_item("_hud_use_custom_health_panel", node)
+	local visible = health_bar_toggle and health_bar_toggle:value() == "on" or false
+
+	local custom_name_input = _get_item("_hud_custom_mugshot_name", node)
+	if visible and custom_name_input then
+		custom_name_input:set_visible(_get_item("_hud_mugshot_name", node):value() == "user_defined")
+	end
+
 	local armor_timer_toggle = _get_item("_hud_display_armor_regen_timer", node)
-	if armor_timer_toggle then
+	if visible and armor_timer_toggle then
 		armor_timer_toggle:set_visible(_get_item("_hud_custom_health_panel_layout", node):value() ~= "vanilla")
 	end
 
@@ -90,8 +111,9 @@ module:add_config_option("_hud_font_scaling", 1.2)
 -- health panel
 module:add_config_option("_hud_use_custom_health_panel", true)
 module:add_config_option("_hud_custom_health_panel_layout", "raid")
+module:add_config_option("_hud_mugshot_name", "steam_username")
+module:add_config_option("_hud_custom_mugshot_name", "<name>")
 module:add_config_option("_hud_name_use_peer_color", false)
-module:add_config_option("_hud_long_name_splitting", true)
 
 -- health panel armor
 module:add_config_option("_hud_display_armor_and_health_values", false)
@@ -184,16 +206,29 @@ module:add_menu_option("_hud_custom_health_panel_layout", {
 	},
 	default_value = "raid",
 })
+module:add_menu_option("_hud_mugshot_name", {
+	type = "multi_choice",
+	text_id = "_hud_mugshot_name",
+	help_id = "_hud_mugshot_name_help",
+	choices = {
+		{ "character_name", "_hud_character_name" },
+		{ "steam_username", "_hud_steam_username" },
+		{ "short_username", "_hud_short_username" },
+		{ "user_defined", "_hud_custom_username" },
+	},
+	default_value = "steam_username",
+})
+module:add_menu_option("_hud_custom_mugshot_name", {
+	type = "string",
+	input_type = "text",
+	text_id = "_hud_custom_mugshot_name",
+	default_value = "<name>",
+})
+
 module:add_menu_option("_hud_name_use_peer_color", {
 	type = "boolean",
 	text_id = "_hud_name_use_peer_color",
 	help_id = "_hud_name_use_peer_color_help",
-	localize = true,
-})
-module:add_menu_option("_hud_long_name_splitting", {
-	type = "boolean",
-	text_id = "_hud_long_name_splitting",
-	help_id = "_hud_long_name_splitting_help",
 	localize = true,
 })
 
