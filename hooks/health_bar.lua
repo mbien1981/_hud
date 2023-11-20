@@ -661,6 +661,8 @@ function PlayerHealthPanel:layout()
 		return
 	end
 
+	self:update_player_data()
+
 	self.data.workspace_width = self.info_panels.mugshot:w() + 8 + (176 * self.scales.panel)
 
 	self.main_panel:set_h(self.info_panels.mugshot:h() + 8)
