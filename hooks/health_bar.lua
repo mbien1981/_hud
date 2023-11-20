@@ -909,6 +909,7 @@ function PlayerHealthPanel:update_health_and_armor()
 					o:set_w(math.lerp(o:w(), container.background:w() * health_percentage, p))
 				else
 					o:set_h(math.lerp(o:h(), container.background:h() * health_percentage, p))
+					o:set_bottom(container.background:bottom())
 				end
 
 				local health_color = ((health_percentage > 0.33) and self.colors[health_color_key]) or self.colors.hurt
@@ -920,6 +921,7 @@ function PlayerHealthPanel:update_health_and_armor()
 				o:set_w(container.background:w() * health_percentage)
 			else
 				o:set_h(container.background:h() * health_percentage)
+				o:set_bottom(container.background:bottom())
 			end
 		end)
 
@@ -951,6 +953,7 @@ function PlayerHealthPanel:update_health_and_armor()
 					)
 
 					o:set_h(math.lerp(o:h(), h - h_offset, p))
+					o:set_bottom(health_container.background:bottom())
 				end
 			end)
 
@@ -964,6 +967,7 @@ function PlayerHealthPanel:update_health_and_armor()
 				local h_offset = h * (1 - armor_percentage)
 				o:set_texture_rect(x, y + y_offset, self.data.armor_bar_rect[3], self.data.armor_bar_rect[4] - y_offset)
 				o:set_h(h - h_offset)
+				o:set_bottom(health_container.background:bottom())
 			end
 		end)
 
