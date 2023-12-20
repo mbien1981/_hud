@@ -23,15 +23,19 @@ local strings = {
 	},
 	["_hud_custom_health_panel_layout"] = {
 		english = "Health Panel Layout",
+		spanish = "Diseño del panel de salud",
 	},
 	["_hud_vanilla_style"] = {
 		english = "Vanilla Style",
+		spanish = "Estilo Vanilla",
 	},
 	["_hud_raid_style"] = {
 		english = "Raid Style",
+		spanish = "Raid",
 	},
 	["_hud_raid_alt_style"] = {
 		english = "Alternative Raid Style",
+		spanish = "Raid alternativo",
 	},
 	["_hud_display_armor_and_health_values"] = {
 		english = "Display armor and health values",
@@ -51,33 +55,43 @@ local strings = {
 	},
 	["_hud_reposition_chat_input"] = {
 		english = "Reposition chat input panel",
+		spanish = "Reposicionar el panel de chat",
 	},
 	["_hud_reposition_chat_input_help"] = {
-		english = "Move the chat input panel above the top player mugshot",
+		english = "Move the chat input panel above the top player mugshot.",
+		spanish = "Mueve la entrada de texto del chat para que este sobre el último panel de jugador.",
 	},
 	["_hud_use_custom_inventory_panel"] = {
 		english = "Use custom inventory panel",
+		spanish = "Utilizar el panel de inventario personalizado",
 	},
 	["_hud_mugshot_name"] = {
 		english = "Mugshot name",
+		spanish = "Nombre de la foto policial",
 	},
 	["_hud_mugshot_name_help"] = {
 		english = "Select what to display as your username in the custom health panel.",
+		spanish = "Selecciona qué mostrar como tu nombre de usuario en el panel de vida personalizado.",
 	},
 	["_hud_character_name"] = {
 		english = "Character name",
+		spanish = "Nombre del personaje",
 	},
 	["_hud_steam_username"] = {
 		english = "Steam username",
+		spanish = "Nombre de Steam",
 	},
 	["_hud_short_username"] = {
 		english = "Shortened Steam username",
+		spanish = "Nombre de Steam acortado",
 	},
 	["_hud_custom_username"] = {
 		english = "Custom username",
+		spanish = "Nombre de usuario personalizado",
 	},
 	["_hud_custom_mugshot_name"] = {
 		english = "Custom mugshot name",
+		spanish = "Nombre personalizado",
 	},
 	["_hud_name_use_peer_color"] = {
 		english = "Use peer color in custom health bar",
@@ -93,9 +107,11 @@ local strings = {
 	},
 	["_hud_enable_deployable_spy"] = {
 		english = "Enable deployable spy",
+		spanish = "Habilidar espía de desplegables",
 	},
 	["_hud_enable_deployable_spy_help"] = {
 		english = "Show remaining bag charges and sentry gun ammo and health.",
+		spanish = "Muestra la cantidad de cargas restantes en las bolsas y la cantidad de vida y munición restante en una torreta.",
 	},
 	["_hud_use_custom_drop_in_panel"] = {
 		english = "Use custom drop-in panel",
@@ -162,7 +178,8 @@ local strings = {
 		spanish = "Sí",
 	},
 	["_hud_no"] = {
-		english = "No",
+		english = "No", 
+		spanish = "No", 
 	},
 }
 
