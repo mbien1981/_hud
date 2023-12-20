@@ -14,8 +14,8 @@ local strings = {
 		spanish = "Utilizar etiquetas de vida personalizadas",
 	},
 	["_hud_peer_contour_colors"] = {
-		english = "Color code player contours",
-		spanish = "Utilizar colores de jugador en los contornos",
+		english = "Color code player and deployable contours",
+		spanish = "Utilizar colores de jugador en los contornos del jugador y desplegables",
 	},
 	["_hud_use_custom_health_panel"] = {
 		english = "Use custom health panel",

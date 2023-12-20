@@ -5,6 +5,7 @@ local module = DMod:new("_hud", {
 	allow_globals = true,
 	dependencies = { "_sdk", "hud" },
 	includes = {
+		{ "debug/base" },
 		{ "mod_hooks" },
 		{ "mod_localization", { type = "localization" } },
 		{ "mod_options", { type = "menu_options" } },
@@ -27,7 +28,10 @@ module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/deployable
 module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/deployable_spy")
 
-module:hook_post_require("lib/managers/gameplaycentralmanager", "hooks/peer_contours")
+module:hook_post_require("lib/units/interactions/interactionext", "hooks/deployable_contours")
+module:hook_post_require("lib/units/weapons/trip_mine/tripminebase", "hooks/deployable_contours")
+module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_contours")
+module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/deployable_contours")
 module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
 module:hook_post_require("lib/network/handlers/unitnetworkhandler", "hooks/name_labels")
 
