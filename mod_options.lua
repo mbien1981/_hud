@@ -16,6 +16,9 @@ local visibility_nodes = {
 		"_hud_drop_in_show_peer_info",
 		"_hud_mod_list_position",
 	},
+	["_hud_enable_custom_ammo_panel"] = {
+		"_hud_ammo_panel_show_real_ammo",
+	},
 }
 
 local function _get_item(item_name, node)
@@ -126,6 +129,8 @@ module:add_config_option("_hud_use_custom_inventory_panel", true)
 
 -- custom ammo panel and deployable spy
 module:add_config_option("_hud_enable_custom_ammo_panel", true)
+module:add_config_option("_hud_ammo_panel_show_real_ammo", true)
+
 module:add_config_option("_hud_enable_deployable_spy", true)
 
 -- custom drop-in panel
@@ -267,6 +272,14 @@ module:add_menu_option("_hud_enable_custom_ammo_panel", {
 	text_id = "_hud_enable_custom_ammo_panel",
 	localize = true,
 })
+module:add_menu_option("_hud_ammo_panel_show_real_ammo", {
+	type = "boolean",
+	text_id = "_hud_ammo_panel_show_real_ammo",
+	help_id = "_hud_ammo_panel_show_real_ammo_help",
+	localize = true,
+})
+
+module:add_menu_option("_hud_deployable_stuff_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_enable_deployable_spy", {
 	type = "boolean",
 	text_id = "_hud_enable_deployable_spy",

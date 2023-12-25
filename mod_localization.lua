@@ -105,6 +105,14 @@ local strings = {
 		english = "Use custom ammo panel",
 		spanish = "Utilizar indicador de munición personalizado.",
 	},
+	["_hud_ammo_panel_show_real_ammo"] = {
+		english = "Show real ammo values",
+		spanish = "Mostrar valores de municion verdaderos",
+	},
+	["_hud_ammo_panel_show_real_ammo_help"] = {
+		english = "Show total ammo count without taking in mind the munition inside your current clip.",
+		spanish = "Muestra el valor total de tu minición sin tomar en cuenta la munición de tu cargador.",
+	},
 	["_hud_enable_deployable_spy"] = {
 		english = "Enable deployable spy",
 		spanish = "Habilidar espía de desplegables",

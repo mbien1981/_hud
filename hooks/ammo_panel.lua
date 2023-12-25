@@ -98,7 +98,6 @@ function CustomAmmoPanelClass:update()
 	local config = D:conf("_hud_enable_custom_ammo_panel")
 	self._panel:set_visible(config)
 	self._hud.weapon_panel:set_visible(not config)
-	-- self._hud.weapon_name:set_visible(not config)
 	self._hud.ammo_panel:set_visible(not config)
 
 	if not self._panel:visible() then
@@ -130,7 +129,13 @@ function CustomAmmoPanelClass:update_weapon(weapon, weapon_base, selected)
 	local max_clip, current_clip, ammo_amount = weapon_base:ammo_info()
 
 	weapon.clip:set_text(tostring(current_clip))
-	weapon.total:set_text(tostring(ammo_amount - current_clip))
+
+	local ammo_total = ammo_amount
+	if D:conf("_hud_ammo_panel_show_real_ammo") then
+		ammo_total = ammo_amount - current_clip
+	end
+
+	weapon.total:set_text(tostring(ammo_total))
 
 	local color_alpha = selected and 1 or 0.4
 	local color_icon = selected and tweak_data.hud.prime_color or self.colors.default
