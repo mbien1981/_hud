@@ -13,6 +13,8 @@ local col_to_vec = function(color)
 	return Vector3(0.1, 1, 0.5)
 end
 
+local module = ... or D:module("_hud")
+
 local GamePlayCentralManager = module:hook_class("GamePlayCentralManager")
 module:pre_hook(50, GamePlayCentralManager, "update", function(self)
 	if not next(self._contour.units) then
