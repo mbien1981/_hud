@@ -148,6 +148,8 @@ function PlayerInventoryPanel:update()
 end
 
 if RequiredScript == "lib/managers/hudmanager" then
+	local module = ... or D:module("_hud")
+
 	local HUDManager = module:hook_class("HUDManager")
 	-- deployables
 	module:post_hook(50, HUDManager, "add_item", function(self, data)
