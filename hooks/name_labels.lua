@@ -4,7 +4,11 @@ if RequiredScript == "lib/managers/hudmanager" then
 	local HUDManager = module:hook_class("HUDManager")
 	module:post_hook(50, HUDManager, "_add_name_label", function(self, data)
 		local name_labels = self._hud.name_labels
+
 		local name_label_data = name_labels[#name_labels]
+		if not name_label_data then
+			return
+		end
 
 		local peer
 		local is_husk_player = data.unit:base().is_husk_player
