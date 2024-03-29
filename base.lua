@@ -24,9 +24,9 @@ module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/health_bar
 module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/health_bar")
 module:hook_post_require("lib/managers/hudmanager", "hooks/inventory")
 
-module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/deployable_spy")
+module:hook_post_require("lib/units/equipment/sentry_gun/sentrygunbase", "hooks/deployable_spy")
 
 module:hook_post_require("lib/managers/gameplaycentralmanager", "hooks/peer_contours")
 module:hook_post_require("lib/units/interactions/interactionext", "hooks/deployable_contours")
