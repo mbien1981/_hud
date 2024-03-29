@@ -9,11 +9,15 @@ if RequiredScript == "lib/units/interactions/interactionext" then
 	module:post_hook(BaseInteractionExt, "_set_contour", function(self, color, opacity)
 		D = D or rawget(_G, "D")
 		local contour_id = self._tweak_data.contour
-		if not D:conf("_hud_peer_contour_colors") or contour_id ~= "deployable" or color ~= "standard_color" then
+		if contour_id ~= "deployable" or color ~= "standard_color" then
 			return
 		end
 
-		local material_color = tablex.get(tweak_data, "contour", contour_id, color)
+		if not D:conf("_hud_peer_contour_colors") or tweak_data.contours_disabled then
+			return
+		end
+
+		local material_color = tablex.get(tweak_data, "contour", contour_id, color) or Vector3(1, 0.5, 0.5)
 		local server_info = self._unit:base():server_information()
 		if server_info then
 			material_color = tweak_data.chat_colors[server_info.owner_peer_id] or material_color
