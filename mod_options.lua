@@ -137,7 +137,7 @@ module:add_config_option("_hud_enable_custom_ammo_panel", true)
 module:add_config_option("_hud_ammo_panel_show_real_ammo", true)
 
 module:add_config_option("_hud_enable_deployable_spy", true)
-module:add_config_option("_hud_medic_bag_spy", "$CHARGES;")
+module:add_config_option("_hud_medic_bag_spy", "$CHARGES;x")
 module:add_config_option("_hud_ammo_bag_spy", "$PERCENT;")
 module:add_config_option("_hud_sentry_gun_spy", "$AMMO;/$AMMO_MAX; | [#7FFF7F]$HEALTH;[]%")
 

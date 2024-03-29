@@ -129,7 +129,7 @@ function DeployableSpy:get_item_text(unit, unit_type)
 	end
 
 	local value = unit:base()[vars[unit_type]]
-	return self:string_format(text, { CHARGES = string.format("%.2fx", value), PERCENT = value * 100 })
+	return self:string_format(text, { CHARGES = string.format("%.2f", value), PERCENT = value * 100 })
 end
 
 function DeployableSpy:update_item(index)
