@@ -19,6 +19,11 @@ local visibility_nodes = {
 	["_hud_enable_custom_ammo_panel"] = {
 		"_hud_ammo_panel_show_real_ammo",
 	},
+	["_hud_enable_deployable_spy"] = {
+		"_hud_medic_bag_spy",
+		"_hud_ammo_bag_spy",
+		"_hud_sentry_gun_spy",
+	},
 }
 
 local function _get_item(item_name, node)
@@ -132,6 +137,9 @@ module:add_config_option("_hud_enable_custom_ammo_panel", true)
 module:add_config_option("_hud_ammo_panel_show_real_ammo", true)
 
 module:add_config_option("_hud_enable_deployable_spy", true)
+module:add_config_option("_hud_medic_bag_spy", "$CHARGES;")
+module:add_config_option("_hud_ammo_bag_spy", "$PERCENT;")
+module:add_config_option("_hud_sentry_gun_spy", "$AMMO;/$AMMO_MAX; | [#7FFF7F]$HEALTH;[]%")
 
 -- custom drop-in panel
 module:add_config_option("_hud_use_custom_drop_in_panel", true)
@@ -285,6 +293,27 @@ module:add_menu_option("_hud_enable_deployable_spy", {
 	text_id = "_hud_enable_deployable_spy",
 	help_id = "_hud_enable_deployable_spy_help",
 	localize = true,
+})
+module:add_menu_option("_hud_medic_bag_spy", {
+	type = "string",
+	input_type = "text",
+	text_id = "_hud_medic_bag_spy",
+	help_id = "_hud_medic_bag_spy_help",
+	default_value = "$CHARGES;",
+})
+module:add_menu_option("_hud_ammo_bag_spy", {
+	type = "string",
+	input_type = "text",
+	text_id = "_hud_ammo_bag_spy",
+	help_id = "_hud_ammo_bag_spy_help",
+	default_value = "$PERCENT;",
+})
+module:add_menu_option("_hud_sentry_gun_spy", {
+	type = "string",
+	input_type = "text",
+	text_id = "_hud_sentry_gun_spy",
+	help_id = "_hud_sentry_gun_spy_help",
+	default_value = "$AMMO;/$AMMO_MAX; | [#7FFF7F]$HEALTH;[]%",
 })
 
 module:add_menu_option("_hud_drop_in_divider", { type = "divider", size = 15 })

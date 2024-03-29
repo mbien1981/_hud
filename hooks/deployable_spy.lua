@@ -1,5 +1,4 @@
 DeployableSpy = DeployableSpy or {}
--- DeployableSpy.items = DeployableSpy.items or {}
 
 function DeployableSpy:setup()
 	if self._ws then
@@ -19,13 +18,6 @@ function DeployableSpy:setup()
 		path = "fonts/font_univers_530_bold",
 		size = 12,
 	}
-	self.strings = {
-		["medic_bag"] = "%.0fx",
-		["ammo_bag"] = "%.2fx",
-		["sentry_gun"] = "%d (hp: %.2f%%)",
-	}
-
-	self._sdk = _G._sdk
 
 	_G._updator:add(callback(self, self, "update"), "deployable_spy_update")
 end
@@ -106,18 +98,38 @@ function DeployableSpy:get_vector_angle(vector)
 	return dir
 end
 
-function DeployableSpy:get_item_text(unit, type)
-	if type == "sentry_gun" then
+function DeployableSpy:make_pretty_text(text_obj)
+	local _, _, w, h = text_obj:text_rect()
+	w, h = w + 2, h + 2
+
+	text_obj:set_w(w)
+	text_obj:set_h(h)
+
+	return w, h
+end
+
+function DeployableSpy:string_format(text, macros)
+	return text:gsub("($([^%s;#]+);?)", function(full_match, macro_name)
+		return macros[macro_name:upper()] or full_match
+	end)
+end
+
+local vars = { medic_bag = "_amount", ammo_bag = "_ammo_amount" }
+function DeployableSpy:get_item_text(unit, unit_type)
+	local text = D:conf(string.format("_hud_%s_spy", unit_type))
+
+	if unit_type == "sentry_gun" then
 		local ammo = unit:weapon()._ammo_total
 		local health = tonumber(unit:character_damage()._health or 0) * 10
 		if health <= 0 or (ammo * 10) <= 0 then
 			return nil
 		end
 
-		return string.format(self.strings[type], ammo, health)
+		return self:string_format(text, { AMMO = ammo, AMMO_MAX = unit:weapon()._ammo_max, HEALTH = health })
 	end
 
-	return string.format(self.strings[type], unit:base()[(type == "medic_bag" and "_amount") or "_ammo_amount"])
+	local value = unit:base()[vars[unit_type]]
+	return self:string_format(text, { CHARGES = string.format("%.2fx", value), PERCENT = value * 100 })
 end
 
 function DeployableSpy:update_item(index)
@@ -136,14 +148,25 @@ function DeployableSpy:update_item(index)
 		return
 	end
 
-	local text = self:get_item_text(item.unit, item.type)
+	local text, colors
+
+	text = self:get_item_text(item.unit, item.type)
 	if not text then
 		self:remove(index)
 		return
 	end
 
+	text, colors = StringUtils:parse_color_string_utf8(text)
 	item.text:set_text(text)
-	local w, _ = self._sdk:update_text_rect(item.text)
+
+	if colors then
+		for i = 1, #colors do
+			local c = colors[i]
+			item.text:set_range_color(c.i - 1, c.j, c.color)
+		end
+	end
+
+	local w, _ = self:make_pretty_text(item.text)
 
 	local distance = math.max(math.min(mvector3.distance(camera:position(), position), 8000), 20)
 	item.text:set_font_size(36 / (distance / 200))
@@ -178,7 +201,6 @@ function DeployableSpy:update()
 end
 
 local module = ... or D:module("_hud")
-
 
 if RequiredScript == "lib/units/equipment/ammo_bag/ammobagbase" then
 	local AmmoBagBase = module:hook_class("AmmoBagBase")

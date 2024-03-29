@@ -121,6 +121,16 @@ local strings = {
 		english = "Show remaining bag charges and sentry gun ammo and health.",
 		spanish = "Muestra la cantidad de cargas restantes en las bolsas y la cantidad de vida y munición restante en una torreta.",
 	},
+	["_hud_medic_bag_spy"] = { english = "Medic Bag text format" },
+	["_hud_medic_bag_spy_help"] = {
+		english = "$CARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
+	},
+	["_hud_ammo_bag_spy"] = { english = "Ammo Bag text format" },
+	["_hud_ammo_bag_spy_help"] = {
+		english = "$CARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
+	},
+	["_hud_sentry_gun_spy"] = { english = "Sentry Gun text format" },
+	["_hud_sentry_gun_spy_help"] = { english = "$AMMO; = Shows current ammo.\n$AMMO_MAX; = Shows max ammo.\n$HEALTH; Shows current health.\n\nSupports color tags." },
 	["_hud_use_custom_drop_in_panel"] = {
 		english = "Use custom drop-in panel",
 		spanish = "Utilizar panel personalizado de entrada de jugador.",
@@ -186,8 +196,8 @@ local strings = {
 		spanish = "Sí",
 	},
 	["_hud_no"] = {
-		english = "No", 
-		spanish = "No", 
+		english = "No",
+		spanish = "No",
 	},
 }
 
