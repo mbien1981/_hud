@@ -1,9 +1,14 @@
-DeployableSpyClass = class()
+DeployableSpy = DeployableSpy or {}
+-- DeployableSpy.items = DeployableSpy.items or {}
 
-function DeployableSpyClass:init()
+function DeployableSpy:setup()
+	if self._ws then
+		return
+	end
+
 	self._ws = managers.gui_data:create_fullscreen_workspace()
 	self._panel = self._ws:panel():panel({
-		name = "bag_spy_panel",
+		name = "deployable_spy_panel",
 		layer = -100,
 		alpha = 1,
 		visible = true,
@@ -25,7 +30,7 @@ function DeployableSpyClass:init()
 	_G._updator:add(callback(self, self, "update"), "deployable_spy_update")
 end
 
-function DeployableSpyClass:exists(unit)
+function DeployableSpy:exists(unit)
 	if not next(self.items) then
 		return false
 	end
@@ -39,7 +44,9 @@ function DeployableSpyClass:exists(unit)
 	return false
 end
 
-function DeployableSpyClass:add(unit, type)
+function DeployableSpy:add(unit, type)
+	self:setup()
+
 	if self:exists(unit) then --?
 		return
 	end
@@ -58,16 +65,16 @@ function DeployableSpyClass:add(unit, type)
 	})
 end
 
-function DeployableSpyClass:remove(index)
+function DeployableSpy:remove(index)
 	local item = self.items[index]
 	self._panel:remove(item.text)
 
 	table.remove(self.items, index)
 end
 
-function DeployableSpyClass:get_vector_angle(vector)
-	local p_unit = self._sdk:player()
-	if not p_unit then
+function DeployableSpy:get_vector_angle(vector)
+	local p_unit = managers.player:player_unit()
+	if not alive(p_unit) then
 		return nil
 	end
 
@@ -99,7 +106,7 @@ function DeployableSpyClass:get_vector_angle(vector)
 	return dir
 end
 
-function DeployableSpyClass:get_item_text(unit, type)
+function DeployableSpy:get_item_text(unit, type)
 	if type == "sentry_gun" then
 		local ammo = unit:weapon()._ammo_total
 		local health = tonumber(unit:character_damage()._health or 0) * 10
@@ -113,7 +120,7 @@ function DeployableSpyClass:get_item_text(unit, type)
 	return string.format(self.strings[type], unit:base()[(type == "medic_bag" and "_amount") or "_ammo_amount"])
 end
 
-function DeployableSpyClass:update_item(index)
+function DeployableSpy:update_item(index)
 	local item = self.items[index]
 	if not alive(item.unit) or alive(item.unit) and item.unit:base()._empty then
 		self:remove(index)
@@ -122,7 +129,7 @@ function DeployableSpyClass:update_item(index)
 
 	local position = item.unit:position()
 
-	local camera = self._sdk:player():camera()
+	local camera = managers.player:player_unit():camera()
 	local angle = self:get_vector_angle(position)
 	if (mvector3.distance(camera:forward(), angle) / 2 * 360) > 180 then
 		item.text:set_alpha(0)
@@ -149,7 +156,7 @@ function DeployableSpyClass:update_item(index)
 	item.text:set_alpha(1)
 end
 
-function DeployableSpyClass:update_items()
+function DeployableSpy:update_items()
 	if not next(self.items) then
 		return
 	end
@@ -159,8 +166,8 @@ function DeployableSpyClass:update_items()
 	end
 end
 
-function DeployableSpyClass:update()
-	if not self._sdk:player() or not D:conf("_hud_enable_deployable_spy") then
+function DeployableSpy:update()
+	if not alive(managers.player:player_unit()) or not D:conf("_hud_enable_deployable_spy") then
 		self._panel:hide()
 		return
 	end
@@ -171,24 +178,18 @@ function DeployableSpyClass:update()
 end
 
 local module = ... or D:module("_hud")
-if RequiredScript == "lib/states/ingamewaitingforplayers" then
-	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
-	module:post_hook(50, IngameWaitingForPlayersState, "at_enter", function(...)
-		rawset(_G, "DeployableSpy", DeployableSpyClass:new())
-	end, false)
-end
 
--- :setup functions don't seem to be called on bags that are already spawned when you join.
+
 if RequiredScript == "lib/units/equipment/ammo_bag/ammobagbase" then
 	local AmmoBagBase = module:hook_class("AmmoBagBase")
-	module:post_hook(50, AmmoBagBase, "setup", function(self, ...)
+	module:post_hook(50, AmmoBagBase, "set_server_information", function(self, ...)
 		DeployableSpy:add(self._unit, "ammo_bag")
 	end)
 end
 
 if RequiredScript == "lib/units/equipment/doctor_bag/doctorbagbase" then
 	local DoctorBagBase = module:hook_class("DoctorBagBase")
-	module:post_hook(50, DoctorBagBase, "setup", function(self, ...)
+	module:post_hook(50, DoctorBagBase, "set_server_information", function(self, ...)
 		DeployableSpy:add(self._unit, "medic_bag")
 	end)
 end
