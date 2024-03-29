@@ -1,6 +1,10 @@
 local module = ... or D:module("_hud")
 
 local col_to_vec = function(color)
+	if not color then
+		return Vector3(0.1, 0.4, 0.25)
+	end
+
 	local r, g, b = color.r, color.g, color.b
 	if r and g and b then
 		return Vector3(r, g, b)
@@ -13,8 +17,6 @@ local col_to_vec = function(color)
 	return Vector3(0.1, 1, 0.5)
 end
 
-local module = ... or D:module("_hud")
-
 local GamePlayCentralManager = module:hook_class("GamePlayCentralManager")
 module:pre_hook(50, GamePlayCentralManager, "update", function(self)
 	if not next(self._contour.units) then
@@ -22,13 +24,13 @@ module:pre_hook(50, GamePlayCentralManager, "update", function(self)
 	end
 
 	local data = self._contour.units[self._contour.index]
-	if not data or data and data.type ~= "character" then
+	if tablex.get(data, "type") ~= "character" then
 		return
 	end
 
-	if not D:conf("_hud_peer_contour_colors") then
+	if not D:conf("_hud_peer_contour_colors") or tweak_data.contours_disabled then
 		if data.updated_color then
-			data.standard_color = tweak_data.contour[data.type].standard_color
+			data.standard_color = tablex.get(tweak_data, "contour", data.type, "standard_color") or col_to_vec(nil)
 			data.updated_color = nil
 		end
 
@@ -39,16 +41,15 @@ module:pre_hook(50, GamePlayCentralManager, "update", function(self)
 		return
 	end
 
-	local is_husk_player = data.unit:base().is_husk_player
-	if is_husk_player then
-		local peer = data.unit:network():peer()
-		if peer then
-			data.standard_color = col_to_vec(tweak_data.chat_colors[peer:id()])
-			data.updated_color = true
-		end
+	if not data.unit:base().is_husk_player then
+		data.standard_color = col_to_vec(D:conf("_hud_ai_contour_color"))
+		data.updated_color = true
 		return
 	end
 
-	data.standard_color = col_to_vec(D:conf("_hud_ai_contour_color"))
-	data.updated_color = true
+	local peer = data.unit:network():peer()
+	if peer then
+		data.standard_color = col_to_vec(tablex.get(tweak_data, "chat_colors", peer:id()))
+		data.updated_color = true
+	end
 end)
