@@ -15,8 +15,11 @@ function PlayerInventoryPanel:init(super)
 
 	self:update_settings()
 	self:setup_panels()
-	_G._updator:remove("teqerasoidjwqe2")
-	_G._updator:add(callback(self, self, "update"), "teqerasoidjwqe2")
+
+	self._updator = _M._hudUpdator
+
+	self._updator:remove("_hud_inventory_panel_update")
+	self._updator:add(callback(self, self, "update"), "_hud_inventory_panel_update")
 end
 
 function PlayerInventoryPanel:update_settings()

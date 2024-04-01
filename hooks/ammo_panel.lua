@@ -1,4 +1,5 @@
 CustomAmmoPanelClass = class()
+
 function CustomAmmoPanelClass:init()
 	self._hud = managers.hud:script(PlayerBase.PLAYER_HUD)
 	self._panel = self._hud.panel:panel()
@@ -10,9 +11,10 @@ function CustomAmmoPanelClass:init()
 		empty = Color("FF7070"),
 	}
 
-	self._sdk = _G._sdk
-	self._updator = _G._updator
+	self._toolbox = _M._hudToolBox
+	self._updator = _M._hudUpdator
 
+	self._updator:remove("ammo_update")
 	self._updator:add(callback(self, self, "update"), "ammo_update")
 end
 
@@ -60,11 +62,11 @@ function CustomAmmoPanelClass:add_weapon(data)
 		bitmap:set_center_x(self._hud.item_panel:center_x())
 	end
 
-	self._sdk:update_text_rect(total)
+	self._toolbox:make_pretty_text(total)
 	total:set_bottom(bitmap:bottom())
 	total:set_right(bitmap:left() - 6)
 
-	self._sdk:update_text_rect(clip)
+	self._toolbox:make_pretty_text(clip)
 	clip:set_center(total:center())
 	clip:set_right(total:left() - 4)
 
@@ -151,18 +153,18 @@ local module = ... or D:module("_hud")
 if RequiredScript == "lib/managers/hudmanager" then
 	local HUDManager = module:hook_class("HUDManager")
 	module:post_hook(HUDManager, "add_weapon", function(self, data)
-		if not rawget(_G, "CustomAmmoPanel") then
-			rawset(_G, "CustomAmmoPanel", CustomAmmoPanelClass:new())
+		if not rawget(_M, "CustomAmmoPanel") then
+			rawset(_M, "CustomAmmoPanel", CustomAmmoPanelClass:new())
 		end
 
-		CustomAmmoPanel:add_weapon(data)
+		_M.CustomAmmoPanel:add_weapon(data)
 	end)
 
 	module:post_hook(HUDManager, "clear_weapons", function(self)
-		if not rawget(_G, "CustomAmmoPanel") then
-			rawset(_G, "CustomAmmoPanel", CustomAmmoPanelClass:new())
+		if not rawget(_M, "CustomAmmoPanel") then
+			rawset(_M, "CustomAmmoPanel", CustomAmmoPanelClass:new())
 		end
 
-		CustomAmmoPanel:clear_weapons()
+		_M.CustomAmmoPanel:clear_weapons()
 	end)
 end

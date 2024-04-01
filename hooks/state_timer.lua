@@ -10,10 +10,13 @@ function StateTimerPanel:init()
 		layer = 150,
 	})
 
-	self._sdk = _G._sdk --* requires version 1.2 or above
+	self._toolbox = _M._hudToolBox
+	self._updator = _M._hudUpdator
 
 	self:setup_panels()
-	_G._updator:add(callback(self, self, "update"), "_hud_reload_timer_update")
+
+	self._updator:remove("_hud_reload_timer_update")
+	self._updator:add(callback(self, self, "update"), "_hud_reload_timer_update")
 end
 
 function StateTimerPanel:setup_panels()
@@ -55,7 +58,7 @@ function StateTimerPanel:setup_panels()
 		x = 4,
 		y = 4,
 	})
-	self._sdk:update_text_rect(self._timer_text)
+	self._toolbox:make_pretty_text(self._timer_text)
 
 	self._timer_text:set_leftbottom(self._timer_panel:lefttop())
 end
@@ -66,7 +69,7 @@ function StateTimerPanel:update_gui(show)
 		self._panel:show()
 
 		self._timer_text:set_text(string.format("%.2fs", self._current_timer))
-		self._sdk:update_text_rect(self._timer_text)
+		self._toolbox:make_pretty_text(self._timer_text)
 
 		local fill_precentage = math.clamp(self._current_timer / self._max_t, 0, 1)
 		local bg = self._timer_panel:child("background")
@@ -84,7 +87,8 @@ function StateTimerPanel:update_fire_timer()
 		return false
 	end
 
-	local state = self._sdk:player_movement_state()
+	local player_unit = managers.player:player_unit()
+	local state = alive(player_unit) and player_unit:movement():current_state()
 	local weapon_base = state and alive(state._equipped_unit) and state._equipped_unit:base()
 	if weapon_base and not weapon_base:start_shooting_allowed() then
 		local name_id = weapon_base._name_id
@@ -92,7 +96,7 @@ function StateTimerPanel:update_fire_timer()
 			return false
 		end
 
-		self._current_timer = tonumber(weapon_base._next_fire_allowed - self._sdk:current_game_time()) or 0
+		self._current_timer = tonumber(weapon_base._next_fire_allowed - self._toolbox:current_game_time()) or 0
 		if not self._max_t then
 			self._max_t = self._current_timer
 		end
@@ -108,9 +112,10 @@ function StateTimerPanel:update_reload_timer()
 		return false
 	end
 
-	local state = self._sdk:player_movement_state()
+	local player_unit = managers.player:player_unit()
+	local state = alive(player_unit) and player_unit:movement():current_state()
 	if state and state._is_reloading and state:_is_reloading() then
-		self._current_timer = tonumber(state:_is_reloading() - self._sdk:current_game_time()) or 0
+		self._current_timer = tonumber(state:_is_reloading() - self._toolbox:current_game_time()) or 0
 		-- todo: find a proper way to reset self._max_t when entering state._reload_exit_expire_t
 		if not self._max_t or (self._max_t and (self._current_timer > self._max_t)) then
 			self._max_t = self._current_timer

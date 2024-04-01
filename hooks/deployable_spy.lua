@@ -19,7 +19,11 @@ function DeployableSpy:setup()
 		size = 12,
 	}
 
-	_G._updator:add(callback(self, self, "update"), "deployable_spy_update")
+	self._toolbox = _M._hudToolBox
+	self._updator = _M._hudUpdator
+
+	self._updator:remove("_hud_deployable_spy_update")
+	self._updator:add(callback(self, self, "update"), "_hud_deployable_spy_update")
 end
 
 function DeployableSpy:exists(unit)
@@ -129,8 +133,9 @@ function DeployableSpy:get_item_text(unit, unit_type)
 	end
 
 	local value = unit:base()[vars[unit_type]]
+	local charge_str = unit_type == "ammo_bag" and "%.2f" or "%d"
 	return self:string_format(text, {
-		CHARGES = string.format("%.2f", value),
+		CHARGES = string.format(charge_str, value),
 		PERCENT = string.format("%d", value * 100),
 	})
 end
@@ -151,25 +156,14 @@ function DeployableSpy:update_item(index)
 		return
 	end
 
-	local text, colors
-
-	text = self:get_item_text(item.unit, item.type)
+	local text = self:get_item_text(item.unit, item.type)
 	if not text then
 		self:remove(index)
 		return
 	end
 
-	text, colors = StringUtils:parse_color_string_utf8(text)
 	item.text:set_text(text)
-
-	if colors then
-		for i = 1, #colors do
-			local c = colors[i]
-			item.text:set_range_color(c.i - 1, c.j, c.color)
-		end
-	end
-
-	local w, _ = self:make_pretty_text(item.text)
+	self._toolbox:parse_color_tags(item.text)
 
 	local distance = math.max(math.min(mvector3.distance(camera:position(), position), 8000), 20)
 	item.text:set_font_size(36 / (distance / 200))
@@ -177,7 +171,7 @@ function DeployableSpy:update_item(index)
 	local world_to_screen = Vector3()
 	mvector3.set(world_to_screen, self._ws:world_to_screen(camera._camera_object, position))
 
-	item.text:set_x(world_to_screen.x - (w / 2))
+	item.text:set_x(world_to_screen.x - (item.text:w() / 2))
 	item.text:set_y(world_to_screen.y)
 	item.text:set_alpha(1)
 end

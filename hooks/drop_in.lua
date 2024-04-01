@@ -24,7 +24,7 @@ function CustomDropInClass:init()
 		grey = Color("CECECE"),
 	}
 
-	self._sdk = _G._sdk
+	self._toolbox = _M._hudToolBox
 
 	self:setup_panels()
 end
@@ -76,10 +76,10 @@ function CustomDropInClass:setup_panels()
 end
 
 function CustomDropInClass:_layout()
-	self._sdk:update_text_rect(self._progress)
-	self._sdk:update_text_rect(self._peer_name)
-	self._sdk:update_text_rect(self._peer_info)
-	self._sdk:update_text_rect(self._peer_mods)
+	self._toolbox:make_pretty_text(self._progress)
+	self._toolbox:make_pretty_text(self._peer_name)
+	self._toolbox:make_pretty_text(self._peer_info)
+	self._toolbox:make_pretty_text(self._peer_mods)
 
 	self._progress:set_center(self.main_panel:center())
 
@@ -130,7 +130,7 @@ function CustomDropInClass:update_peer(peer_id, progress, time_left)
 		self._background:stop()
 		self._background:animate(function(o)
 			o:show()
-			self._sdk:animate_ui(1, function(p)
+			self._toolbox:animate_ui(1, function(p)
 				o:set_alpha(math.lerp(o:alpha(), 0.75, p))
 			end)
 
@@ -190,7 +190,7 @@ function CustomDropInClass:show(peer_id)
 	self._background:stop()
 	self._background:animate(function(o)
 		o:show()
-		self._sdk:animate_ui(1, function(p)
+		self._toolbox:animate_ui(1, function(p)
 			o:set_alpha(math.lerp(o:alpha(), 0.75, p))
 		end)
 
@@ -212,7 +212,7 @@ function CustomDropInClass:hide(peer_id)
 
 	self._background:stop()
 	self._background:animate(function(o)
-		self._sdk:animate_ui(1, function(p)
+		self._toolbox:animate_ui(1, function(p)
 			o:set_alpha(math.lerp(o:alpha(), 0, p))
 		end)
 
@@ -238,7 +238,7 @@ D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, funct
 		return
 	end
 
-	local drop_in = rawget(_G, "CustomDropInPanel")
+	local drop_in = rawget(_M, "CustomDropInPanel")
 	if not drop_in then
 		return
 	end
@@ -257,13 +257,13 @@ end)
 if RequiredScript == "lib/states/ingamewaitingforplayers" then
 	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
 	module:post_hook(50, IngameWaitingForPlayersState, "at_exit", function(...)
-		rawset(_G, "CustomDropInPanel", CustomDropInClass:new())
+		rawset(_M, "CustomDropInPanel", CustomDropInClass:new())
 	end, false)
 end
 
 if RequiredScript == "lib/managers/menumanager" then
 	module:hook(50, MenuManager, "update_person_joining", function(self, id, progress)
-		local drop_in = rawget(_G, "CustomDropInPanel")
+		local drop_in = rawget(_M, "CustomDropInPanel")
 		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
 			if drop_in and drop_in._active then
 				drop_in:hide(id)
@@ -293,7 +293,7 @@ if RequiredScript == "lib/managers/menumanager" then
 
 	local MenuManager = module:hook_class("MenuManager")
 	module:hook(50, MenuManager, "show_person_joining", function(self, id, nick)
-		local drop_in = rawget(_G, "CustomDropInPanel")
+		local drop_in = rawget(_M, "CustomDropInPanel")
 
 		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
 			module:call_orig(MenuManager, "show_person_joining", self, id, nick)
@@ -311,7 +311,7 @@ if RequiredScript == "lib/managers/menumanager" then
 			self.peer_join_start_t[id] = nil
 		end
 
-		local drop_in = rawget(_G, "CustomDropInPanel")
+		local drop_in = rawget(_M, "CustomDropInPanel")
 		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
 			module:call_orig(MenuManager, "close_person_joining", self, id)
 			return

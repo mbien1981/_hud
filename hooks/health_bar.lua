@@ -51,7 +51,8 @@ function PlayerHealthPanel:init(super)
 	}
 	self._cached_conf_vars = {}
 
-	self._sdk = _G._sdk
+	self._toolbox = _M._hudToolBox
+	self._updator = _M._hudUpdator
 
 	self:update_settings()
 	self:setup_panels()
@@ -60,8 +61,8 @@ function PlayerHealthPanel:init(super)
 	self:layout()
 	self:update_panel_visibility()
 
-	_G._updator:remove("health_bar_update")
-	_G._updator:add(callback(self, self, "update"), "health_bar_update")
+	self._updator:remove("health_bar_update")
+	self._updator:add(callback(self, self, "update"), "health_bar_update")
 end
 
 function PlayerHealthPanel:update_settings()
@@ -199,66 +200,73 @@ function PlayerHealthPanel:create_mugshot()
 end
 
 function PlayerHealthPanel:create_player_data()
-	self.info_panels.player_name = make_fine_text(self.main_panel:text({
+	self.info_panels.player_name = self.main_panel:text({
 		name = "player_name",
 		text = "simon andersson",
 		font = self.font,
 		font_size = 14 * self.scales.hud * self.scales.font,
 		layer = 1,
-	}))
+	})
 
-	self.info_panels.player_level = make_fine_text(self.main_panel:text({
+	self.info_panels.player_level = self.main_panel:text({
 		name = "player_level",
 		text = "0",
 		font = self.font,
 		font_size = 11 * self.scales.hud * self.scales.font,
 		layer = 1,
-	}))
+	})
 
-	self.info_panels.player_downs = make_fine_text(self.main_panel:text({
+	self.info_panels.player_downs = self.main_panel:text({
 		name = "player_downs",
 		text = "0",
 		font = self.font,
 		font_size = 11 * self.scales.hud * self.scales.font,
 		layer = 2,
-	}))
+	})
 
-	self.info_panels.base_text = make_fine_text(self.main_panel:text({
+	self.info_panels.base_text = self.main_panel:text({
 		name = "base_text",
 		text = "100",
 		font = self.font,
 		font_size = 11 * self.scales.hud * self.scales.font,
 		layer = 1,
 		visible = false,
-	}))
+	})
 
-	self.info_panels.health_points = make_fine_text(self.main_panel:text({
+	self.info_panels.health_points = self.main_panel:text({
 		name = "health_points",
 		text = "0",
 		font = self.font,
 		font_size = 11 * self.scales.hud * self.scales.font,
 		color = self.colors.patch,
 		layer = 1,
-	}))
+	})
 
-	self.info_panels.armor_points = make_fine_text(self.main_panel:text({
+	self.info_panels.armor_points = self.main_panel:text({
 		name = "armor_points",
 		text = "0",
 		font = self.font,
 		font_size = 11 * self.scales.hud * self.scales.font,
 		color = self.colors.armor,
 		layer = 1,
-	}))
+	})
 
-	-- I don't know where to position this text in the vanilla and raid_alt layouts
-	self.info_panels.armor_timer = make_fine_text(self.main_panel:text({
+	self.info_panels.armor_timer = self.main_panel:text({
 		name = "armor_timer",
 		text = "0.00s",
 		font = self.font,
 		font_size = 11 * self.scales.hud * self.scales.font,
 		color = self.colors.armor,
 		layer = 1,
-	}))
+	})
+
+	self._toolbox:make_pretty_text(self.info_panels.player_name)
+	self._toolbox:make_pretty_text(self.info_panels.player_level)
+	self._toolbox:make_pretty_text(self.info_panels.player_downs)
+	self._toolbox:make_pretty_text(self.info_panels.base_text)
+	self._toolbox:make_pretty_text(self.info_panels.health_points)
+	self._toolbox:make_pretty_text(self.info_panels.armor_points)
+	self._toolbox:make_pretty_text(self.info_panels.armor_timer)
 end
 
 function PlayerHealthPanel:create_health_and_armor()
@@ -659,7 +667,7 @@ function PlayerHealthPanel:layout_panel(panel, data)
 				position = position_translation[position] or position
 
 				if panel.font then
-					make_fine_text(panel)
+					self._toolbox:make_pretty_text(panel)
 				end
 
 				if position == "center" then
@@ -904,7 +912,7 @@ function PlayerHealthPanel:update_health_and_armor()
 		local health_color_key = var_cache.selected_layout == "vanilla" and "vanilla_health" or "health"
 		container.bar:stop()
 		container.bar:animate(function(o)
-			self._sdk:animate_ui(1, function(p)
+			self._toolbox:animate_ui(1, function(p)
 				if var_cache.selected_layout ~= "vanilla" then
 					o:set_w(math.lerp(o:w(), container.background:w() * health_percentage, p))
 				else
@@ -914,7 +922,7 @@ function PlayerHealthPanel:update_health_and_armor()
 
 				local health_color = ((health_percentage > 0.33) and self.colors[health_color_key]) or self.colors.hurt
 				local damage_color = lower and self.colors.hurt or self.colors.patch
-				o:set_color(self._sdk:blend_colors(health_color, damage_color, p))
+				o:set_color(self._toolbox:blend_colors(health_color, damage_color, p))
 			end)
 
 			if var_cache.selected_layout ~= "vanilla" then
@@ -936,7 +944,7 @@ function PlayerHealthPanel:update_health_and_armor()
 		armor_container.bar:set_color(self.colors[armor_color_key])
 
 		armor_container.bar:animate(function(o)
-			self._sdk:animate_ui(0.2, function(p)
+			self._toolbox:animate_ui(0.2, function(p)
 				if var_cache.selected_layout ~= "vanilla" then
 					o:set_w(math.lerp(o:w(), health_container.background:w() * armor_percentage, p))
 				else
@@ -1003,7 +1011,7 @@ function PlayerHealthPanel:close_panel()
 
 	self.main_panel:stop()
 	self.main_panel:animate(function(o)
-		self._sdk:animate_ui(2, function(p)
+		self._toolbox:animate_ui(2, function(p)
 			o:set_w(math.lerp(o:w(), self.info_panels.mugshot:w() + self.info_panels.mugshot:x() + 4, p))
 		end)
 
@@ -1018,7 +1026,7 @@ function PlayerHealthPanel:open_panel()
 
 	self.main_panel:stop()
 	self.main_panel:animate(function(o)
-		self._sdk:animate_ui(1, function(p)
+		self._toolbox:animate_ui(1, function(p)
 			o:set_w(math.lerp(o:w(), self.data.workspace_width, p))
 		end)
 
@@ -1090,7 +1098,7 @@ function PlayerHealthPanel:update_mugshot()
 
 		self.info_panels.mugshot_status:stop()
 		self.info_panels.mugshot_status:animate(function(o)
-			self._sdk:animate_ui(1, function(p)
+			self._toolbox:animate_ui(1, function(p)
 				o:set_alpha(math.lerp(o:alpha(), 1, p))
 				self.info_panels.mugshot:set_alpha(math.lerp(self.info_panels.mugshot:alpha(), 0.5, p))
 			end)
@@ -1103,7 +1111,7 @@ function PlayerHealthPanel:update_mugshot()
 
 	self.info_panels.mugshot_status:stop()
 	self.info_panels.mugshot_status:animate(function(o)
-		self._sdk:animate_ui(1, function(p)
+		self._toolbox:animate_ui(1, function(p)
 			o:set_alpha(math.lerp(o:alpha(), 0, p))
 			self.info_panels.mugshot:set_alpha(math.lerp(self.info_panels.mugshot:alpha(), 1, p))
 		end)

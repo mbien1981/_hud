@@ -2,10 +2,9 @@ local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
 	version = "1.4.13",
-	allow_globals = true,
-	dependencies = { "_sdk", "hud" },
+	dependencies = { "hud", "[holiday_special]" },
 	includes = {
-		{ "debug/base" },
+		{ "dev/base" },
 		{ "mod_hooks" },
 		{ "mod_localization", { type = "localization" } },
 		{ "mod_options", { type = "menu_options" } },
@@ -36,5 +35,9 @@ module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/
 
 module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
 module:hook_post_require("lib/network/handlers/unitnetworkhandler", "hooks/name_labels")
+
+module:hook_post_require("lib/setups/setup", "classes/toolbox")
+module:hook_post_require("lib/setups/setup", "classes/updator")
+module:hook_post_require("core/lib/setups/coresetup", "classes/updator")
 
 return module
