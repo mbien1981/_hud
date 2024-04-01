@@ -3,7 +3,7 @@ StateTimerPanel = class()
 function StateTimerPanel:init()
 	self._initialized = true
 
-	self._ws = managers.gui_data:create_fullscreen_workspace()
+	self._ws = Overlay:newgui():create_screen_workspace()
 	self._panel = self._ws:panel():panel({
 		visible = false,
 		alpha = 1,

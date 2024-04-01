@@ -5,7 +5,7 @@ function DeployableSpy:setup()
 		return
 	end
 
-	self._ws = managers.gui_data:create_fullscreen_workspace()
+	self._ws = Overlay:newgui():create_screen_workspace()
 	self._panel = self._ws:panel():panel({
 		name = "deployable_spy_panel",
 		layer = -100,

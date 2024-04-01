@@ -3,7 +3,7 @@ CustomDropInClass = class()
 function CustomDropInClass:init()
 	self._active = false
 
-	self._ws = managers.gui_data:create_fullscreen_workspace()
+	self._ws = Overlay:newgui():create_screen_workspace()
 	self._panel = self._ws:panel():panel({
 		alpha = 1,
 		layer = 150,
