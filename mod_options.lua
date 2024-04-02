@@ -26,15 +26,17 @@ local visibility_nodes = {
 	},
 }
 
-local function _get_item(item_name, node)
+local _get_item = function(item_name, node)
 	local node_name = "mod_options_" .. module:id()
 	if not node then
 		node = managers.menu:active_menu().logic:selected_node()
 	end
+
 	return node:item(node_name .. "_" .. item_name)
 end
 
 local function _hud_option_changed(k, value, old_value, old_value_was_user_set, o, item)
+	local refresh_wanted = false
 	local items_to_change = visibility_nodes[k]
 	if items_to_change then
 		for _, key in pairs(items_to_change) do
@@ -43,34 +45,44 @@ local function _hud_option_changed(k, value, old_value, old_value_was_user_set, 
 				local previous_visibility = child:visible()
 				child:set_visible(value)
 				if value ~= previous_visibility then
-					managers.menu:active_menu().logic:refresh_node()
+					refresh_wanted = true
 				end
 			end
 		end
 	end
 
-	if k == "_hud_custom_health_panel_layout" then
+	if items_to_change or k == "_hud_custom_health_panel_layout" then
+		local master = _get_item("_hud_mugshot_name")
 		local child = _get_item("_hud_display_armor_regen_timer")
 		if child then
-			local visible = value ~= "vanilla"
+			local visible = master:value() ~= "vanilla"
 			local previous_visibility = child:visible()
+
 			child:set_visible(visible)
+
 			if visible ~= previous_visibility then
-				managers.menu:active_menu().logic:refresh_node()
+				refresh_wanted = true
 			end
 		end
 	end
 
-	if k == "_hud_mugshot_name" then
+	if items_to_change or k == "_hud_mugshot_name" then
+		local master = _get_item("_hud_mugshot_name")
 		local child = _get_item("_hud_custom_mugshot_name")
+
 		if child then
-			local visible = value == "user_defined"
+			local visible = master:value() == "user_defined"
 			local previous_visibility = child:visible()
+
 			child:set_visible(visible)
 			if visible ~= previous_visibility then
-				managers.menu:active_menu().logic:refresh_node()
+				refresh_wanted = true
 			end
 		end
+	end
+
+	if refresh_wanted then
+		managers.menu:active_menu().logic:refresh_node()
 	end
 
 	-- update gui
