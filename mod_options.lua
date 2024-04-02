@@ -160,6 +160,10 @@ module:add_config_option("_hud_use_custom_drop_in_panel", true)
 module:add_config_option("_hud_drop_in_show_peer_info", true)
 module:add_config_option("_hud_mod_list_position", "righttop")
 
+-- custom control and point of no return panels
+module:add_config_option("_hud_use_custom_control_panel", true)
+module:add_config_option("_hud_use_custom_use_ponr_panel", true)
+
 module:add_config_option("_hud_mod_whitelist", {
 	["ovk_193"] = true,
 	["crybaby"] = true,
@@ -335,7 +339,6 @@ module:add_menu_option("_hud_use_custom_drop_in_panel", {
 	text_id = "_hud_use_custom_drop_in_panel",
 	localize = true,
 })
-
 module:add_menu_option("_hud_drop_in_show_peer_info", {
 	type = "boolean",
 	text_id = "_hud_drop_in_show_peer_info",
@@ -356,6 +359,19 @@ module:add_menu_option("_hud_mod_list_position", {
 	},
 	default_value = "righttop",
 })
+
+module:add_menu_option("_hud_control_panel_divider", { type = "divider", size = 15 })
+module:add_menu_option("_hud_use_custom_control_panel", {
+	type = "boolean",
+	text_id = "_hud_use_custom_control_panel",
+	localize = true,
+})
+module:add_menu_option("_hud_use_custom_ponr_panel", {
+	type = "boolean",
+	text_id = "_hud_use_custom_ponr_panel",
+	localize = true,
+})
+
 
 module:add_menu_option("_hud_reload_panel_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_reload_timer", {

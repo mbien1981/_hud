@@ -130,7 +130,9 @@ local strings = {
 		english = "$CARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
 	},
 	["_hud_sentry_gun_spy"] = { english = "Sentry Gun text format" },
-	["_hud_sentry_gun_spy_help"] = { english = "$AMMO; = Shows current ammo.\n$AMMO_MAX; = Shows max ammo.\n$HEALTH; Shows current health.\n\nSupports color tags." },
+	["_hud_sentry_gun_spy_help"] = {
+		english = "$AMMO; = Shows current ammo.\n$AMMO_MAX; = Shows max ammo.\n$HEALTH; Shows current health.\n\nSupports color tags.",
+	},
 	["_hud_use_custom_drop_in_panel"] = {
 		english = "Use custom drop-in panel",
 		spanish = "Utilizar panel personalizado de entrada de jugador.",
@@ -198,6 +200,18 @@ local strings = {
 	["_hud_no"] = {
 		english = "No",
 		spanish = "No",
+	},
+	["_hud_use_custom_control_panel"] = {
+		english = "Use custom control panel",
+	},
+	["_hud_assault_title"] = {
+		english = "Police Assault in Progress",
+	},
+	["_hud_use_custom_ponr_panel"] = {
+		english = "Use custom point of no return panel",
+	},
+	["_hud_ponr_title"] = {
+		english = "Point of no return in $TIME;",
 	},
 }
 

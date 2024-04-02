@@ -36,6 +36,10 @@ module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/
 module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
 module:hook_post_require("lib/network/handlers/unitnetworkhandler", "hooks/name_labels")
 
+module:hook_post_require("lib/units/beings/player/playerbase", "hooks/control_panel")
+module:hook_post_require("lib/managers/hudmanager", "hooks/control_panel")
+
+
 module:hook_post_require("lib/setups/setup", "classes/toolbox")
 module:hook_post_require("lib/setups/setup", "classes/updator")
 module:hook_post_require("core/lib/setups/coresetup", "classes/updator")
