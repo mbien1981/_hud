@@ -11,6 +11,8 @@ local visibility_nodes = {
 		"_hud_use_custom_inventory_panel",
 		"_hud_display_armor_regen_timer",
 		"_hud_reposition_chat_input",
+		"_hud_chat_input_divider",
+		"_hud_inventory_divider",
 	},
 	["_hud_use_custom_drop_in_panel"] = {
 		"_hud_drop_in_show_peer_info",
@@ -52,10 +54,10 @@ local function _hud_option_changed(k, value, old_value, old_value_was_user_set, 
 	end
 
 	if items_to_change or k == "_hud_custom_health_panel_layout" then
-		local master = _get_item("_hud_mugshot_name")
+		local master = _get_item("_hud_custom_health_panel_layout")
 		local child = _get_item("_hud_display_armor_regen_timer")
 		if child then
-			local visible = master:value() ~= "vanilla"
+			local visible = master:visible() and master:value() ~= "vanilla"
 			local previous_visibility = child:visible()
 
 			child:set_visible(visible)
@@ -257,7 +259,6 @@ module:add_menu_option("_hud_name_use_peer_color", {
 	localize = true,
 })
 
--- module:add_menu_option("_hud_armor_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_display_armor_and_health_values", {
 	type = "boolean",
 	text_id = "_hud_display_armor_and_health_values",
