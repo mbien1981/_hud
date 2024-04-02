@@ -199,8 +199,8 @@ function CustomControlPanel:init(super)
 	self:setup_panels()
 	self:update_settings()
 
-	_M._updator:remove("control_panel_update")
-	_M._updator:add(callback(self, self, "update"), "control_panel_update")
+	self._updator:remove("control_panel_update")
+	self._updator:add(callback(self, self, "update"), "control_panel_update")
 end
 
 function CustomControlPanel:setup_vars()
@@ -585,6 +585,8 @@ function CustomControlPanel:destroy()
 	self._panel:clear()
 	self._panel:parent():remove(self._panel)
 end
+
+local module = ... or D:module("_hud")
 
 if RequiredScript == "lib/units/beings/player/playerbase" then
 	local PlayerBase = module:hook_class("PlayerBase")
