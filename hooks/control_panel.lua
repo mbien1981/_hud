@@ -114,7 +114,6 @@ function CustomControlPanel:_animate_ponr_timer(o)
 end
 
 function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
-	local text_list = self:get_assault_text()
 	local text_index = 0
 	local texts = {}
 	local padding = 10
@@ -138,22 +137,22 @@ function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
 			text = text_string,
 			font = "fonts/font_univers_530_bold",
 			font_size = 24,
-			-- color = self:get_assault_color(),
-			color = self._assault_color,
+			color = self:get_assault_color(),
 			layer = 1,
 			blend_mode = "add",
 			align = "center",
 			vertical = "center",
 		})
-		local w, h = self._toolbox:make_pretty_text(text)
+		self._toolbox:parse_color_tags(text)
 
 		texts[text_index] = {
-			x = text_panel:w() + w * 0.5 + padding * 2,
+			x = text_panel:w() + text:w() * 0.5 + padding * 2,
 			text = text,
 		}
 	end
 
 	while true do
+		local text_list = self:get_assault_text()
 		local dt = coroutine.yield()
 		local last_text = texts[text_index]
 		if last_text and last_text.text then
@@ -207,6 +206,7 @@ function CustomControlPanel:setup_vars()
 	self._cached_conf_vars = {}
 
 	self.in_assault = false
+	self._double_assault = false
 	self.in_ponr = false
 	self._mutated = false
 
@@ -298,7 +298,7 @@ function CustomControlPanel:create_assault_panel() -- pasted from payday 2
 	icon_assaultbox:animate(callback(self, self, "_animate_flash_in_out"))
 
 	local info_box_container = assault_panel:panel({ name = "info_box_container", w = 50, h = 38 })
-	self:create_box(info_box_container, nil, { blend_mode = "add", color = self._assault_color })
+	self:create_box(info_box_container, nil, { blend_mode = "add", color = self:get_assault_color() })
 
 	local assault_timer = info_box_container:text({
 		name = "assault_timer",
@@ -307,7 +307,7 @@ function CustomControlPanel:create_assault_panel() -- pasted from payday 2
 		font_size = 24,
 		layer = 1,
 		vertical = "center",
-		color = self._assault_color,
+		color = self:get_assault_color(),
 		blend_mode = "normal",
 		align = "center",
 	})
@@ -321,7 +321,7 @@ function CustomControlPanel:create_assault_panel() -- pasted from payday 2
 	self._bg_box = self:create_box(
 		assault_panel,
 		{ x = 0, h = 38, y = 0, w = size * 1.5 - 58 },
-		{ blend_mode = "add", color = self._assault_color }
+		{ blend_mode = "add", color = self:get_assault_color() }
 	)
 	self._bg_box:set_right(info_box_container:left() - 3)
 
@@ -364,7 +364,7 @@ function CustomControlPanel:create_point_of_no_return_panel()
 		align = "center",
 		vertical = "center",
 	})
-	self._toolbox:make_pretty_text(ponr_title)
+	self._toolbox:parse_color_tags(ponr_title)
 
 	local ponr_timer = info_box_container:text({
 		name = "ponr_timer",
@@ -442,18 +442,9 @@ function CustomControlPanel:create_hostages_panel()
 end
 
 function CustomControlPanel:get_assault_string()
-	-- local assault_state = managers.groupai:state()
-	-- if not assault_state then
-	-- 	return "_hud_assault_title" -- broken?
-	-- end
-
-	-- if assault_state:get_hunt_mode() then
-	-- 	return "_hud_hunt_assault_title"
-	-- end
-
-	-- if assault_state._fake_assault_mode then
-	-- 	return "_hud_fake_assault_title"
-	-- end
+	if self._double_assault then
+		return "_hud_reinforced_assault_title"
+	end
 
 	return "_hud_assault_title"
 end
@@ -469,17 +460,14 @@ function CustomControlPanel:get_assault_text()
 end
 
 function CustomControlPanel:start_assault()
-	if not self._cached_conf_vars.use_control_panel or self.in_assault or self.in_ponr then
+	if not self._cached_conf_vars.use_control_panel or self.in_ponr then
 		return
 	end
 
-	-- if self.in_assault then -- double assault
-	-- 	local box_text_panel = self._bg_box:child("text_panel")
-	-- 	box_text_panel:stop()
-	-- 	box_text_panel:clear()
-	-- 	box_text_panel:animate(callback(self, self, "_animate_text"))
-	-- 	return
-	-- end
+	if self.in_assault then
+		self._double_assault = true
+		return
+	end
 
 	self.in_assault = true
 
@@ -494,6 +482,7 @@ end
 
 function CustomControlPanel:end_assault()
 	self.in_assault = false
+	self._double_assault = false
 	self.main_panel:child("assault_panel"):hide()
 
 	local box_text_panel = self._bg_box:child("text_panel")

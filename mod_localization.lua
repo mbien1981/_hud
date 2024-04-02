@@ -207,6 +207,9 @@ local strings = {
 	["_hud_assault_title"] = {
 		english = "Police Assault in Progress",
 	},
+	["_hud_reinforced_assault_title"] = {
+		english = "Reinforced Police Assault in Progress",
+	},
 	["_hud_use_custom_ponr_panel"] = {
 		english = "Use custom point of no return panel",
 	},
