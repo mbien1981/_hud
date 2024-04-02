@@ -84,16 +84,6 @@ function CustomControlPanel:create_box(panel, params, config)
 	return box_panel
 end
 
-function CustomControlPanel:make_pretty_text(text_obj)
-	local _, _, w, h = text_obj:text_rect()
-	w, h = w + 2, h + 2
-
-	text_obj:set_w(w)
-	text_obj:set_h(h)
-
-	return w, h
-end
-
 function CustomControlPanel:_animate_flash_in_out(o) -- pasted from gui files
 	while true do
 		local n = (math.sin(Application:time() * 750) + 1) / 4
@@ -124,19 +114,7 @@ function CustomControlPanel:_animate_ponr_timer(o)
 end
 
 function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
-	local text_list = {
-		"///",
-		managers.localization:to_upper_text("_hud_assault_title"),
-		"///",
-		self.super._cached_conf_vars.difficulty_name:upper(),
-		-- ghetto retarded fix
-		-- scroll list is too short, assault title gets removed while in bounds
-		-- duplicating the contents solves this problem ¯\_(ツ)_/¯
-		"///",
-		managers.localization:to_upper_text("_hud_assault_title"),
-		"///",
-		self.super._cached_conf_vars.difficulty_name:upper(),
-	}
+	local text_list = self:get_assault_text()
 	local text_index = 0
 	local texts = {}
 	local padding = 10
@@ -167,7 +145,7 @@ function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
 			align = "center",
 			vertical = "center",
 		})
-		local w, h = self:make_pretty_text(text)
+		local w, h = self._toolbox:make_pretty_text(text)
 
 		texts[text_index] = {
 			x = text_panel:w() + w * 0.5 + padding * 2,
@@ -214,12 +192,15 @@ function CustomControlPanel:init(super)
 	self._hud = self.super:script(PlayerBase.PLAYER_INFO_HUD)
 	self._panel = self._hud.panel:panel({ layer = -100 })
 
+	self._toolbox = _M._hudToolBox
+	self._updator = _M._hudUpdator
+
 	self:setup_vars()
 	self:setup_panels()
 	self:update_settings()
 
-	_G._updator:remove("control_panel_update")
-	_G._updator:add(callback(self, self, "update"), "control_panel_update")
+	_M._updator:remove("control_panel_update")
+	_M._updator:add(callback(self, self, "update"), "control_panel_update")
 end
 
 function CustomControlPanel:setup_vars()
@@ -281,7 +262,7 @@ function CustomControlPanel:update_panel_visibility()
 
 	-- * Point of no return panel
 	self.super._cached_conf_vars.hud_vis_ponr = not var_cache.use_ponr_panel
-	self._hud.point_of_no_return_panel:set_visible(self.super._cached_conf_vars.hud_vis_ponr and self.super._hud.in_ponr)
+	self._hud.point_of_no_return_panel:set_visible(not var_cache.use_ponr_panel and self.super._hud.in_ponr)
 	self.main_panel:child("point_of_no_return_panel"):set_visible(self.in_ponr and var_cache.use_ponr_panel)
 end
 
@@ -291,7 +272,7 @@ end
 
 function CustomControlPanel:create_assault_panel() -- pasted from payday 2
 	local size = 200
-	local assault_panel = self.main_panel:panel({ name = "assault_panel", visible = false, h = 100, w = size * 2 })
+	local assault_panel = self.main_panel:panel({ name = "assault_panel", visible = false, h = 80, w = size * 2 })
 	assault_panel:set_right(self.main_panel:right())
 
 	local image, rect = tweak_data.hud_icons:get_icon_data("assault")
@@ -330,7 +311,7 @@ function CustomControlPanel:create_assault_panel() -- pasted from payday 2
 		blend_mode = "normal",
 		align = "center",
 	})
-	self:make_pretty_text(assault_timer)
+	self._toolbox:make_pretty_text(assault_timer)
 	assault_timer:set_center(info_box_container:center())
 
 	info_box_container:set_right(icon_container:left() - 3)
@@ -383,7 +364,7 @@ function CustomControlPanel:create_point_of_no_return_panel()
 		align = "center",
 		vertical = "center",
 	})
-	self:make_pretty_text(ponr_title)
+	self._toolbox:make_pretty_text(ponr_title)
 
 	local ponr_timer = info_box_container:text({
 		name = "ponr_timer",
@@ -396,7 +377,7 @@ function CustomControlPanel:create_point_of_no_return_panel()
 		blend_mode = "add",
 		align = "center",
 	})
-	self:make_pretty_text(ponr_timer)
+	self._toolbox:make_pretty_text(ponr_timer)
 
 	self._bg_ponr_box_size = 8 + ponr_title:w() + ponr_timer:w()
 	info_box_container:set_w(self._bg_ponr_box_size)
@@ -438,7 +419,7 @@ function CustomControlPanel:create_hostages_panel()
 		blend_mode = "normal",
 		align = "center",
 	})
-	self:make_pretty_text(hostage_count)
+	self._toolbox:make_pretty_text(hostage_count)
 
 	hostage_count:set_center(info_box_container:center())
 
@@ -460,10 +441,45 @@ function CustomControlPanel:create_hostages_panel()
 	hostage_icon:set_center_y(info_box_container:center_y())
 end
 
+function CustomControlPanel:get_assault_string()
+	-- local assault_state = managers.groupai:state()
+	-- if not assault_state then
+	-- 	return "_hud_assault_title" -- broken?
+	-- end
+
+	-- if assault_state:get_hunt_mode() then
+	-- 	return "_hud_hunt_assault_title"
+	-- end
+
+	-- if assault_state._fake_assault_mode then
+	-- 	return "_hud_fake_assault_title"
+	-- end
+
+	return "_hud_assault_title"
+end
+
+function CustomControlPanel:get_assault_text()
+	local assault_text = managers.localization:to_upper_text(self:get_assault_string())
+	local difficulty_name = self.super._cached_conf_vars.difficulty_name:upper()
+
+	-- ghetto retarded fix
+	-- scroll list is too short, assault title gets removed while in bounds
+	-- duplicating the contents solves this problem ¯\_(ツ)_/¯
+	return { "///", assault_text, "///", difficulty_name, "///", assault_text, "///", difficulty_name }
+end
+
 function CustomControlPanel:start_assault()
 	if not self._cached_conf_vars.use_control_panel or self.in_assault or self.in_ponr then
 		return
 	end
+
+	-- if self.in_assault then -- double assault
+	-- 	local box_text_panel = self._bg_box:child("text_panel")
+	-- 	box_text_panel:stop()
+	-- 	box_text_panel:clear()
+	-- 	box_text_panel:animate(callback(self, self, "_animate_text"))
+	-- 	return
+	-- end
 
 	self.in_assault = true
 
@@ -501,7 +517,7 @@ function CustomControlPanel:update_assault_timer()
 	end
 
 	assault_timer:set_text(text)
-	self:make_pretty_text(assault_timer)
+	self._toolbox:make_pretty_text(assault_timer)
 	assault_timer:animate(callback(self, self, "_animate_ponr_timer"))
 
 	assault_timer:set_world_center(assault_timer:parent():world_center()) -- fucking diesel retarded shit
@@ -547,7 +563,7 @@ function CustomControlPanel:set_control_info(data)
 	local hostage_count = hostages_panel:child("info_box_container"):child("hostage_count")
 
 	hostage_count:set_text(data.nr_hostages)
-	self:make_pretty_text(hostage_count)
+	self._toolbox:make_pretty_text(hostage_count)
 	-- hostage_count:set_center(hostage_count:parent():center())
 	hostage_count:set_world_center(hostage_count:parent():world_center()) -- fucking diesel retarded shit
 end
