@@ -1,7 +1,7 @@
 local module = DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.5.2",
+	version = "1.5.3",
 	dependencies = { "hud", "[holiday_special]" },
 	includes = {
 		{ "dev/base" },
