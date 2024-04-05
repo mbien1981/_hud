@@ -224,6 +224,15 @@ function PlayerHealthPanel:create_player_data()
 		layer = 2,
 	})
 
+	self.info_panels.respawn_delay = self.main_panel:text({
+		name = "respawn_delay",
+		text = "00",
+		font = self.font,
+		font_size = 24 * self.scales.hud * self.scales.font,
+		layer = 4,
+		visible = false,
+	})
+
 	self.info_panels.base_text = self.main_panel:text({
 		name = "base_text",
 		text = "100",
@@ -263,6 +272,7 @@ function PlayerHealthPanel:create_player_data()
 	self._toolbox:make_pretty_text(self.info_panels.player_name)
 	self._toolbox:make_pretty_text(self.info_panels.player_level)
 	self._toolbox:make_pretty_text(self.info_panels.player_downs)
+	self._toolbox:make_pretty_text(self.info_panels.respawn_delay)
 	self._toolbox:make_pretty_text(self.info_panels.base_text)
 	self._toolbox:make_pretty_text(self.info_panels.health_points)
 	self._toolbox:make_pretty_text(self.info_panels.armor_points)
@@ -365,6 +375,7 @@ function PlayerHealthPanel:update_panel_visibility()
 	self.info_panels.player_name:set_visible(self:is_panel_open())
 	self.info_panels.player_level:set_visible(self:is_panel_open())
 	self.info_panels.player_downs:set_visible(self:is_panel_open())
+	self.info_panels.respawn_delay:set_visible(not self:is_panel_open())
 
 	local var_cache = self._cached_conf_vars
 	self.info_panels.health_points:set_visible(
@@ -444,6 +455,12 @@ function PlayerHealthPanel:get_layout()
 				},
 			},
 			{
+				name = "respawn_delay",
+				data = {
+					center = "player_mugshot",
+				},
+			},
+			{
 				name = "player_downs",
 				data = {
 					y = "player_mugshot",
@@ -475,6 +492,12 @@ function PlayerHealthPanel:get_layout()
 			},
 			{
 				name = "mugshot_status",
+				data = {
+					center = "player_mugshot",
+				},
+			},
+			{
+				name = "respawn_delay",
 				data = {
 					center = "player_mugshot",
 				},
@@ -548,6 +571,12 @@ function PlayerHealthPanel:get_layout()
 			},
 			{
 				name = "mugshot_status",
+				data = {
+					center = "player_mugshot",
+				},
+			},
+			{
+				name = "respawn_delay",
 				data = {
 					center = "player_mugshot",
 				},
@@ -884,6 +913,10 @@ function PlayerHealthPanel:update_player_data()
 	)
 	self.info_panels.player_level:set_font_size(
 		(var_cache.selected_layout == "vanilla" and 14 or 11) * self.scales.hud * self.scales.font
+	)
+
+	self.info_panels.respawn_delay:set_text(
+		string.format("%02d", managers.trade:respawn_delay_by_name(managers.criminals:local_character_name()))
 	)
 end
 
