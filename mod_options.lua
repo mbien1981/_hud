@@ -316,14 +316,14 @@ module:add_menu_option("_hud_medic_bag_spy", {
 	input_type = "text",
 	text_id = "_hud_medic_bag_spy",
 	help_id = "_hud_medic_bag_spy_help",
-	default_value = "$CHARGES;",
+	default_value = "$CHARGES;x",
 })
 module:add_menu_option("_hud_ammo_bag_spy", {
 	type = "string",
 	input_type = "text",
 	text_id = "_hud_ammo_bag_spy",
 	help_id = "_hud_ammo_bag_spy_help",
-	default_value = "$PERCENT;",
+	default_value = "$PERCENT;%",
 })
 module:add_menu_option("_hud_sentry_gun_spy", {
 	type = "string",
