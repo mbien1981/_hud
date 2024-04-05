@@ -245,6 +245,10 @@ function CustomControlPanel:update_settings()
 	self:update_panel_visibility()
 end
 
+function CustomControlPanel:is_in_assault()
+	return self.super._hud.in_assault or self._hud.assault_image:visible()
+end
+
 function CustomControlPanel:update_panel_visibility()
 	local var_cache = self._cached_conf_vars
 
@@ -254,7 +258,7 @@ function CustomControlPanel:update_panel_visibility()
 	self.main_panel:child("hostages_panel"):set_visible(var_cache.use_control_panel)
 
 	local visible = self.main_panel:child("assault_panel"):visible()
-	if var_cache.use_control_panel and self.super._hud.in_assault and not visible then
+	if var_cache.use_control_panel and self:is_in_assault() and not visible then
 		self:start_assault()
 	elseif not var_cache.use_control_panel and visible then
 		self:end_assault()
@@ -414,10 +418,10 @@ function CustomControlPanel:create_hostages_panel()
 		font = "fonts/font_univers_530_bold",
 		font_size = 24,
 		layer = 1,
-		vertical = "center",
 		color = Color("FFA800"),
 		blend_mode = "normal",
 		align = "center",
+		vertical = "center",
 	})
 	self._toolbox:make_pretty_text(hostage_count)
 
@@ -535,7 +539,6 @@ function CustomControlPanel:feed_point_of_no_return_timer(is_inside)
 	if self._point_of_no_return_color ~= color then
 		self._point_of_no_return_color = color
 		ponr_timer:set_color(self._point_of_no_return_color)
-		ponr_timer:set_color(self._point_of_no_return_color)
 	end
 end
 
@@ -553,7 +556,7 @@ function CustomControlPanel:set_control_info(data)
 
 	hostage_count:set_text(data.nr_hostages)
 	self._toolbox:make_pretty_text(hostage_count)
-	-- hostage_count:set_center(hostage_count:parent():center())
+
 	hostage_count:set_world_center(hostage_count:parent():world_center()) -- fucking diesel retarded shit
 end
 
@@ -589,6 +592,7 @@ end
 if RequiredScript == "lib/managers/hudmanager" then
 	local HUDManager = module:hook_class("HUDManager")
 	module:post_hook(HUDManager, "sync_start_assault", function(self)
+		self._hud.in_assault = true
 		if not self._hud.custom_control_panel then
 			return
 		end
@@ -597,6 +601,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 	end, false)
 
 	module:post_hook(HUDManager, "sync_end_assault", function(self)
+		self._hud.in_assault = false
 		if not self._hud.custom_control_panel then
 			return
 		end
