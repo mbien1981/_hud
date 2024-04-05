@@ -1,11 +1,3 @@
-local make_fine_text = function(text_obj)
-	local _, _, w, h = text_obj:text_rect()
-	text_obj:set_size(w + 2, h + 2)
-	text_obj:set_position(math.round(text_obj:x()), math.round(text_obj:y()))
-
-	return text_obj
-end
-
 local convert_panel_data = function(data)
 	if type(data) == "string" then
 		data = { child = data, offset = 0 }
