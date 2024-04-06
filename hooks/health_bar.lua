@@ -220,7 +220,7 @@ function PlayerHealthPanel:create_player_data()
 		name = "respawn_delay",
 		text = "00",
 		font = self.font,
-		font_size = 24 * self.scales.hud * self.scales.font,
+		font_size = 20 * self.scales.hud * self.scales.font,
 		layer = 4,
 		visible = false,
 	})
