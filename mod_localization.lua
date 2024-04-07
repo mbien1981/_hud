@@ -216,6 +216,9 @@ local strings = {
 	["_hud_ponr_title"] = {
 		english = "Point of no return in $TIME;",
 	},
+	["_hud_use_loadout_dropdowns"] = {
+		english = "Use loadout dropdowns",
+	},
 }
 
 for key, translations in pairs(strings) do

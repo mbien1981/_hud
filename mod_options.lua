@@ -130,6 +130,9 @@ end)
 module:add_config_option("_hud_scaling", 1.2)
 module:add_config_option("_hud_font_scaling", 1.2)
 
+-- other gui stuff
+module:add_config_option("_hud_use_loadout_dropdowns", true)
+
 -- health panel
 module:add_config_option("_hud_use_custom_health_panel", true)
 module:add_config_option("_hud_custom_health_panel_layout", "raid")
@@ -218,6 +221,13 @@ module:add_menu_option("_hud_use_custom_name_labels", {
 module:add_menu_option("_hud_peer_contour_colors", {
 	type = "boolean",
 	text_id = "_hud_peer_contour_colors",
+	localize = true,
+})
+
+module:add_menu_option("_hud_misc_gui_divider", { type = "divider", size = 15 })
+module:add_menu_option("_hud_use_loadout_dropdowns", {
+	type = "boolean",
+	text_id = "_hud_use_loadout_dropdowns",
 	localize = true,
 })
 
@@ -371,7 +381,6 @@ module:add_menu_option("_hud_use_custom_ponr_panel", {
 	text_id = "_hud_use_custom_ponr_panel",
 	localize = true,
 })
-
 
 module:add_menu_option("_hud_reload_panel_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_reload_timer", {
