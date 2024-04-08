@@ -201,14 +201,13 @@ function CustomDropInclass:update_person_joining(peer, join_progress)
 	local mod_list_title = panel:child("mod_list_title")
 	local mod_list = panel:child("mod_list")
 
-	local time_left = ((os.clock() - peer_data.join_start_t) / join_progress) * (100 - join_progress)
+	local time_left = math.max(((os.clock() - peer_data.join_start_t) / join_progress) * (100 - join_progress), 0)
 	progress:show()
 	progress:set_text(self:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;% ($DROP_IN_TIME;s)", {
 		PLEASE_WAIT = managers.localization:text("dialog_wait"),
 		JOIN_PROGRESS = join_progress,
 		DROP_IN_TIME = string.format("%02d", time_left),
 	}))
-	
 
 	peer_info:set_visible(D:conf("_hud_drop_in_show_peer_info"))
 	peer_info:set_text(managers.localization:text("_hud_drop_in_peer_info", {
