@@ -33,22 +33,6 @@ function CustomDropInclass:setup_panels()
 	self.main_panel = self._panel:panel()
 
 	self.player_container = self.main_panel:panel()
-
-	-- self.background = self.main_panel:rect({
-	-- 	color = self.colors.black,
-	-- 	visible = true,
-	-- 	alpha = 0,
-	-- 	layer = -1,
-	-- })
-
-	-- self.background:stop()
-	-- self.background:animate(function(o)
-	-- 	self._toolbox:animate_ui(1, function(p)
-	-- 		o:set_alpha(math.lerp(o:alpha(), 0.75, p))
-	-- 	end)
-
-	-- 	o:set_alpha(0.75)
-	-- end)
 end
 
 function CustomDropInclass:get_peer_panel(peer_id)
