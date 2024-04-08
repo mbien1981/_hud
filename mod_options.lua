@@ -363,7 +363,6 @@ module:add_menu_option("_hud_mod_list_position", {
 		{ "lefttop", "_hud_lefttop" },
 		{ "centertop", "_hud_centertop" },
 		{ "righttop", "_hud_righttop" },
-		{ "centerright", "_hud_centerright" },
 		{ "rightbottom", "_hud_rightbottom" },
 		{ "centerbottom", "_hud_centerbottom" },
 	},

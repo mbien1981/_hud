@@ -138,8 +138,8 @@ local strings = {
 		spanish = "Utilizar panel personalizado de entrada de jugador.",
 	},
 	["_hud_drop_in_peer_info"] = {
-		english = "Level: %d\nMask set: %s\nDeployable: %s\nCrew bonus: %s\nReady: %s",
-		spanish = "Nivel: %d\nSet de máscara: %s\nEquipamiento desplegable: %s\nBono de equipo: %s\nPreparado: %s",
+		english = "Level: $LEVEL;\nMask set: $MASK;\nDeployable: $DEPLOYABLE;\nCrew bonus: $CREW_BONUS;\nReady: $READY;",
+		spanish = "Nivel: $LEVEL;\nSet de máscara: $MASK;\nEquipamiento desplegable: $DEPLOYABLE;\nBono de equipo: $CREW_BONUS;\nPreparado: $READY;",
 	},
 	["_hud_drop_in_show_peer_info"] = {
 		english = "Show peer info in drop in",
@@ -165,10 +165,6 @@ local strings = {
 		english = "Right Top",
 		spanish = "Arriba a la derecha",
 	},
-	["_hud_centerright"] = {
-		english = "Center Right",
-		spanish = "Centrado a la derecha",
-	},
 	["_hud_rightbottom"] = {
 		english = "Right Bottom",
 		spanish = "Abajo a la derecha",
@@ -181,9 +177,9 @@ local strings = {
 		english = "Player mod list position",
 		spanish = "Posición de la lista de mods del jugador",
 	},
-	["_hud_mod_list_title"] = {
-		english = "Gameplay altering mods:%s",
-		spanish = "Mods que alteran el juego:%s",
+	["_hud_drop_in_mod_list_title"] = {
+		english = "Gameplay changing mods",
+		spanish = "Mods que alteran la jugabilidad",
 	},
 	["_hud_reload_timer"] = {
 		english = "Show reload timer",
@@ -200,6 +196,10 @@ local strings = {
 	["_hud_no"] = {
 		english = "No",
 		spanish = "No",
+	},
+	["_hud_none_selected"] = {
+		english = "None selected",
+		spanish = "Ninguno seleccionado",
 	},
 	["_hud_use_custom_control_panel"] = {
 		english = "Use custom control panel",
