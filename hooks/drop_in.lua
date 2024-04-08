@@ -1,3 +1,11 @@
+--[[
+	To apply peer_color to drop-in title you must implement a localization override to 'dialog_dropin_title'
+	["dialog_dropin_title"] = { english = "[peer_color]$NAME;[] is joining the game"}
+	
+	To apply color tags on peer drop-in info you must implement a localization override to '_hud_drop_in_peer_info'
+	The string template can be found @_hud/mod_localization.lua
+--]]
+
 _M.CustomDropInclass = class()
 local CustomDropInclass = _M.CustomDropInclass
 
@@ -76,14 +84,13 @@ function CustomDropInclass:show_person_joining(peer)
 		layer = 1,
 		color = Color.white,
 	})
-	self._toolbox:make_pretty_text(drop_in_title)
+	self._toolbox:parse_color_tags(drop_in_title, { peer_color = tweak_data.chat_colors[peer:id()] })
 
 	local drop_in_progress = panel:text({
 		name = "drop_in_progress",
-		text = self:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;% ($DROP_IN_TIME;s)", {
+		text = self:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;%", {
 			PLEASE_WAIT = managers.localization:text("dialog_wait"),
-			JOIN_PROGRESS = 69,
-			DROP_IN_TIME = 420,
+			JOIN_PROGRESS = 0,
 		}),
 		font = self.font.path,
 		font_size = self.font.sizes.small,
