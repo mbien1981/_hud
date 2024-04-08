@@ -17,7 +17,7 @@ end
 
 function CustomDropInclass:init()
 	self._ws = Overlay:newgui():create_screen_workspace()
-	self._panel = self._ws:panel():panel({ layer = 1151 })
+	self._panel = self._ws:panel():panel({ layer = 150 })
 
 	self._sound_source = SoundDevice:create_source("_drop_in")
 
