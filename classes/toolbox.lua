@@ -83,8 +83,8 @@ function _hudToolBox:make_pretty_text(text_obj)
 	return w, h
 end
 
-function _hudToolBox:parse_color_tags(text_obj)
-	local text, colors = StringUtils:parse_color_string_utf8(text_obj:text())
+function _hudToolBox:parse_color_tags(text_obj, color_tbl)
+	local text, colors = StringUtils:parse_color_string_utf8(text_obj:text(), color_tbl)
 	text_obj:set_text(text)
 	self:make_pretty_text(text_obj)
 
@@ -204,7 +204,6 @@ function _hudToolBox:read_color_tags(text_panel_obj)
 	-- in case we need it back.
 	return text_panel_obj
 end
-
 
 --* Player utils
 function _hudToolBox:player_movement_state()
