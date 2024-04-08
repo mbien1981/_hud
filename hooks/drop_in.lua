@@ -197,7 +197,7 @@ function CustomDropInclass:update_person_joining(peer, join_progress)
 	progress:set_text(self:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;% ($DROP_IN_TIME;s)", {
 		PLEASE_WAIT = managers.localization:text("dialog_wait"),
 		JOIN_PROGRESS = join_progress,
-		DROP_IN_TIME = string.format("%02d", time_left),
+		DROP_IN_TIME = string.format("%d", time_left),
 	}))
 
 	peer_info:set_visible(D:conf("_hud_drop_in_show_peer_info"))
