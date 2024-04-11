@@ -201,32 +201,22 @@ local module = ... or D:module("_hud")
 
 if RequiredScript == "lib/units/equipment/ammo_bag/ammobagbase" then
 	local AmmoBagBase = module:hook_class("AmmoBagBase")
-	module:post_hook(50, AmmoBagBase, "set_server_information", function(self, ...)
-		DeployableSpy:add(self._unit, "ammo_bag")
-	end)
 
-	module:post_hook(50, AmmoBagBase, "_take", function(self, ...)
-		DeployableSpy:add(self._unit, "ammo_bag")
-	end)
-
-	module:post_hook(50, AmmoBagBase, "sync_ammo_taken", function(self, ...)
-		DeployableSpy:add(self._unit, "ammo_bag")
-	end)
+	for _, func in pairs({ "set_server_information", "_take_ammo", "sync_ammo_taken" }) do
+		module:post_hook(50, AmmoBagBase, func, function(self, ...)
+			DeployableSpy:add(self._unit, "ammo_bag")
+		end)
+	end
 end
 
 if RequiredScript == "lib/units/equipment/doctor_bag/doctorbagbase" then
 	local DoctorBagBase = module:hook_class("DoctorBagBase")
-	module:post_hook(50, DoctorBagBase, "set_server_information", function(self, ...)
-		DeployableSpy:add(self._unit, "medic_bag")
-	end)
 
-	module:post_hook(50, DoctorBagBase, "_take_ammo", function(self, ...)
-		DeployableSpy:add(self._unit, "medic_bag")
-	end)
-
-	module:post_hook(50, DoctorBagBase, "sync_taken", function(self, ...)
-		DeployableSpy:add(self._unit, "medic_bag")
-	end)
+	for _, func in pairs({ "set_server_information", "_take", "sync_taken" }) do
+		module:post_hook(50, DoctorBagBase, func, function(self, ...)
+			DeployableSpy:add(self._unit, "ammo_bag")
+		end)
+	end
 end
 
 -- only works as host, unfortunately
