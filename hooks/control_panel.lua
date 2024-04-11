@@ -439,9 +439,9 @@ function CustomControlPanel:create_hostages_panel()
 		h = 30,
 	})
 
-	info_box_container:set_right(info_box_container:parent():w())
+	hostage_icon:set_right(hostage_icon:parent():w())
+	info_box_container:set_right(hostage_icon:left() - 4)
 
-	hostage_icon:set_right(info_box_container:left() - 4)
 	hostage_icon:set_center_y(info_box_container:center_y())
 end
 
