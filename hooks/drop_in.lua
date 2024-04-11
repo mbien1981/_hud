@@ -373,7 +373,7 @@ end
 
 local module = ... or D:module("_hud")
 
--- https://gist.github.com/zneix/fb99059520fe94cfcfaaefe8d02af6db#file-user-lua-L739
+-- https://gist.github.com/zneix/fb99059520fe94cfcfaaefe8d02af6db#file-user-lua-L736
 D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, function(peer, _, data)
 	if type(data) ~= "table" then
 		return
