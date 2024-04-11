@@ -157,52 +157,22 @@ function _hudToolBox:blend_colors(current, target, blend)
 end
 
 --* string stuff
-function _hudToolBox:read_color_tags(text_panel_obj)
-	local string_data = {}
+function _hudToolBox:get_longest_word(text)
+	local words = {}
+	text:gsub("([^%s_%-+]+)", function(w)
+		table.insert(words, w)
+	end)
 
-	local splitString = function(s, i)
-		i = (i or 0) + 1
-		local j = s:sub(i, i)
-		if j == "" then
-			return
-		end
-		j = s:find(j == "[" and "]" or ".%f[[%z]", i) or #s
-		table.insert(string_data, { i, j, s:sub(i, j) })
-		return j
-	end
-
-	for k, v in splitString, text_panel_obj:text() do
-		-- nothing
-	end
-
-	local start_count = 0
-	local commands = {}
-	local command_count = 0
-	local real_text = ""
-	for i, v in pairs(string_data) do
-		if string.lower(v[3]):find("color=") then
-			command_count = command_count + 1
-			local temp = {}
-			for word in string.gmatch(v[3]:match("%(([^%)]+)"), "([^,]+)") do
-				table.insert(temp, tonumber(word))
-			end
-			table.insert(commands, { start = start_count, ending = 0, color = temp })
-		elseif string.lower(v[3]):find("/color") then
-			commands[command_count].ending = start_count
-		else
-			start_count = start_count + utf8.len(v[3])
-			real_text = real_text .. v[3]
+	local longest_n, longest_i = 0, 1
+	for i = 1, #words do
+		local n = #words[i]
+		if n > longest_n then
+			longest_i = i
+			longest_n = n
 		end
 	end
 
-	text_panel_obj:set_text(real_text)
-
-	for _, v in pairs(commands) do
-		text_panel_obj:set_range_color(v.start, v.ending, Color(unpack(v.color)))
-	end
-
-	-- in case we need it back.
-	return text_panel_obj
+	return words[longest_i]
 end
 
 --* Player utils

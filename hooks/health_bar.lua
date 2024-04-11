@@ -442,15 +442,11 @@ function PlayerHealthPanel:get_layout()
 			},
 			{
 				name = "mugshot_status",
-				data = {
-					center = "player_mugshot",
-				},
+				data = { center = "player_mugshot" },
 			},
 			{
 				name = "respawn_delay",
-				data = {
-					center = "player_mugshot",
-				},
+				data = { center = "player_mugshot" },
 			},
 			{
 				name = "player_downs",
@@ -484,15 +480,11 @@ function PlayerHealthPanel:get_layout()
 			},
 			{
 				name = "mugshot_status",
-				data = {
-					center = "player_mugshot",
-				},
+				data = { center = "player_mugshot" },
 			},
 			{
 				name = "respawn_delay",
-				data = {
-					center = "player_mugshot",
-				},
+				data = { center = "player_mugshot" },
 			},
 			{
 				name = "player_downs",
@@ -563,15 +555,11 @@ function PlayerHealthPanel:get_layout()
 			},
 			{
 				name = "mugshot_status",
-				data = {
-					center = "player_mugshot",
-				},
+				data = { center = "player_mugshot" },
 			},
 			{
 				name = "respawn_delay",
-				data = {
-					center = "player_mugshot",
-				},
+				data = { center = "player_mugshot" },
 			},
 			{
 				name = "player_downs",
@@ -748,11 +736,7 @@ function PlayerHealthPanel:layout()
 end
 
 function PlayerHealthPanel:layout_team_mugshots()
-	if not managers.hud then
-		return
-	end
-
-	if not self._hud then
+	if not managers.hud or not self._hud then
 		return
 	end
 
@@ -829,20 +813,7 @@ function PlayerHealthPanel:get_player_name()
 
 	local name = self.data.peer:name()
 	if var_cache.mugshot_name == "short_username" and utf8.len(name) > 16 then
-		local words = {}
-		name:gsub("([^%s_%-+]+)", function(w)
-			table.insert(words, w)
-		end)
-
-		local longest_n, longest_i = 0, 1
-		for i = 1, #words do
-			local n = #words[i]
-			if n > longest_n then
-				longest_i = i
-				longest_n = n
-			end
-		end
-		name = words[longest_i]
+		name = self._toolbox:get_longest_word(name)
 	end
 
 	return name
@@ -876,6 +847,7 @@ function PlayerHealthPanel:update_scaling()
 end
 
 function PlayerHealthPanel:update_player_data()
+	local character_name = managers.criminals:local_character_name()
 	if self.info_panels.mugshot:texture_name():key() == "7e3fa6faeeaf4dd0" then
 		local mugshot_ids = {
 			["american"] = 1,
@@ -883,11 +855,11 @@ function PlayerHealthPanel:update_player_data()
 			["russian"] = 3,
 			["spanish"] = 4,
 		}
-		local mask_id = mugshot_ids[managers.criminals:local_character_name()]
+		local mask_id = mugshot_ids[character_name]
 		local mask_set = tweak_data.mask_sets[self.data.peer:mask_set()][mask_id]
-		local image, texture_rect =
-			tweak_data.hud_icons:get_icon_data(mask_set and mask_set.mask_icon or "mugshot_random")
-		self.info_panels.mugshot:set_image(image, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
+		local icon_id = tablex.get(mask_set, "mask_icon") or "mugshot_random"
+		local texture, texture_rect = tweak_data.hud_icons:get_icon_data(icon_id)
+		self.info_panels.mugshot:set_image(texture, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
 	end
 
 	local player_level =
@@ -907,9 +879,7 @@ function PlayerHealthPanel:update_player_data()
 		(var_cache.selected_layout == "vanilla" and 14 or 11) * self.scales.hud * self.scales.font
 	)
 
-	self.info_panels.respawn_delay:set_text(
-		string.format("%02d", managers.trade:respawn_delay_by_name(managers.criminals:local_character_name()))
-	)
+	self.info_panels.respawn_delay:set_text(string.format("%02d", managers.trade:respawn_delay_by_name(character_name)))
 end
 
 function PlayerHealthPanel:update_health_and_armor()
