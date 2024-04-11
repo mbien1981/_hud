@@ -214,7 +214,7 @@ if RequiredScript == "lib/units/equipment/doctor_bag/doctorbagbase" then
 
 	for _, func in pairs({ "set_server_information", "_take", "sync_taken" }) do
 		module:post_hook(50, DoctorBagBase, func, function(self, ...)
-			DeployableSpy:add(self._unit, "ammo_bag")
+			DeployableSpy:add(self._unit, "medic_bag")
 		end)
 	end
 end
