@@ -165,6 +165,11 @@ module:add_config_option("_hud_mod_list_position", "righttop")
 
 -- custom control and point of no return panels
 module:add_config_option("_hud_use_custom_control_panel", true)
+module:add_config_option("_hud_assault_text", {
+	{ "///", "$ASSAULT_TITLE;", "///", "$DIFFICULTY_NAME;" },
+	-- { "///", "SWAT ASSAULT IN PROGRESS", "///", "$DIFFICULTY_NAME;" },
+})
+
 module:add_config_option("_hud_use_custom_use_ponr_panel", true)
 
 module:add_config_option("_hud_mod_whitelist", {

@@ -151,10 +151,11 @@ function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
 		}
 	end
 
+	local text_list = self:get_assault_text()
 	while true do
-		local text_list = self:get_assault_text()
 		local dt = coroutine.yield()
 		local last_text = texts[text_index]
+
 		if last_text and last_text.text then
 			if last_text.x + last_text.text:w() * 0.5 + padding < text_panel:w() then
 				text_index = text_index % #text_list + 1
@@ -165,6 +166,10 @@ function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
 			text_index = text_index % #text_list + 1
 
 			create_new_text(text_panel, text_list, text_index, texts)
+		end
+
+		if text_index == 1 then
+			text_list = self:get_assault_text()
 		end
 
 		local speed = 90
@@ -183,6 +188,12 @@ function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
 			end
 		end
 	end
+end
+
+function CustomControlPanel:string_format(text, macros)
+	return text:gsub("($([^%s;#]+);?)", function(full_match, macro_name)
+		return macros[macro_name:upper()] or full_match
+	end)
 end
 
 function CustomControlPanel:init(super)
@@ -454,13 +465,25 @@ function CustomControlPanel:get_assault_string()
 end
 
 function CustomControlPanel:get_assault_text()
-	local assault_text = managers.localization:to_upper_text(self:get_assault_string())
+	local assault_title = managers.localization:to_upper_text(self:get_assault_string())
 	local difficulty_name = self.super._cached_conf_vars.difficulty_name:upper()
 
-	-- ghetto retarded fix
-	-- scroll list is too short, assault title gets removed while in bounds
-	-- duplicating the contents solves this problem ¯\_(ツ)_/¯
-	return { "///", assault_text, "///", difficulty_name, "///", assault_text, "///", difficulty_name }
+	local streams = D:conf("_hud_assault_text") or { { "///", "$ASSAULT_TITLE;", "///", "$DIFFICULTY_NAME;" } }
+	local items = streams[math.random(table.size(streams))]
+	local n_items = table.size(items)
+
+	local assault_text = {}
+	for i, item in pairs(items) do
+		local text = self:string_format(item, { ASSAULT_TITLE = assault_title, DIFFICULTY_NAME = difficulty_name })
+
+		assault_text[i] = text
+		-- ghetto retarded fix
+		-- if the scroll list is too short, assault title gets removed while in bounds
+		-- duplicating the contents solves this problem ¯\_(ツ)_/¯
+		assault_text[i + n_items] = text -- doing this though a loop freezes the game, yay!
+	end
+
+	return assault_text
 end
 
 function CustomControlPanel:start_assault()
