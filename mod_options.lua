@@ -106,6 +106,11 @@ module:hook("OnModulePostBuildOptions", "OnModulePostBuildOptions__hud", functio
 		end
 	end
 
+	local dropdowns_toggle = _get_item("_hud_use_loadout_dropdowns", node)
+	if dropdowns_toggle then
+		dropdowns_toggle:set_enabled(D:version() >= "1.16.1.1")
+	end
+
 	local health_bar_toggle = _get_item("_hud_use_custom_health_panel", node)
 	local visible = health_bar_toggle and health_bar_toggle:value() == "on" or false
 
@@ -131,7 +136,7 @@ module:add_config_option("_hud_scaling", 1.2)
 module:add_config_option("_hud_font_scaling", 1.2)
 
 -- other gui stuff
-module:add_config_option("_hud_use_loadout_dropdowns", true)
+module:add_config_option("_hud_use_loadout_dropdowns", D:version() >= "1.16.1.1")
 
 -- health panel
 module:add_config_option("_hud_use_custom_health_panel", true)
