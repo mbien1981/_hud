@@ -219,6 +219,9 @@ local strings = {
 	["_hud_use_loadout_dropdowns"] = {
 		english = "Use loadout dropdowns",
 	},
+	["_hud_use_loadout_dropdowns_help"] = {
+		english = "Allows you to quickly equip weapons, equipments and crew bonuses without having to switch through all of them.\n\nRequires DAHM 1.6.1.1 or above.",
+	},
 }
 
 for key, translations in pairs(strings) do

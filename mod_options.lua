@@ -233,6 +233,7 @@ module:add_menu_option("_hud_misc_gui_divider", { type = "divider", size = 15 })
 module:add_menu_option("_hud_use_loadout_dropdowns", {
 	type = "boolean",
 	text_id = "_hud_use_loadout_dropdowns",
+	help_id = "_hud_use_loadout_dropdowns_help",
 	localize = true,
 })
 
