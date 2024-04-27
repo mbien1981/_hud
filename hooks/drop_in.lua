@@ -9,12 +9,6 @@
 _M.CustomDropInclass = class()
 local CustomDropInclass = _M.CustomDropInclass
 
-function CustomDropInclass:string_format(text, macros)
-	return text:gsub("($([^%s;#]+);?)", function(full_match, macro_name)
-		return macros[macro_name:upper()] or full_match
-	end)
-end
-
 function CustomDropInclass:init()
 	self._ws = Overlay:newgui():create_screen_workspace()
 	self._panel = self._ws:panel():panel({ layer = 150 })
@@ -88,7 +82,7 @@ function CustomDropInclass:show_person_joining(peer)
 
 	local drop_in_progress = panel:text({
 		name = "drop_in_progress",
-		text = self:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;%", {
+		text = self._toolbox:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;%", {
 			PLEASE_WAIT = managers.localization:text("dialog_wait"),
 			JOIN_PROGRESS = 0,
 		}),
@@ -194,7 +188,7 @@ function CustomDropInclass:update_person_joining(peer, join_progress)
 
 	local time_left = math.max(((os.clock() - peer_data.join_start_t) / join_progress) * (100 - join_progress), 0)
 	progress:show()
-	progress:set_text(self:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;% ($DROP_IN_TIME;s)", {
+	progress:set_text(self._toolbox:string_format("$PLEASE_WAIT; $JOIN_PROGRESS;% ($DROP_IN_TIME;s)", {
 		PLEASE_WAIT = managers.localization:text("dialog_wait"),
 		JOIN_PROGRESS = join_progress,
 		DROP_IN_TIME = string.format("%d", time_left),

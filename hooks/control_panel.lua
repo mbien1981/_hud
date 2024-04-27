@@ -190,12 +190,6 @@ function CustomControlPanel:_animate_text(text_panel) -- pasted from payday 2
 	end
 end
 
-function CustomControlPanel:string_format(text, macros)
-	return text:gsub("($([^%s;#]+);?)", function(full_match, macro_name)
-		return macros[macro_name:upper()] or full_match
-	end)
-end
-
 function CustomControlPanel:init(super)
 	self.super = super
 
@@ -474,7 +468,7 @@ function CustomControlPanel:get_assault_text()
 
 	local assault_text = {}
 	for i, item in pairs(items) do
-		local text = self:string_format(item, { ASSAULT_TITLE = assault_title, DIFFICULTY_NAME = difficulty_name })
+		local text = self._toolbox:string_format(item, { ASSAULT_TITLE = assault_title, DIFFICULTY_NAME = difficulty_name })
 
 		assault_text[i] = text
 		-- ghetto retarded fix

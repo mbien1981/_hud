@@ -175,6 +175,12 @@ function _hudToolBox:get_longest_word(text)
 	return words[longest_i]
 end
 
+function _hudToolBox:string_format(text, macros)
+	return text:gsub("($([^%s;#]+);?)", function(full_match, macro_name)
+		return macros[macro_name:upper()] or full_match
+	end)
+end
+
 --* Player utils
 function _hudToolBox:player_movement_state()
 	local unit = self:player()

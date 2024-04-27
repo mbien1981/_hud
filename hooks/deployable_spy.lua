@@ -106,12 +106,6 @@ function DeployableSpy:make_pretty_text(text_obj)
 	return w, h
 end
 
-function DeployableSpy:string_format(text, macros)
-	return text:gsub("($([^%s;#]+);?)", function(full_match, macro_name)
-		return macros[macro_name:upper()] or full_match
-	end)
-end
-
 local vars = { medic_bag = "_amount", ammo_bag = "_ammo_amount" }
 function DeployableSpy:get_item_text(unit, unit_type)
 	local text = D:conf(string.format("_hud_%s_spy", unit_type))
@@ -123,12 +117,12 @@ function DeployableSpy:get_item_text(unit, unit_type)
 			return nil
 		end
 
-		return self:string_format(text, { AMMO = ammo, AMMO_MAX = unit:weapon()._ammo_max, HEALTH = health })
+		return self._toolbox:string_format(text, { AMMO = ammo, AMMO_MAX = unit:weapon()._ammo_max, HEALTH = health })
 	end
 
 	local value = unit:base()[vars[unit_type]]
 	local charge_str = unit_type == "ammo_bag" and "%.2f" or "%d"
-	return self:string_format(text, {
+	return self._toolbox:string_format(text, {
 		CHARGES = string.format(charge_str, value),
 		PERCENT = string.format("%d", value * 100),
 	})
