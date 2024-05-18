@@ -808,7 +808,8 @@ function PlayerHealthPanel:get_player_name()
 	end
 
 	if var_cache.mugshot_name == "character_name" then
-		return managers.localization:text("debug_" .. managers.criminals:local_character_name())
+		local character_name = managers.criminals:local_character_name() or "russian"
+		return managers.localization:text("debug_" .. character_name)
 	end
 
 	local name = self.data.peer:name()
