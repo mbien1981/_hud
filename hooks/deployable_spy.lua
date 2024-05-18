@@ -180,6 +180,10 @@ function DeployableSpy:update_items(camera)
 end
 
 function DeployableSpy:update()
+	if not Util:is_in_state("any_ingame_playing") then
+		return
+	end
+
 	local camera = managers.viewport:get_current_camera()
 	if not alive(camera) or not D:conf("_hud_enable_deployable_spy") then
 		self._panel:hide()

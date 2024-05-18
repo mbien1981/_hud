@@ -468,7 +468,10 @@ function CustomControlPanel:get_assault_text()
 
 	local assault_text = {}
 	for i, item in pairs(items) do
-		local text = self._toolbox:string_format(item, { ASSAULT_TITLE = assault_title, DIFFICULTY_NAME = difficulty_name })
+		local text = self._toolbox:string_format(item, {
+			ASSAULT_TITLE = assault_title,
+			DIFFICULTY_NAME = difficulty_name,
+		})
 
 		assault_text[i] = text
 		-- ghetto retarded fix
@@ -578,6 +581,10 @@ function CustomControlPanel:set_control_info(data)
 end
 
 function CustomControlPanel:update()
+	if not Util:is_in_state("any_ingame_playing") then
+		return
+	end
+
 	local hud = self.super._hud
 	if hud.in_assault and not hud.in_ponr and not self.in_assault then
 		self:start_assault()

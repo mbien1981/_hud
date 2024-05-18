@@ -134,6 +134,10 @@ function PlayerInventoryPanel:layout()
 end
 
 function PlayerInventoryPanel:update()
+	if not Util:is_in_state("any_ingame_playing") then
+		return
+	end
+
 	if not self._cached_conf_vars.use_inventory then
 		self.main_panel:hide()
 		self._hud.item_panel:set_visible(true)

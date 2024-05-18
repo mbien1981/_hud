@@ -93,6 +93,10 @@ function CustomAmmoPanelClass:clear_weapons()
 end
 
 function CustomAmmoPanelClass:update()
+	if not Util:is_in_state("any_ingame_playing") then
+		return
+	end
+
 	if not self._panel:parent():visible() then
 		return
 	end

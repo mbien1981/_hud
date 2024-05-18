@@ -882,7 +882,6 @@ function PlayerHealthPanel:update_player_data()
 
 	self.info_panels.player_name:set_text(name)
 	self.info_panels.player_name:set_color(self:get_name_color())
-
 	local var_cache = self._cached_conf_vars
 	self.info_panels.player_level:set_text(
 		string.format((var_cache.selected_layout == "vanilla" and "[%d]" or "%d"), player_level)
@@ -1129,6 +1128,10 @@ function PlayerHealthPanel:update_mugshot()
 end
 
 function PlayerHealthPanel:update()
+	if not Util:is_in_state("any_ingame_playing") then
+		return
+	end
+
 	local var_cache = self._cached_conf_vars
 	if not var_cache.use_health_panel then
 		if not self._panel:visible() then

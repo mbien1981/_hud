@@ -128,6 +128,10 @@ function StateTimerPanel:update_reload_timer()
 end
 
 function StateTimerPanel:update()
+	if not Util:is_in_state("any_ingame_playing") then
+		return
+	end
+
 	if not self._initialized then
 		self:init()
 	end
