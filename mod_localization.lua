@@ -93,6 +93,10 @@ local strings = {
 		english = "Custom mugshot name",
 		spanish = "Nombre personalizado",
 	},
+	["_hud_display_name_in_upper_cases"] = {
+		english = "Display mugshot name in upper cases",
+		spanish = "Mostrar nombre en mayúsculas",
+	},
 	["_hud_name_use_peer_color"] = {
 		english = "Use peer color in custom health bar",
 		spanish = "Utilizar color del jugador en el panel de vida",

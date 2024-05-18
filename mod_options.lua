@@ -5,6 +5,7 @@ local visibility_nodes = {
 		"_hud_custom_health_panel_layout",
 		"_hud_mugshot_name",
 		"_hud_custom_mugshot_name",
+		"_hud_display_name_in_upper_cases",
 		"_hud_name_use_peer_color",
 		"_hud_display_armor_and_health_values",
 		"_hud_inventory_divider",
@@ -143,6 +144,7 @@ module:add_config_option("_hud_use_custom_health_panel", true)
 module:add_config_option("_hud_custom_health_panel_layout", "raid")
 module:add_config_option("_hud_mugshot_name", "steam_username")
 module:add_config_option("_hud_custom_mugshot_name", "<name>")
+module:add_config_option("_hud_display_name_in_upper_cases", false)
 module:add_config_option("_hud_name_use_peer_color", false)
 
 -- health panel armor
@@ -275,6 +277,11 @@ module:add_menu_option("_hud_custom_mugshot_name", {
 	input_type = "text",
 	text_id = "_hud_custom_mugshot_name",
 	default_value = "<name>",
+})
+module:add_menu_option("_hud_display_name_in_upper_cases", {
+	type = "boolean",
+	text_id = "_hud_display_name_in_upper_cases",
+	localize = true,
 })
 
 module:add_menu_option("_hud_name_use_peer_color", {

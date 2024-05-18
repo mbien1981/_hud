@@ -125,6 +125,12 @@ function PlayerHealthPanel:update_settings()
 		refresh_required = true
 	end
 
+	local upper_name = D:conf("_hud_display_name_in_upper_cases")
+	if var_cache.upper_name ~= upper_name then
+		var_cache.upper_name = upper_name
+		refresh_required = true
+	end
+
 	var_cache.name_use_peer_color = D:conf("_hud_name_use_peer_color")
 
 	if refresh_required then
@@ -869,7 +875,12 @@ function PlayerHealthPanel:update_player_data()
 			true
 		)
 
-	self.info_panels.player_name:set_text(self:get_player_name())
+	local name = self:get_player_name()
+	if self._cached_conf_vars.upper_name then
+		name = utf8.to_upper(name)
+	end
+
+	self.info_panels.player_name:set_text(name)
 	self.info_panels.player_name:set_color(self:get_name_color())
 
 	local var_cache = self._cached_conf_vars
