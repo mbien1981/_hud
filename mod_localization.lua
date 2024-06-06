@@ -127,11 +127,11 @@ local strings = {
 	},
 	["_hud_medic_bag_spy"] = { english = "Medic Bag text format" },
 	["_hud_medic_bag_spy_help"] = {
-		english = "$CARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
+		english = "$CHARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
 	},
 	["_hud_ammo_bag_spy"] = { english = "Ammo Bag text format" },
 	["_hud_ammo_bag_spy_help"] = {
-		english = "$CARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
+		english = "$CHARGES; = Shows remaining charges.\n$PERCENT; = Shows remaining percentage.\n\nSupports DAHM Color tags.",
 	},
 	["_hud_sentry_gun_spy"] = { english = "Sentry Gun text format" },
 	["_hud_sentry_gun_spy_help"] = {
