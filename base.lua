@@ -12,16 +12,21 @@ local module = DMod:new("_hud", {
 	update = { id = "_hud", url = "https://raw.githubusercontent.com/mbien1981/dahm-modules/main/version.json" },
 })
 
+module:hook_post_require("lib/units/beings/player/playerbase", "hooks/playerbase")
+
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/drop_in")
 module:hook_post_require("lib/managers/menumanager", "hooks/drop_in")
 
 module:hook_post_require("lib/managers/hudmanager", "hooks/ammo_panel")
+-- module:hook_post_require("lib/units/beings/player/playerbase", "hooks/ammo_panel")
 
-module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/state_timer")
+module:hook_post_require("lib/managers/hudmanager", "hooks/hudmanager")
 
-module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/health_bar")
+module:hook_post_require("lib/managers/hudmanager", "hooks/state_timer")
+
+module:hook_post_require("lib/managers/hudmanager", "hooks/health_bar")
 module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/health_bar")
-module:hook_post_require("lib/managers/hudmanager", "hooks/inventory")
+module:hook_post_require("lib/managers/hudmanager", "hooks/inventory_panel")
 
 module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/deployable_spy")
@@ -36,7 +41,6 @@ module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/
 module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
 module:hook_post_require("lib/network/handlers/unitnetworkhandler", "hooks/name_labels")
 
-module:hook_post_require("lib/units/beings/player/playerbase", "hooks/control_panel")
 module:hook_post_require("lib/managers/hudmanager", "hooks/control_panel")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/loadout_dropdowns")
@@ -44,7 +48,7 @@ module:hook_post_require("lib/managers/menu/menunodekitgui", "hooks/loadout_drop
 module:hook_post_require("lib/managers/menumanager", "hooks/loadout_dropdowns")
 
 module:hook_post_require("lib/setups/setup", "classes/toolbox")
-module:hook_post_require("lib/setups/setup", "classes/updator")
-module:hook_post_require("core/lib/setups/coresetup", "classes/updator")
+module:hook_post_require("lib/setups/setup", "classes/updater")
+module:hook_post_require("core/lib/setups/coresetup", "classes/updater")
 
 return module

@@ -6,7 +6,7 @@
 	The string template can be found @_hud/mod_localization.lua
 --]]
 
-_M.CustomDropInclass = class()
+_M.CustomDropInclass = rawget(_M, "CustomDropInclass") or class()
 local CustomDropInclass = _M.CustomDropInclass
 
 function CustomDropInclass:init()

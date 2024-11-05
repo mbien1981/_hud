@@ -1,93 +1,232 @@
-CustomAmmoPanelClass = class()
+local CustomAmmoPanelClass = class()
 
-function CustomAmmoPanelClass:init()
-	self._hud = managers.hud:script(PlayerBase.PLAYER_HUD)
-	self._panel = self._hud.panel:panel()
+function CustomAmmoPanelClass:init(player_hud)
+	self._hud = player_hud
 
-	self._weapons = {}
+	local ammo_panel = self._hud.ammo_panel
+	self.main_panel = self._hud.panel:panel({
+		w = ammo_panel:w(),
+		h = ammo_panel:h(),
+	})
+
 	self.colors = {
 		default = Color(0.8, 0.8, 0.8),
 		full = Color("70FF70"),
 		empty = Color("FF7070"),
 	}
+	self.items = {}
+	self._cached_conf_vars = {}
 
 	self._toolbox = _M._hudToolBox
-	self._updator = _M._hudUpdator
 
-	self._updator:remove("ammo_update")
-	self._updator:add(callback(self, self, "update"), "ammo_update")
+	self:layout()
+	self:update_settings()
+end
+
+function CustomAmmoPanelClass:update_settings()
+	local D = D
+	local var_cache = self._cached_conf_vars
+
+	local use_ammo_panel = D:conf("_hud_enable_custom_ammo_panel")
+	if var_cache.enabled ~= use_ammo_panel then
+		var_cache.enabled = use_ammo_panel
+		self.main_panel:set_visible(use_ammo_panel)
+
+		if not use_ammo_panel then
+			managers.hud:update_hud_settings()
+		end
+
+		managers.hud:update_hud_visibility()
+	end
+
+	local show_real_ammo_values = D:conf("_hud_ammo_panel_show_real_ammo")
+	if var_cache.show_real_ammo ~= show_real_ammo_values then
+		var_cache.show_real_ammo = show_real_ammo_values
+
+		for i = 1, 3 do
+			if self.items[i] then
+				self:set_ammo_amount(i)
+			end
+		end
+	end
+end
+
+function CustomAmmoPanelClass:layout()
+	local icon_size = (32 * tweak_data.scale.hud_equipment_icon_multiplier)
+	local font_size_medium = 20 * tweak_data.scale.hud_mugshot_multiplier
+	local font_size_small = 12 * tweak_data.scale.hud_mugshot_multiplier
+
+	local ammo_panel = self._hud.ammo_panel
+
+	self.main_panel:set_w(ammo_panel:w())
+	self.main_panel:set_h(icon_size * 3)
+	self.main_panel:set_top(self._hud.item_panel:bottom() + 2)
+	self.main_panel:set_right(self._hud.panel:w())
+
+	for i = 1, 3 do
+		local item = self.items[i]
+		if item then
+			item.panel:set_size(item.panel:parent():w(), icon_size)
+			item.icon:set_size(icon_size, icon_size)
+			item.total:set_font_size(font_size_medium)
+			item.magazine:set_font_size(font_size_small)
+
+			item.icon:set_center_y(item.panel:h() / 2)
+			-- item.icon:set_right(item.panel:w())
+			item.icon:set_world_center_x(self._hud.item_panel:center_x())
+
+			-- text shouldn't move when ammo values change, so we resize to a 3 character width text rect size.
+			local old_total_count = item.total:text()
+			item.total:set_text("000")
+			self._toolbox:make_pretty_text(item.total)
+			item.total:set_text(old_total_count)
+
+			item.total:set_bottom(item.icon:bottom())
+			item.total:set_right(item.icon:left() - 6)
+
+			local old_magazine_count = item.magazine:text()
+			item.magazine:set_text("000")
+			self._toolbox:make_pretty_text(item.magazine)
+			item.magazine:set_text(old_magazine_count)
+
+			item.magazine:set_center_y(item.total:center_y())
+			item.magazine:set_right(item.total:left() - 4)
+		end
+	end
+
+	self:arrange_weapons()
 end
 
 function CustomAmmoPanelClass:add_weapon(data)
-	local weapon_tweak_data = data.unit:base():weapon_tweak_data()
-	local i = weapon_tweak_data.use_data.selection_index
-	self:remove_weapon(i)
+	local slot = data.inventory_index
+	self:remove_weapon(slot)
 
-	local icon, texture_rect = tweak_data.hud_icons:get_icon_data(weapon_tweak_data.hud_icon)
-	local bitmap = self._panel:bitmap({
+	local icon_size = (32 * tweak_data.scale.hud_equipment_icon_multiplier)
+	local panel = self.main_panel:panel({ h = icon_size })
+
+	local alpha = data.is_equip and 1 or 0.4
+	local weapon_tweak = data.unit:base():weapon_tweak_data()
+	local icon, texture_rect = tweak_data.hud_icons:get_icon_data(weapon_tweak.hud_icon)
+	local bitmap = panel:bitmap({
 		texture = icon,
-		color = Color(0.4, 0.8, 0.8, 0.8),
+		color = Color(0.8, 0.8, 0.8),
+		alpha = alpha,
 		layer = 2,
 		texture_rect = texture_rect,
-		w = 32 * tweak_data.scale.hud_equipment_icon_multiplier,
-		h = 32 * tweak_data.scale.hud_equipment_icon_multiplier,
+		w = icon_size,
+		h = icon_size,
 	})
 
-	local total = self._panel:text({
+	local total_ammo = panel:text({
 		text = "000",
 		font_size = 20 * tweak_data.scale.hud_mugshot_multiplier,
 		font = "fonts/font_univers_530_bold",
-		color = self.colors.default:with_alpha(data.is_equip and 1 or 0.4),
+		color = self.colors.default,
+		alpha = alpha,
 		align = "right",
 		vertical = "center",
 		layer = 3,
 	})
 
-	local clip = self._panel:text({
+	local ammo_in_magazine = panel:text({
 		text = "000",
 		font = "fonts/font_univers_530_medium",
 		font_size = 12 * tweak_data.scale.hud_mugshot_multiplier,
-		color = self.colors.default:with_alpha(data.is_equip and 1 or 0.4),
+		color = self.colors.default,
+		alpha = alpha,
 		align = "right",
 		vertical = "center",
 		layer = 3,
 	})
 
-	local previous_item = self._weapons[i - 1]
-	if previous_item then
-		bitmap:set_right(previous_item.icon:right())
-		bitmap:set_top(previous_item.icon:bottom())
-	else
-		bitmap:set_top(self._hud.item_panel:bottom() + 2)
-		bitmap:set_center_x(self._hud.item_panel:center_x())
-	end
+	bitmap:set_center_y(panel:h() / 2)
+	-- bitmap:set_right(panel:right())
+	bitmap:set_world_center_x(self._hud.item_panel:center_x())
 
-	self._toolbox:make_pretty_text(total)
-	total:set_bottom(bitmap:bottom())
-	total:set_right(bitmap:left() - 6)
+	self._toolbox:make_pretty_text(total_ammo)
+	total_ammo:set_bottom(bitmap:bottom())
+	total_ammo:set_right(bitmap:left() - 6)
 
-	self._toolbox:make_pretty_text(clip)
-	clip:set_center(total:center())
-	clip:set_right(total:left() - 4)
+	self._toolbox:make_pretty_text(ammo_in_magazine)
+	ammo_in_magazine:set_center(total_ammo:center())
+	ammo_in_magazine:set_right(total_ammo:left() - 4)
 
-	self._weapons[i] = { icon = bitmap, total = total, clip = clip }
+	self.items[slot] = { panel = panel, icon = bitmap, total = total_ammo, magazine = ammo_in_magazine }
+
+	self:arrange_weapons()
+	self:set_ammo_amount(slot)
 end
 
-function CustomAmmoPanelClass:remove_weapon(i)
-	local weapon = self._weapons[i]
-	if not weapon then
+function CustomAmmoPanelClass:remove_weapon(slot)
+	local item = self.items[slot]
+	if not item then
 		return
 	end
 
-	weapon.icon:parent():remove(weapon.icon)
-	weapon.total:parent():remove(weapon.total)
-	weapon.clip:parent():remove(weapon.clip)
+	item.panel:parent():remove(item.panel)
 
-	self._weapons[i] = nil
+	self.items[slot] = nil
+end
+
+function CustomAmmoPanelClass:arrange_weapons()
+	for i = 1, 3 do
+		local item = self.items[i]
+		local previous_item = self.items[i - 1]
+		if self.items[i] then
+			local y = (previous_item and previous_item.panel:bottom()) or 0
+			item.panel:set_top(y)
+		end
+	end
+end
+
+function CustomAmmoPanelClass:set_weapon_selected(slot)
+	for i, item in pairs(self.items) do
+		if self.items[i] then
+			local selected = i == slot
+			local color_icon = selected and tweak_data.hud.prime_color or self.colors.default
+			local alpha = selected and 1 or 0.4
+			item.icon:set_color(color_icon)
+			item.icon:set_alpha(alpha)
+			item.magazine:set_alpha(alpha)
+			item.total:set_alpha(alpha)
+		end
+	end
+end
+
+function CustomAmmoPanelClass:set_ammo_amount(slot)
+	local item = self.items[slot]
+	if not item then
+		return
+	end
+
+	local selections = managers.player:player_unit():inventory():available_selections()
+	local weapon_base = selections[slot].unit:base()
+
+	local max_clip, current_clip, ammo_amount = weapon_base:ammo_info()
+	local ammo_max = weapon_base._ammo_max
+	local ammo_total = self._cached_conf_vars.show_real_ammo and ammo_amount - current_clip or ammo_amount
+
+	item.magazine:set_text(tostring(current_clip))
+	item.magazine:set_right(item.total:left() - 4)
+
+	item.total:set_text(tostring(ammo_total))
+	item.total:set_right(item.icon:left() - 6)
+
+	local color_magazine = self._toolbox:blend_colors(self.colors.full, self.colors.empty, current_clip / max_clip)
+	local color_total = self._toolbox:blend_colors(self.colors.full, self.colors.empty, ammo_amount / ammo_max)
+
+	item.magazine:set_color(color_magazine)
+	item.total:set_color(color_total)
+end
+
+function CustomAmmoPanelClass:set_weapon_ammo_by_unit(unit)
+	local weapon_base = unit:base()
+	local slot = weapon_base:weapon_tweak_data().use_data.selection_index
+	self:set_ammo_amount(slot)
 end
 
 function CustomAmmoPanelClass:clear_weapons()
-	for i, _ in pairs(self._weapons) do
+	for i, _ in pairs(self.items) do
 		self:remove_weapon(i)
 	end
 end
@@ -97,16 +236,16 @@ function CustomAmmoPanelClass:update()
 		return
 	end
 
-	if not self._panel:parent():visible() then
+	if not self.main_panel:parent():visible() then
 		return
 	end
 
 	local config = D:conf("_hud_enable_custom_ammo_panel")
-	self._panel:set_visible(config)
+	self.main_panel:set_visible(config)
 	self._hud.weapon_panel:set_visible(not config)
 	self._hud.ammo_panel:set_visible(not config)
 
-	if not self._panel:visible() then
+	if not self.main_panel:visible() then
 		return
 	end
 
@@ -116,8 +255,8 @@ function CustomAmmoPanelClass:update()
 		return
 	end
 
-	for i, weapon in pairs(self._weapons) do
-		if self._weapons[i] then
+	for i, weapon in pairs(self.items) do
+		if self.items[i] then
 			self:update_weapon(weapon, selections[i].unit:base(), managers.hud._hud.selected_weapon == i)
 		end
 	end
@@ -154,21 +293,78 @@ function CustomAmmoPanelClass:update_weapon(weapon, weapon_base, selected)
 end
 
 local module = ... or D:module("_hud")
-if RequiredScript == "lib/managers/hudmanager" then
-	local HUDManager = module:hook_class("HUDManager")
-	module:post_hook(HUDManager, "add_weapon", function(self, data)
-		if not rawget(_M, "CustomAmmoPanel") then
-			rawset(_M, "CustomAmmoPanel", CustomAmmoPanelClass:new())
-		end
+module:hook("OnSetupHUD", "_hud.init_custom_weapon_panel", function(self, panels)
+	module.initialize_panel("custom_weapon_panel", CustomAmmoPanelClass, panels.PLAYER_HUD)
+end, false)
 
-		_M.CustomAmmoPanel:add_weapon(data)
-	end)
+module:hook("OnPlayerHudLayout", "_hud.layout_custom_ammo_panel", function(self, panels)
+	local weapon_panel = self._hud.custom_weapon_panel
+	if not weapon_panel then
+		return
+	end
 
-	module:post_hook(HUDManager, "clear_weapons", function(self)
-		if not rawget(_M, "CustomAmmoPanel") then
-			rawset(_M, "CustomAmmoPanel", CustomAmmoPanelClass:new())
-		end
+	weapon_panel:layout()
+end, false)
 
-		_M.CustomAmmoPanel:clear_weapons()
-	end)
-end
+module:hook("OnUpdateHUDVisibility", "_hud.override_ammo_panel_visibility", function(self)
+	local weapon_panel = self._hud.custom_weapon_panel
+	if not weapon_panel then
+		return
+	end
+
+	local dahm_cached_vars = self._cached_conf_vars
+	local _hud_cached_vars = weapon_panel._cached_conf_vars
+
+	if _hud_cached_vars.enabled then
+		dahm_cached_vars.hud_vis_ammo_panel = false
+		dahm_cached_vars.hud_vis_weapon_panel = false
+	end
+end, false)
+
+local HUDManager = module:hook_class("HUDManager")
+module:post_hook(HUDManager, "add_weapon", function(self, data)
+	local weapon_hud_data = self._hud.weapons[data.inventory_index]
+	if D:conf("_hud_enable_custom_ammo_panel") and alive(weapon_hud_data.b2) then
+		weapon_hud_data.b2:stop()
+		weapon_hud_data.b2:parent():remove(weapon_hud_data.b2)
+		weapon_hud_data.b2 = nil
+	end
+
+	if not self._hud.custom_weapon_panel then
+		return
+	end
+
+	self._hud.custom_weapon_panel:add_weapon(data)
+end)
+
+module:post_hook(HUDManager, "clear_weapons", function(self)
+	if not self._hud.custom_weapon_panel then
+		return
+	end
+
+	self._hud.custom_weapon_panel:clear_weapons()
+end)
+
+module:post_hook(HUDManager, "_set_weapon_selected", function(self, id)
+	if not self._hud.custom_weapon_panel then
+		return
+	end
+
+	self._hud.custom_weapon_panel:set_weapon_selected(id)
+end)
+
+module:post_hook(HUDManager, "set_weapon_ammo_by_unit", function(self, unit)
+	if not self._hud.custom_weapon_panel then
+		return
+	end
+
+	self._hud.custom_weapon_panel:set_weapon_ammo_by_unit(unit)
+end)
+
+module:post_hook(HUDManager, "set_ammo_amount", function(self)
+	if not self._hud.custom_weapon_panel then
+		return
+	end
+
+	self._hud.custom_weapon_panel:set_ammo_amount(self._hud.selected_weapon)
+end)

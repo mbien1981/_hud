@@ -215,19 +215,19 @@ function DropdownClass:init()
 		sizes = { small = 18, medium = 24 },
 	}
 
-	self.visible = false
+	self.active = false
 	self.colors = { background = Color.black }
 	self.height_data = {
 		["button"] = 38,
 	}
 end
 
-function DropdownClass:is_visible()
-	return self.visible
+function DropdownClass:is_active()
+	return self.active
 end
 
 function DropdownClass:show()
-	if self:is_visible() then
+	if self:is_active() then
 		return
 	end
 
@@ -247,11 +247,11 @@ function DropdownClass:show()
 	end
 	self._controller:enable()
 
-	self.visible = true
+	self.active = true
 end
 
 function DropdownClass:hide()
-	if not self:is_visible() then
+	if not self:is_active() then
 		return
 	end
 
@@ -269,7 +269,7 @@ function DropdownClass:hide()
 		menu.input._controller:enable()
 	end
 
-	self.visible = false
+	self.active = false
 end
 
 function DropdownClass:destroy()
@@ -446,7 +446,7 @@ end
 
 -- Keyboard input
 function DropdownClass:keyboard_cancel()
-	if not self:is_visible() then
+	if not self:is_active() then
 		return
 	end
 
@@ -577,6 +577,8 @@ function DropdownClass:mouse_press(_, button, x, y)
 	end
 end
 
+local module = ... or D:module("_hud")
+
 -- Hooks
 if RequiredScript == "lib/states/ingamewaitingforplayers" then
 	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
@@ -685,7 +687,7 @@ if RequiredScript == "lib/managers/menumanager" then
 	local KitMenuDropdown
 	module:hook(module:hook_class("MenuManager"), "toggle_menu_state", function(self)
 		KitMenuDropdown = KitMenuDropdown or rawget(_M, "KitMenuDropdown")
-		if KitMenuDropdown and KitMenuDropdown:is_visible() then -- prevent pausing when closing the active dropdown with escape
+		if KitMenuDropdown and KitMenuDropdown:is_active() then -- prevent pausing when closing the active dropdown with escape
 			return
 		end
 

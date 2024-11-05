@@ -45,9 +45,10 @@ if RequiredScript == "lib/managers/hudmanager" then
 			return
 		end
 
-		for i, data in ipairs(self._hud.name_labels) do
+		for _, data in ipairs(self._hud.name_labels) do
 			if data.id == id then
 				data.health_bar:set_w(data.background:w() * amount)
+				break
 			end
 		end
 	end)

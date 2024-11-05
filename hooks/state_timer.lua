@@ -11,12 +11,12 @@ function StateTimerPanel:init()
 	})
 
 	self._toolbox = _M._hudToolBox
-	self._updator = _M._hudUpdator
+	self._updater = _M._hudUpdater
 
 	self:setup_panels()
 
-	self._updator:remove("_hud_reload_timer_update")
-	self._updator:add(callback(self, self, "update"), "_hud_reload_timer_update")
+	self._updater:remove("_hud_reload_timer_update")
+	self._updater:add(callback(self, self, "update"), "_hud_reload_timer_update")
 end
 
 function StateTimerPanel:setup_panels()
@@ -143,6 +143,6 @@ function StateTimerPanel:update()
 end
 
 local module = ... or D:module("_hud")
-module:post_hook(50, module:hook_class("IngameWaitingForPlayersState"), "at_exit", function(...)
-	StateTimerPanel:new()
+module:hook("OnSetupHUD", "_hud.init_custom_state_panel", function(self)
+	module.initialize_panel("custom_state_panel", StateTimerPanel)
 end, false)

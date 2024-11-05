@@ -44,7 +44,7 @@ function PlayerHealthPanel:init(super)
 	self._cached_conf_vars = {}
 
 	self._toolbox = _M._hudToolBox
-	self._updator = _M._hudUpdator
+	self._updater = _M._hudUpdater
 
 	self:update_settings()
 	self:setup_panels()
@@ -53,8 +53,8 @@ function PlayerHealthPanel:init(super)
 	self:layout()
 	self:update_panel_visibility()
 
-	self._updator:remove("health_bar_update")
-	self._updator:add(callback(self, self, "update"), "health_bar_update")
+	self._updater:remove("health_bar_update")
+	self._updater:add(callback(self, self, "update"), "health_bar_update")
 end
 
 function PlayerHealthPanel:update_settings()
@@ -62,11 +62,46 @@ function PlayerHealthPanel:update_settings()
 	local var_cache = self._cached_conf_vars
 	local refresh_required
 
-	var_cache.use_health_panel = D:conf("_hud_use_custom_health_panel")
-
 	if type(var_cache.use_bcl) ~= "boolean" then
 		local bcl = D:module("better_chat_location")
 		var_cache.use_bcl = bcl and bcl:enabled() or false
+	end
+
+	local use_health_panel = D:conf("_hud_use_custom_health_panel")
+	if var_cache.use_health_panel ~= use_health_panel then
+		var_cache.use_health_panel = use_health_panel
+		self._panel:set_visible(use_health_panel)
+
+		if not use_health_panel then
+			managers.hud:_layout_mugshots()
+			managers.hud:_layout_chat_output()
+
+			for _, mugshot in ipairs(managers.hud._hud.mugshots or {}) do
+				-- DorentuZ` direct_messaging marker
+				if alive(mugshot.selection_marker) then
+					local w = mugshot.selection_marker:w()
+					local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
+					mugshot.selection_marker:set_shape(panel_x, panel_y, w, panel_h)
+					mugshot.panel:set_x(panel_x + w)
+				end
+			end
+
+			local full_hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN)
+			if not full_hud then
+				return
+			end
+
+			local say_text = full_hud.panel:child("say_text")
+			local input_panel = full_hud.panel:child("chat_input")
+			local text_scroll = full_hud.panel:child("textscroll")
+
+			input_panel:set_top((var_cache.use_bcl and text_scroll:bottom() + 4) or 4)
+			say_text:set_center_y(input_panel:center_y())
+
+			managers.hud:update_hud_settings()
+		end
+
+		managers.hud:update_hud_visibility()
 	end
 
 	var_cache.reposition_chat_input = var_cache.use_bcl or D:conf("_hud_reposition_chat_input")
@@ -707,9 +742,24 @@ function PlayerHealthPanel:layout()
 	self.main_panel:set_h(self.info_panels.mugshot:h() + 8)
 	self.main_panel:child("panel_background"):set_size(self.main_panel:size())
 
-	self:update_player_data()
+	local target_bottom = self._panel:bottom()
+	if self._xp_hud then
+		target_bottom = self.super._xp_hud_hidden and self._panel:bottom() or self._xp_hud.experience_panel:top() - 10
+	end
 
 	local var_cache = self._cached_conf_vars
+	if var_cache.use_inventory then
+		local inventory_panel = self.super._hud.custom_inventory_panel
+		if inventory_panel and alive(inventory_panel.main_panel) then
+			if var_cache.selected_layout ~= "vanilla" or inventory_panel.rows > 1 then
+				target_bottom = target_bottom - inventory_panel.main_panel:h()
+			end
+		end
+	end
+
+	self.main_panel:set_world_bottom(target_bottom)
+	self.main_panel:set_left(self._panel:left())
+
 	for _, category in ipairs(self:get_layout()[var_cache.selected_layout]) do
 		local info_panel = tablex.get(self.info_panels, category.name)
 		if alive(info_panel) then
@@ -869,11 +919,8 @@ function PlayerHealthPanel:update_player_data()
 		self.info_panels.mugshot:set_image(texture, texture_rect[1], texture_rect[2], texture_rect[3], texture_rect[4])
 	end
 
-	local player_level =
-		managers.experience[self._cached_conf_vars.use_vrep and "current_virtual_level" or "current_level"](
-			managers.experience,
-			true
-		)
+	local player_level_func = self._cached_conf_vars.use_vrep and "current_virtual_level" or "current_level"
+	local player_level = managers.experience[player_level_func](managers.experience, true)
 
 	local name = self:get_player_name()
 	if self._cached_conf_vars.upper_name then
@@ -891,6 +938,10 @@ function PlayerHealthPanel:update_player_data()
 	)
 
 	self.info_panels.respawn_delay:set_text(string.format("%02d", managers.trade:respawn_delay_by_name(character_name)))
+
+	self._toolbox:make_pretty_text(self.info_panels.player_level)
+	self._toolbox:make_pretty_text(self.info_panels.player_downs)
+	self._toolbox:make_pretty_text(self.info_panels.respawn_delay)
 end
 
 function PlayerHealthPanel:update_health_and_armor()
@@ -1112,6 +1163,7 @@ function PlayerHealthPanel:update_mugshot()
 			o:set_alpha(1)
 			self.info_panels.mugshot:set_alpha(0.5)
 		end)
+
 		return
 	end
 
@@ -1132,60 +1184,9 @@ function PlayerHealthPanel:update()
 		return
 	end
 
-	local var_cache = self._cached_conf_vars
-	if not var_cache.use_health_panel then
-		if not self._panel:visible() then
-			return
-		end
-
-		self._panel:hide()
-		self._hud.health_panel:show()
-		managers.hud:_layout_mugshots()
-		managers.hud:_layout_chat_output()
-
-		for _, mugshot in ipairs(managers.hud._hud.mugshots or {}) do
-			-- DorentuZ` direct_messaging marker
-			if alive(mugshot.selection_marker) then
-				local w = mugshot.selection_marker:w()
-				local panel_x, panel_y, _, panel_h = mugshot.panel:shape()
-				mugshot.selection_marker:set_shape(panel_x, panel_y, w, panel_h)
-				mugshot.panel:set_x(panel_x + w)
-			end
-		end
-
-		local full_hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN)
-		if not full_hud then
-			return
-		end
-
-		local say_text = full_hud.panel:child("say_text")
-		local input_panel = full_hud.panel:child("chat_input")
-		local text_scroll = full_hud.panel:child("textscroll")
-
-		input_panel:set_top((var_cache.use_bcl and text_scroll:bottom() + 4) or 4)
-		say_text:set_center_y(input_panel:center_y())
+	if not self._cached_conf_vars.use_health_panel then
 		return
 	end
-
-	if not self._panel:visible() then
-		self._panel:show()
-	end
-
-	local target_bottom = self._panel:bottom()
-	if self._xp_hud then
-		target_bottom = self.super._xp_hud_hidden and self._panel:bottom() or self._xp_hud.experience_panel:top() - 10
-	end
-
-	if var_cache.selected_layout ~= "vanilla" and var_cache.use_inventory then
-		local inventory_panel = self.super._hud.inventory
-		if inventory_panel and alive(inventory_panel.main_panel) then
-			target_bottom = target_bottom - inventory_panel.main_panel:h()
-		end
-	end
-
-	self.main_panel:set_world_bottom(target_bottom)
-	self.main_panel:set_left(self._panel:left())
-	self._hud.health_panel:hide()
 
 	self:update_player_data()
 	self:update_health_and_armor()
@@ -1201,11 +1202,50 @@ function PlayerHealthPanel:destroy()
 end
 
 local module = ... or D:module("_hud")
-if RequiredScript == "lib/states/ingamewaitingforplayers" then
-	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
-	module:post_hook(50, IngameWaitingForPlayersState, "at_exit", function(...)
-		managers.hud._hud.custom_health_panel = PlayerHealthPanel:new(managers.hud)
-	end, false)
+
+if RequiredScript == "lib/managers/hudmanager" then
+	module:hook("OnSetupHUD", "_hud.init_custom_health_panel", function(self)
+		module.initialize_panel("custom_health_panel", PlayerHealthPanel, self)
+	end)
+
+	module:hook("OnPlayerHudLayout", "_hud.layout_health_panel", function(self, hud)
+		local health_panel = self._hud.custom_health_panel
+		if not health_panel then
+			return
+		end
+
+		health_panel._panel:set_size(hud.panel:size())
+	end)
+
+	module:hook("OnUpdateHUDVisibility", "_hud.override_health_panel_visibility", function(self, hud)
+		local health_panel = self._hud.custom_health_panel
+		if not health_panel then
+			return
+		end
+
+		local dahm_cached_vars = self._cached_conf_vars
+		local _hud_cached_vars = health_panel._cached_conf_vars
+
+		if _hud_cached_vars.use_health_panel then
+			dahm_cached_vars.hud_vis_mugshots = false
+			dahm_cached_vars.hud_vis_weapon_panel = false
+		end
+	end)
+
+	local HUDManager = module:hook_class("HUDManager")
+	module:post_hook(HUDManager, "update_hud_visibility", function(self, name)
+		local health_panel = self._hud.custom_health_panel
+		if not health_panel then
+			return
+		end
+
+		if health_panel._cached_conf_vars.use_health_panel then
+			local mugshots = self._hud.mugshots
+			for i = 1, #mugshots do
+				mugshots[i].panel:set_visible(true)
+			end
+		end
+	end)
 end
 
 if RequiredScript == "lib/units/beings/player/playerdamage" then

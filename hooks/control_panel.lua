@@ -197,14 +197,14 @@ function CustomControlPanel:init(super)
 	self._panel = self._hud.panel:panel({ layer = -100 })
 
 	self._toolbox = _M._hudToolBox
-	self._updator = _M._hudUpdator
+	self._updater = _M._hudUpdater
 
 	self:setup_vars()
 	self:setup_panels()
 	self:update_settings()
 
-	self._updator:remove("control_panel_update")
-	self._updator:add(callback(self, self, "update"), "control_panel_update")
+	self._updater:remove("control_panel_update")
+	self._updater:add(callback(self, self, "update"), "control_panel_update")
 end
 
 function CustomControlPanel:setup_vars()
@@ -238,6 +238,20 @@ function CustomControlPanel:setup_panels()
 	self:create_assault_panel()
 	self:create_point_of_no_return_panel()
 	self:create_hostages_panel()
+end
+
+function CustomControlPanel:layout()
+	self.main_panel:set_size(self._panel:size())
+
+	local assault_panel = self.main_panel:child("assault_panel")
+	assault_panel:set_right(self.main_panel:right())
+
+	local ponr_panel = self.main_panel:child("point_of_no_return_panel")
+	ponr_panel:set_right(self.main_panel:right())
+
+	local hostages_panel = self.main_panel:child("hostages_panel")
+	hostages_panel:set_top(assault_panel:bottom() + 4)
+	hostages_panel:set_right(self.main_panel:right())
 end
 
 function CustomControlPanel:update_settings()
@@ -603,75 +617,78 @@ function CustomControlPanel:destroy()
 end
 
 local module = ... or D:module("_hud")
+local HUDManager = module:hook_class("HUDManager")
 
-if RequiredScript == "lib/units/beings/player/playerbase" then
-	local PlayerBase = module:hook_class("PlayerBase")
-	module:post_hook(50, PlayerBase, "_setup_hud", function(...)
-		if not managers.hud._hud.custom_control_panel then
-			managers.hud._hud.custom_control_panel = CustomControlPanel:new(managers.hud)
-		end
-	end, false)
-end
+module:post_hook("OnSetupHUD", "_hud.init_custom_control_panel", function(self)
+	module.initialize_panel("custom_control_panel", CustomControlPanel, self)
+end)
 
-if RequiredScript == "lib/managers/hudmanager" then
-	local HUDManager = module:hook_class("HUDManager")
-	module:post_hook(HUDManager, "sync_start_assault", function(self)
-		self._hud.in_assault = true
-		if not self._hud.custom_control_panel then
-			return
-		end
+module:hook("OnPlayerHudLayout", "layout_control_panel", function(self, hud)
+	local control_panel = self._hud.custom_control_panel
+	if not control_panel then
+		return
+	end
 
-		self._hud.custom_control_panel:start_assault()
-	end, false)
+	control_panel._panel:set_size(hud.panel:size())
+	control_panel:layout()
+end)
 
-	module:post_hook(HUDManager, "sync_end_assault", function(self)
-		self._hud.in_assault = false
-		if not self._hud.custom_control_panel then
-			return
-		end
+module:post_hook(HUDManager, "sync_start_assault", function(self)
+	self._hud.in_assault = true
+	if not self._hud.custom_control_panel then
+		return
+	end
 
-		self._hud.custom_control_panel:end_assault()
-	end, false)
+	self._hud.custom_control_panel:start_assault()
+end, false)
 
-	module:post_hook(50, HUDManager, "update_timers", function(self, t, dt)
-		if not self._hud.custom_control_panel then
-			return
-		end
+module:post_hook(HUDManager, "sync_end_assault", function(self)
+	self._hud.in_assault = false
+	if not self._hud.custom_control_panel then
+		return
+	end
 
-		self._hud.custom_control_panel:update_assault_timer()
-	end)
+	self._hud.custom_control_panel:end_assault()
+end, false)
 
-	module:post_hook(HUDManager, "show_point_of_no_return_timer", function(self)
-		self._hud.in_ponr = true
+module:post_hook(50, HUDManager, "update_timers", function(self, t, dt)
+	if not self._hud.custom_control_panel then
+		return
+	end
 
-		if not self._hud.custom_control_panel then
-			return
-		end
+	self._hud.custom_control_panel:update_assault_timer()
+end)
 
-		self._hud.custom_control_panel:show_point_of_no_return_timer()
-	end)
+module:post_hook(HUDManager, "show_point_of_no_return_timer", function(self)
+	self._hud.in_ponr = true
 
-	module:post_hook(HUDManager, "feed_point_of_no_return_timer", function(self, _, is_inside)
-		if not self._hud.custom_control_panel then
-			return
-		end
+	if not self._hud.custom_control_panel then
+		return
+	end
 
-		self._hud.custom_control_panel:feed_point_of_no_return_timer(is_inside)
-	end)
+	self._hud.custom_control_panel:show_point_of_no_return_timer()
+end)
 
-	module:post_hook(HUDManager, "flash_point_of_no_return_timer", function(self)
-		if not self._hud.custom_control_panel then
-			return
-		end
+module:post_hook(HUDManager, "feed_point_of_no_return_timer", function(self, _, is_inside)
+	if not self._hud.custom_control_panel then
+		return
+	end
 
-		self._hud.custom_control_panel:flash_point_of_no_return_timer()
-	end)
+	self._hud.custom_control_panel:feed_point_of_no_return_timer(is_inside)
+end)
 
-	module:post_hook(HUDManager, "set_control_info", function(self, data)
-		if not self._hud.custom_control_panel then
-			return
-		end
+module:post_hook(HUDManager, "flash_point_of_no_return_timer", function(self)
+	if not self._hud.custom_control_panel then
+		return
+	end
 
-		self._hud.custom_control_panel:set_control_info(data)
-	end)
-end
+	self._hud.custom_control_panel:flash_point_of_no_return_timer()
+end)
+
+module:post_hook(HUDManager, "set_control_info", function(self, data)
+	if not self._hud.custom_control_panel then
+		return
+	end
+
+	self._hud.custom_control_panel:set_control_info(data)
+end)

@@ -1,5 +1,6 @@
-DeployableSpy = DeployableSpy or {}
+_M.DeployableSpy = rawget(_M, "DeployableSpy") or {}
 
+local DeployableSpy = _M.DeployableSpy
 function DeployableSpy:setup()
 	if self._ws then
 		return
@@ -19,10 +20,10 @@ function DeployableSpy:setup()
 	}
 
 	self._toolbox = _M._hudToolBox
-	self._updator = _M._hudUpdator
+	self._updater = _M._hudUpdater
 
-	self._updator:remove("_hud_deployable_spy_update")
-	self._updator:add(callback(self, self, "update"), "_hud_deployable_spy_update")
+	self._updater:remove("_hud_deployable_spy_update")
+	self._updater:add(callback(self, self, "update"), "_hud_deployable_spy_update")
 end
 
 function DeployableSpy:exists(unit)
@@ -42,7 +43,7 @@ end
 function DeployableSpy:add(unit, type)
 	self:setup()
 
-	if self:exists(unit) then --?
+	if self:exists(unit) then
 		return
 	end
 
@@ -122,6 +123,7 @@ function DeployableSpy:get_item_text(unit, unit_type)
 
 	local value = unit:base()[vars[unit_type]]
 	local charge_str = unit_type == "ammo_bag" and "%.2f" or "%d"
+
 	return self._toolbox:string_format(text, {
 		CHARGES = string.format(charge_str, value),
 		PERCENT = string.format("%d", value * 100),
@@ -156,7 +158,11 @@ function DeployableSpy:update_item(index, camera)
 	end
 
 	item.text:set_text(text)
-	self._toolbox:parse_color_tags(item.text)
+
+	local owner_id = tablex.get(item.unit:base(), "_server_information", "owner_peer_id")
+	self._toolbox:parse_color_tags(item.text, {
+		peer_color = owner_id and tweak_data.chat_colors[owner_id] or D:conf("_hud_ai_contour_color"),
+	})
 
 	local distance = math.max(math.min(mvector3.distance(camera_position, position), 8000), 20)
 	item.text:set_font_size(36 / (distance / 200))
@@ -217,7 +223,7 @@ if RequiredScript == "lib/units/equipment/doctor_bag/doctorbagbase" then
 	end
 end
 
--- only works as host, unfortunately
+-- Host only
 if RequiredScript == "lib/units/equipment/sentry_gun/sentrygunbase" then
 	local SentryGunBase = module:hook_class("SentryGunBase")
 	module:post_hook(50, SentryGunBase, "setup", function(self, ...)

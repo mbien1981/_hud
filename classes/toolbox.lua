@@ -32,8 +32,15 @@ function _hudToolBox:debug_panel_fill(panel, color)
 	panel:rect({ color = color, visible = true, alpha = 0.5, layer = 10000 })
 end
 
+local ids_outline = Idstring("debug_outline"):key()
 function _hudToolBox:debug_panel_outline(panel, color, layer)
-	panel:rect({
+	if alive(panel:child(ids_outline)) then
+		panel:remove(panel:child(ids_outline))
+	end
+
+	local container = panel:panel({ name = ids_outline })
+
+	container:rect({
 		valign = "grow",
 		halign = "grow",
 		h = 1,
@@ -42,17 +49,17 @@ function _hudToolBox:debug_panel_outline(panel, color, layer)
 		alpha = 0.5,
 		layer = layer or 1000,
 	})
-	panel:rect({
+	container:rect({
 		valign = "grow",
 		halign = "grow",
-		y = panel:h() - 1,
+		y = container:h() - 1,
 		h = 1,
 		color = color,
 		visible = true,
 		alpha = 0.5,
 		layer = layer or 1000,
 	})
-	panel:rect({
+	container:rect({
 		valign = "grow",
 		halign = "grow",
 		w = 1,
@@ -61,10 +68,10 @@ function _hudToolBox:debug_panel_outline(panel, color, layer)
 		alpha = 0.5,
 		layer = layer or 1000,
 	})
-	panel:rect({
+	container:rect({
 		valign = "grow",
 		halign = "grow",
-		x = panel:w() - 1,
+		x = container:w() - 1,
 		w = 1,
 		color = color,
 		visible = true,
