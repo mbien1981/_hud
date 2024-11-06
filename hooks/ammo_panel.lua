@@ -27,18 +27,31 @@ function CustomAmmoPanelClass:update_settings()
 	local D = D
 	local var_cache = self._cached_conf_vars
 
-	local use_ammo_panel = D:conf("_hud_enable_custom_ammo_panel")
-		and D:conf("_hud_custom_custom_ammo_panel_style") == "custom"
+	local settings_update_wanted, visibility_update_wanted
 
+	local use_ammo_panel = D:conf("_hud_enable_custom_ammo_panel")
 	if var_cache.enabled ~= use_ammo_panel then
 		var_cache.enabled = use_ammo_panel
-		self.main_panel:set_visible(use_ammo_panel)
 
 		if not use_ammo_panel then
-			managers.hud:update_hud_settings()
+			self.main_panel:set_visible(use_ammo_panel and var_cache.selected_style == "custom")
+
+			settings_update_wanted = true
 		end
 
-		managers.hud:update_hud_visibility()
+		visibility_update_wanted = true
+	end
+
+	local selected_style = D:conf("_hud_custom_custom_ammo_panel_style")
+	if var_cache.selected_style ~= selected_style then
+		var_cache.selected_style = selected_style
+
+		if alive(self.main_panel) then
+			self.main_panel:set_visible(var_cache.enabled and selected_style == "custom")
+		end
+
+		settings_update_wanted = true
+		visibility_update_wanted = true
 	end
 
 	local show_real_ammo_values = D:conf("_hud_ammo_panel_show_real_ammo")
@@ -50,6 +63,14 @@ function CustomAmmoPanelClass:update_settings()
 				self:set_ammo_amount(i)
 			end
 		end
+	end
+
+	if settings_update_wanted then
+		managers.hud:update_hud_settings()
+	end
+
+	if visibility_update_wanted then
+		managers.hud:update_hud_visibility()
 	end
 end
 
@@ -317,9 +338,19 @@ module:hook("OnPreUpdateHUDVisibility", "_hud.override_ammo_panel_visibility", f
 	local dahm_cached_vars = self._cached_conf_vars
 	local _hud_cached_vars = weapon_panel._cached_conf_vars
 
-	if _hud_cached_vars.enabled then
+	if _hud_cached_vars.enabled and _hud_cached_vars.selected_style == "custom" then
 		dahm_cached_vars.hud_vis_ammo_panel = false
 		dahm_cached_vars.hud_vis_weapon_panel = false
+
+		local weapons = self._hud.weapons
+		for i = 1, 3 do
+			local data = weapons[i]
+			if data and alive(data.b2) then
+				data.b2:stop()
+				data.b2:parent():remove(data.b2)
+				data.b2 = nil
+			end
+		end
 	end
 end, false)
 
@@ -328,6 +359,7 @@ module:hook("OnUpdateHUDVisibility", "_hud.set_vanilla_magazine_counter_visibili
 
 	local setting = D:conf("_hud_enable_custom_ammo_panel")
 		and D:conf("_hud_custom_custom_ammo_panel_style") == "vanilla+"
+
 	if cached_vars.show_vanilla_magazine_indicator ~= setting then
 		cached_vars.show_vanilla_magazine_indicator = setting
 
@@ -403,14 +435,16 @@ module:post_hook(HUDManager, "add_weapon", function(self, data)
 
 	self:add_vanilla_magazine_indicator(weapon_hud_data)
 
-	if D:conf("_hud_enable_custom_ammo_panel") and alive(weapon_hud_data.b2) then
+	local panel = self._hud.custom_weapon_panel
+	if not panel then
+		return
+	end
+
+	local var_cache = panel._cached_conf_vars
+	if alive(weapon_hud_data.b2) and var_cache.enabled and var_cache.selected_style == "custom" then
 		weapon_hud_data.b2:stop()
 		weapon_hud_data.b2:parent():remove(weapon_hud_data.b2)
 		weapon_hud_data.b2 = nil
-	end
-
-	if not self._hud.custom_weapon_panel then
-		return
 	end
 
 	self._hud.custom_weapon_panel:add_weapon(data)
