@@ -13,20 +13,18 @@ local module = DMod:new("_hud", {
 })
 
 module:hook_post_require("lib/units/beings/player/playerbase", "hooks/playerbase")
+module:hook_post_require("lib/managers/hudmanager", "hooks/hudmanager")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/drop_in")
 module:hook_post_require("lib/managers/menumanager", "hooks/drop_in")
 
 module:hook_post_require("lib/managers/hudmanager", "hooks/ammo_panel")
--- module:hook_post_require("lib/units/beings/player/playerbase", "hooks/ammo_panel")
-
-module:hook_post_require("lib/managers/hudmanager", "hooks/hudmanager")
 
 module:hook_post_require("lib/managers/hudmanager", "hooks/state_timer")
 
-module:hook_post_require("lib/managers/hudmanager", "hooks/health_bar")
-module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/health_bar")
-module:hook_post_require("lib/managers/hudmanager", "hooks/inventory_panel")
+module:hook_post_require("lib/managers/hudmanager", "hooks/health_bar", false, 50)
+module:hook_post_require("lib/units/beings/player/playerdamage", "hooks/health_bar", false, 50)
+module:hook_post_require("lib/managers/hudmanager", "hooks/inventory_panel", false, 51)
 
 module:hook_post_require("lib/units/equipment/ammo_bag/ammobagbase", "hooks/deployable_spy")
 module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/deployable_spy")
