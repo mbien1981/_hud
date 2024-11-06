@@ -37,13 +37,23 @@ function PlayerInventoryPanel:update_settings()
 		managers.hud:update_hud_visibility()
 	end
 
+	local refresh_wanted
 	local selected_layout = D:conf("_hud_custom_health_panel_layout")
 	if var_cache.selected_layout ~= selected_layout then
 		var_cache.selected_layout = selected_layout
 
-		if alive(self.main_panel) then
-			self:layout()
-		end
+		refresh_wanted = true
+	end
+
+	local display_hp_ap = D:conf("_hud_display_armor_and_health_values")
+	if var_cache.display_hp_ap ~= display_hp_ap then
+		var_cache.display_hp_ap = display_hp_ap
+
+		refresh_wanted = true
+	end
+
+	if refresh_wanted and alive(self.main_panel) then
+		self:layout()
 	end
 end
 
@@ -65,18 +75,20 @@ function PlayerInventoryPanel:layout()
 	-- now that this panel exists, we need to reposition the health panel.
 	health_panel:layout()
 
+	local cached_vars = self._cached_conf_vars
+
 	local health_main = health_panel.main_panel
 	local info_panels = health_panel.info_panels
 	self.workspace_widths = {
 		vanilla = health_main:w()
 			- info_panels.mugshot:w()
-			- (health_panel.display_hp_ap and info_panels.base_text:w() or 0)
+			- ((cached_vars.display_hp_ap and info_panels.base_text:w()) or 0)
 			- health_panel.armor_health_panels.vanilla.health.background:w()
 			- 20,
 		raid = health_panel.data.workspace_width or health_main:w(),
 	}
 
-	if self._cached_conf_vars.selected_layout == "vanilla" and self.rows <= 1 then
+	if cached_vars.selected_layout == "vanilla" and self.rows <= 1 then
 		self.main_panel:set_w(self.workspace_widths.vanilla)
 		self.main_panel:set_left(info_panels.mugshot:right() + 4)
 		self.main_panel:set_bottom(health_main:bottom() - 4)
