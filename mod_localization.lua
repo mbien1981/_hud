@@ -136,6 +136,17 @@ local strings = {
 		spanish = "Utilizar indicador de munición personalizado.",
 		german = "Nutze benutzerdefinierten Munitionspanel",
 	},
+	["_hud_custom_custom_ammo_panel_style"] = {
+		english = "Weapon Panel Style",
+		spanish = "Estilo del panel de armas",
+	},
+	["_hud_style_vanilla_plus"] = {
+		english = "Vanilla+",
+	},
+	["_hud_style_custom"] = {
+		english = "Custom",
+		spanish = "Personalizado",
+	},
 	["_hud_ammo_panel_show_real_ammo"] = {
 		english = "Show real ammo values",
 		spanish = "Mostrar valores de municion verdaderos",

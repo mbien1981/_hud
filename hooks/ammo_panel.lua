@@ -1,4 +1,9 @@
 local CustomAmmoPanelClass = class()
+CustomAmmoPanelClass.colors = {
+	default = Color(0.8, 0.8, 0.8),
+	full = Color("70FF70"),
+	empty = Color("FF7070"),
+}
 
 function CustomAmmoPanelClass:init(player_hud)
 	self._hud = player_hud
@@ -9,11 +14,6 @@ function CustomAmmoPanelClass:init(player_hud)
 		h = ammo_panel:h(),
 	})
 
-	self.colors = {
-		default = Color(0.8, 0.8, 0.8),
-		full = Color("70FF70"),
-		empty = Color("FF7070"),
-	}
 	self.items = {}
 	self._cached_conf_vars = {}
 
@@ -28,6 +28,8 @@ function CustomAmmoPanelClass:update_settings()
 	local var_cache = self._cached_conf_vars
 
 	local use_ammo_panel = D:conf("_hud_enable_custom_ammo_panel")
+		and D:conf("_hud_custom_custom_ammo_panel_style") == "custom"
+
 	if var_cache.enabled ~= use_ammo_panel then
 		var_cache.enabled = use_ammo_panel
 		self.main_panel:set_visible(use_ammo_panel)
@@ -306,7 +308,7 @@ module:hook("OnPlayerHudLayout", "_hud.layout_custom_ammo_panel", function(self,
 	weapon_panel:layout()
 end, false)
 
-module:hook("OnUpdateHUDVisibility", "_hud.override_ammo_panel_visibility", function(self)
+module:hook("OnPreUpdateHUDVisibility", "_hud.override_ammo_panel_visibility", function(self)
 	local weapon_panel = self._hud.custom_weapon_panel
 	if not weapon_panel then
 		return
@@ -321,9 +323,86 @@ module:hook("OnUpdateHUDVisibility", "_hud.override_ammo_panel_visibility", func
 	end
 end, false)
 
+module:hook("OnUpdateHUDVisibility", "_hud.set_vanilla_magazine_counter_visibility", function(self)
+	local cached_vars = self._cached_conf_vars
+
+	local setting = D:conf("_hud_enable_custom_ammo_panel")
+		and D:conf("_hud_custom_custom_ammo_panel_style") == "vanilla+"
+	if cached_vars.show_vanilla_magazine_indicator ~= setting then
+		cached_vars.show_vanilla_magazine_indicator = setting
+
+		local weapons = self._hud.weapons
+		for i = 1, 3 do
+			local data = weapons[i]
+			if data and alive(data.magazine) then
+				data.magazine:set_visible(setting)
+			end
+		end
+	end
+end)
+
 local HUDManager = module:hook_class("HUDManager")
+function HUDManager:add_vanilla_magazine_indicator(data)
+	local hud = self:script(PlayerBase.PLAYER_HUD)
+	local ammo_panel = hud.ammo_panel
+	local magazine = ammo_panel:text({
+		text = "[000/000]",
+		font = "fonts/font_univers_530_bold",
+		font_size = 16,
+		visible = self._cached_conf_vars.show_vanilla_magazine_indicator,
+		align = "center",
+		layer = data.bitmap:layer() + 1,
+	})
+	_M._hudToolBox:make_pretty_text(magazine)
+
+	data.magazine = magazine
+
+	self:set_vanilla_magazine_indicator_amount(data)
+end
+
+function HUDManager:arrange_vanilla_magazine_indicators()
+	local weapons = self._hud.weapons
+	for i = 1, 3 do
+		local data = weapons[i]
+		if data and alive(data.magazine) then
+			data.magazine:set_world_center_x(data.bitmap:world_center_x())
+			data.magazine:set_world_bottom(data.bitmap:world_y())
+		end
+	end
+end
+
+function HUDManager:set_vanilla_magazine_indicator_amount_by_unit(unit)
+	local weapon_base = unit:base()
+	local slot = weapon_base:weapon_tweak_data().use_data.selection_index
+
+	self:set_vanilla_magazine_indicator_amount(self._hud.weapons[slot])
+end
+
+function HUDManager:set_vanilla_magazine_indicator_amount(data)
+	if not tablex.get(data, "magazine") then
+		return
+	end
+
+	local weapon_base = data.unit:base()
+
+	local max_clip, current_clip, _ = weapon_base:ammo_info()
+
+	data.magazine:set_text(string.format("[%s/%s]", current_clip, max_clip))
+	_M._hudToolBox:make_pretty_text(data.magazine)
+
+	local colors = CustomAmmoPanelClass.colors
+	local color_magazine = _M._hudToolBox:blend_colors(colors.full, colors.empty, current_clip / max_clip)
+	data.magazine:set_color(color_magazine)
+
+	data.magazine:set_world_center_x(data.bitmap:world_center_x())
+	data.magazine:set_world_bottom(data.bitmap:world_y())
+end
+
 module:post_hook(HUDManager, "add_weapon", function(self, data)
 	local weapon_hud_data = self._hud.weapons[data.inventory_index]
+
+	self:add_vanilla_magazine_indicator(weapon_hud_data)
+
 	if D:conf("_hud_enable_custom_ammo_panel") and alive(weapon_hud_data.b2) then
 		weapon_hud_data.b2:stop()
 		weapon_hud_data.b2:parent():remove(weapon_hud_data.b2)
@@ -335,6 +414,18 @@ module:post_hook(HUDManager, "add_weapon", function(self, data)
 	end
 
 	self._hud.custom_weapon_panel:add_weapon(data)
+end)
+
+module:post_hook(HUDManager, "_arrange_weapons", function(self)
+	self:arrange_vanilla_magazine_indicators()
+end)
+
+module:pre_hook(HUDManager, "clear_weapons", function(self)
+	for _, data in pairs(self._hud.weapons or {}) do
+		if alive(data.magazine) then
+			data.magazine:parent():remove(data.magazine)
+		end
+	end
 end)
 
 module:post_hook(HUDManager, "clear_weapons", function(self)
@@ -354,6 +445,8 @@ module:post_hook(HUDManager, "_set_weapon_selected", function(self, id)
 end)
 
 module:post_hook(HUDManager, "set_weapon_ammo_by_unit", function(self, unit)
+	self:set_vanilla_magazine_indicator_amount_by_unit(unit)
+
 	if not self._hud.custom_weapon_panel then
 		return
 	end
@@ -362,9 +455,13 @@ module:post_hook(HUDManager, "set_weapon_ammo_by_unit", function(self, unit)
 end)
 
 module:post_hook(HUDManager, "set_ammo_amount", function(self)
+	local _hud = self._hud
+
+	self:set_vanilla_magazine_indicator_amount(_hud.weapons[_hud.selected_weapon])
+
 	if not self._hud.custom_weapon_panel then
 		return
 	end
 
-	self._hud.custom_weapon_panel:set_ammo_amount(self._hud.selected_weapon)
+	self._hud.custom_weapon_panel:set_ammo_amount(_hud.selected_weapon)
 end)

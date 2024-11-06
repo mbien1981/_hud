@@ -20,6 +20,7 @@ local visibility_nodes = {
 		"_hud_mod_list_position",
 	},
 	["_hud_enable_custom_ammo_panel"] = {
+		"_hud_custom_custom_ammo_panel_style",
 		"_hud_ammo_panel_show_real_ammo",
 	},
 	["_hud_enable_deployable_spy"] = {
@@ -84,6 +85,21 @@ local function _hud_option_changed(k, value, old_value, old_value_was_user_set, 
 		end
 	end
 
+	if items_to_change or k == "_hud_custom_custom_ammo_panel_style" then
+		local master = _get_item("_hud_custom_custom_ammo_panel_style")
+		local child = _get_item("_hud_ammo_panel_show_real_ammo")
+		if child then
+			local visible = master:visible() and master:value() ~= "vanilla+"
+			local previous_visibility = child:visible()
+
+			child:set_visible(visible)
+
+			if visible ~= previous_visibility then
+				refresh_wanted = true
+			end
+		end
+	end
+
 	if refresh_wanted then
 		managers.menu:active_menu().logic:refresh_node()
 	end
@@ -130,6 +146,14 @@ module:hook("OnModulePostBuildOptions", "OnModulePostBuildOptions__hud", functio
 	if bcl and bcl:enabled() then
 		reposition_chat_input:set_enabled(false)
 	end
+
+	local ammo_panel_toggle = _get_item("_hud_enable_custom_ammo_panel", node)
+	local visible = ammo_panel_toggle and ammo_panel_toggle:value() == "on" or false
+
+	local real_ammo_values_toggle = _get_item("_hud_ammo_panel_show_real_ammo", node)
+	if visible and real_ammo_values_toggle then
+		real_ammo_values_toggle:set_visible(_get_item("_hud_custom_custom_ammo_panel_style", node):value() ~= "vanilla+")
+	end
 end)
 
 -- scaling settings
@@ -158,6 +182,7 @@ module:add_config_option("_hud_use_custom_inventory_panel", true)
 
 -- custom ammo panel and deployable spy
 module:add_config_option("_hud_enable_custom_ammo_panel", true)
+module:add_config_option("_hud_custom_custom_ammo_panel_style", "custom")
 module:add_config_option("_hud_ammo_panel_show_real_ammo", true)
 
 module:add_config_option("_hud_enable_deployable_spy", true)
@@ -324,6 +349,15 @@ module:add_menu_option("_hud_enable_custom_ammo_panel", {
 	type = "boolean",
 	text_id = "_hud_enable_custom_ammo_panel",
 	localize = true,
+})
+module:add_menu_option("_hud_custom_custom_ammo_panel_style", {
+	type = "multi_choice",
+	text_id = "_hud_custom_custom_ammo_panel_style",
+	choices = {
+		{ "vanilla+", "_hud_style_vanilla_plus" },
+		{ "custom", "_hud_style_custom" },
+	},
+	default_value = "custom",
 })
 module:add_menu_option("_hud_ammo_panel_show_real_ammo", {
 	type = "boolean",

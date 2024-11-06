@@ -11,5 +11,9 @@ module:post_hook(HUDManager, "_player_hud_layout", function(self)
 end)
 
 module:pre_hook(HUDManager, "update_hud_visibility", function(self, name)
+	D:call_hooks("OnPreUpdateHUDVisibility", self)
+end)
+
+module:post_hook(HUDManager, "update_hud_visibility", function(self, name)
 	D:call_hooks("OnUpdateHUDVisibility", self)
 end)

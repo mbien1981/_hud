@@ -195,7 +195,7 @@ module:hook("OnPlayerHudLayout", "_hud.layout_custom_inventory_panel", function(
 	inventory_panel:layout()
 end)
 
-module:hook("OnUpdateHUDVisibility", "_hud.override_item_panel_visibility", function(self)
+module:hook("OnPreUpdateHUDVisibility", "_hud.override_item_panel_visibility", function(self)
 	local inventory_panel = self._hud.custom_inventory_panel
 	if not inventory_panel then
 		return

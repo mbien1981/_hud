@@ -1217,7 +1217,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 		health_panel._panel:set_size(hud.panel:size())
 	end)
 
-	module:hook("OnUpdateHUDVisibility", "_hud.override_health_panel_visibility", function(self, hud)
+	module:hook("OnPreUpdateHUDVisibility", "_hud.override_health_panel_visibility", function(self, hud)
 		local health_panel = self._hud.custom_health_panel
 		if not health_panel then
 			return
@@ -1231,8 +1231,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 		end
 	end)
 
-	local HUDManager = module:hook_class("HUDManager")
-	module:post_hook(HUDManager, "update_hud_visibility", function(self, name)
+	module:hook("OnUpdateHUDVisibility", "_hud.override_teammate_mugshots_visibility", function(self, hud)
 		local health_panel = self._hud.custom_health_panel
 		if not health_panel then
 			return
