@@ -42,7 +42,7 @@ function CustomAmmoPanelClass:update_settings()
 		visibility_update_wanted = true
 	end
 
-	local selected_style = D:conf("_hud_custom_custom_ammo_panel_style")
+	local selected_style = D:conf("_hud_custom_ammo_panel_style")
 	if var_cache.selected_style ~= selected_style then
 		var_cache.selected_style = selected_style
 
@@ -358,7 +358,7 @@ module:hook("OnUpdateHUDVisibility", "_hud.set_vanilla_magazine_counter_visibili
 	local cached_vars = self._cached_conf_vars
 
 	local setting = D:conf("_hud_enable_custom_ammo_panel")
-		and D:conf("_hud_custom_custom_ammo_panel_style") == "vanilla+"
+		and D:conf("_hud_custom_ammo_panel_style") == "vanilla+"
 
 	if cached_vars.show_vanilla_magazine_indicator ~= setting then
 		cached_vars.show_vanilla_magazine_indicator = setting

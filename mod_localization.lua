@@ -136,7 +136,7 @@ local strings = {
 		spanish = "Utilizar indicador de munición personalizado.",
 		german = "Nutze benutzerdefinierten Munitionspanel",
 	},
-	["_hud_custom_custom_ammo_panel_style"] = {
+	["_hud_custom_ammo_panel_style"] = {
 		english = "Weapon Panel Style",
 		spanish = "Estilo del panel de armas",
 	},
