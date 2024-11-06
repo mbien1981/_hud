@@ -26,6 +26,10 @@ function PlayerInventoryPanel:update_settings()
 	if var_cache.use_inventory ~= use_inventory then
 		var_cache.use_inventory = use_inventory
 
+		if alive(self.main_panel) then
+			self.main_panel:set_visible(use_inventory)
+		end
+
 		if not use_inventory then
 			managers.hud:update_hud_settings()
 		end
@@ -44,7 +48,10 @@ function PlayerInventoryPanel:update_settings()
 end
 
 function PlayerInventoryPanel:setup_panels()
-	self.main_panel = self._panel:panel({ h = 24 })
+	self.main_panel = self._panel:panel({
+		visible = self._cached_conf_vars.use_inventory,
+		h = 24,
+	})
 	self:create_background()
 	self:layout()
 end
@@ -151,7 +158,7 @@ function PlayerInventoryPanel:layout_inventory()
 	local rows = process_inventory(self.main_panel:w())
 
 	self.rows = rows
-	
+
 	if self._cached_conf_vars.selected_layout == "vanilla" and self.rows > 1 then
 		rows = process_inventory(self.workspace_widths.raid)
 	end
