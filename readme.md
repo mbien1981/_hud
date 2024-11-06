@@ -1,4 +1,4 @@
-# Requirements:
+# Requirements
 - [DAHM 1.16.15x or above with the hud module enabled.](https://steamcommunity.com/groups/dahm4pd/discussions/3/490123197956419203/)
 
 # Installation
