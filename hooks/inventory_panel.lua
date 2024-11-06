@@ -22,6 +22,8 @@ function PlayerInventoryPanel:update_settings()
 	local D = D
 	local var_cache = self._cached_conf_vars
 
+	local settings_update_wanted, visibility_update_wanted, refresh_wanted
+
 	local use_inventory = D:conf("_hud_use_custom_health_panel") and D:conf("_hud_use_custom_inventory_panel")
 	if var_cache.use_inventory ~= use_inventory then
 		var_cache.use_inventory = use_inventory
@@ -30,14 +32,11 @@ function PlayerInventoryPanel:update_settings()
 			self.main_panel:set_visible(use_inventory)
 		end
 
-		if not use_inventory then
-			managers.hud:update_hud_settings()
-		end
-
-		managers.hud:update_hud_visibility()
+		settings_update_wanted = true
+		visibility_update_wanted = true
+		refresh_wanted = true
 	end
 
-	local refresh_wanted
 	local selected_layout = D:conf("_hud_custom_health_panel_layout")
 	if var_cache.selected_layout ~= selected_layout then
 		var_cache.selected_layout = selected_layout
@@ -50,6 +49,14 @@ function PlayerInventoryPanel:update_settings()
 		var_cache.display_hp_ap = display_hp_ap
 
 		refresh_wanted = true
+	end
+
+	if settings_update_wanted then
+		managers.hud:update_hud_settings()
+	end
+
+	if visibility_update_wanted then
+		managers.hud:update_hud_visibility()
 	end
 
 	if refresh_wanted and alive(self.main_panel) then

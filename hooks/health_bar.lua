@@ -106,7 +106,12 @@ function PlayerHealthPanel:update_settings()
 
 	var_cache.reposition_chat_input = var_cache.use_bcl or D:conf("_hud_reposition_chat_input")
 
-	var_cache.use_inventory = D:conf("_hud_use_custom_health_panel") and D:conf("_hud_use_custom_inventory_panel")
+	local use_inventory = D:conf("_hud_use_custom_health_panel") and D:conf("_hud_use_custom_inventory_panel")
+	if var_cache.use_inventory ~= use_inventory then
+		var_cache.use_inventory = use_inventory
+
+		refresh_required = true
+	end
 
 	local hud_scale = D:conf("_hud_scaling")
 	local font_scale = D:conf("_hud_font_scaling")
