@@ -1228,7 +1228,6 @@ if RequiredScript == "lib/managers/hudmanager" then
 
 		if _hud_cached_vars.use_health_panel then
 			dahm_cached_vars.hud_vis_mugshots = false
-			dahm_cached_vars.hud_vis_weapon_panel = false
 		end
 	end)
 
