@@ -13,7 +13,7 @@ if RequiredScript == "lib/units/interactions/interactionext" then
 			return
 		end
 
-		if not D:conf("_hud_peer_contour_colors") or tweak_data.contours_disabled then
+		if not D:conf("_hud_peer_contour_colors") or managers.game_play_central:contours_disabled() then
 			return
 		end
 
