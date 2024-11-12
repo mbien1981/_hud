@@ -1234,11 +1234,11 @@ if RequiredScript == "lib/managers/hudmanager" then
 			return
 		end
 
-		if D:version() >= "1.17.0.0-beta5" then
+		if D:version() <= "1.17.0.0-beta4" then
 			dahm_cached_vars.hud_vis_mugshots = false
 			return
 		end
-
+		
 		dahm_cached_vars.hud_vis_health_panel = false
 	end)
 
