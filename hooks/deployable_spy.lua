@@ -1,6 +1,5 @@
-_M.DeployableSpy = rawget(_M, "DeployableSpy") or {}
+DeployableSpy = DeployableSpy
 
-local DeployableSpy = _M.DeployableSpy
 function DeployableSpy:setup()
 	if self._ws then
 		return
@@ -63,7 +62,9 @@ end
 
 function DeployableSpy:remove(index)
 	local item = self.items[index]
-	self._panel:remove(item.text)
+	if alive(item.text) then
+		self._panel:remove(item.text)
+	end
 
 	table.remove(self.items, index)
 end
@@ -181,7 +182,9 @@ function DeployableSpy:update_items(camera)
 	end
 
 	for index, _ in pairs(self.items) do
-		self:update_item(index, camera)
+		if self.items[index] then
+			self:update_item(index, camera)
+		end
 	end
 end
 
