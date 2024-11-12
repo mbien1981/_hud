@@ -1230,13 +1230,23 @@ if RequiredScript == "lib/managers/hudmanager" then
 
 		local dahm_cached_vars = self._cached_conf_vars
 		local _hud_cached_vars = health_panel._cached_conf_vars
-
-		if _hud_cached_vars.use_health_panel then
-			dahm_cached_vars.hud_vis_mugshots = false
+		if not _hud_cached_vars.use_health_panel then
+			return
 		end
+
+		if D:version() >= "1.17.0.0-beta5" then
+			dahm_cached_vars.hud_vis_mugshots = false
+			return
+		end
+
+		dahm_cached_vars.hud_vis_health_panel = false
 	end)
 
 	module:hook("OnUpdateHUDVisibility", "_hud.override_teammate_mugshots_visibility", function(self, hud)
+		if D:version() >= "1.17.0.0-beta5" then
+			return
+		end
+
 		local health_panel = self._hud.custom_health_panel
 		if not health_panel then
 			return
