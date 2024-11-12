@@ -1238,7 +1238,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 			dahm_cached_vars.hud_vis_mugshots = false
 			return
 		end
-		
+
 		dahm_cached_vars.hud_vis_health_panel = false
 	end)
 
