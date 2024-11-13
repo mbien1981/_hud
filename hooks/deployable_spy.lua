@@ -1,4 +1,4 @@
-DeployableSpy = DeployableSpy
+DeployableSpy = DeployableSpy or {}
 
 function DeployableSpy:setup()
 	if self._ws then
