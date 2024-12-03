@@ -1220,6 +1220,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 		end
 
 		health_panel._panel:set_size(hud.panel:size())
+		health_panel:layout()
 	end)
 
 	module:hook("OnPreUpdateHUDVisibility", "_hud.override_health_panel_visibility", function(self, hud)
