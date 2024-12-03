@@ -270,7 +270,7 @@ module:post_hook(50, HUDManager, "remove_special_equipment", function(self, id)
 	self._hud.custom_inventory_panel:remove(id)
 end, false)
 
-module:hook("OnPlayerHudLayout", "layout_inventory_panel", function(self, hud)
+module:hook("OnPlayerHudLayout", "_hud.layout_inventory_panel", function(self, hud)
 	local inventory_panel = self._hud.custom_inventory_panel
 	if not inventory_panel then
 		return
