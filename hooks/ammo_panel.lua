@@ -254,67 +254,6 @@ function CustomAmmoPanelClass:clear_weapons()
 	end
 end
 
-function CustomAmmoPanelClass:update()
-	if not Util:is_in_state("any_ingame_playing") then
-		return
-	end
-
-	if not self.main_panel:parent():visible() then
-		return
-	end
-
-	local config = D:conf("_hud_enable_custom_ammo_panel")
-	self.main_panel:set_visible(config)
-	self._hud.weapon_panel:set_visible(not config)
-	self._hud.ammo_panel:set_visible(not config)
-
-	if not self.main_panel:visible() then
-		return
-	end
-
-	local unit = managers.player:player_unit()
-	local selections = alive(unit) and unit:inventory():available_selections()
-	if not selections then
-		return
-	end
-
-	for i, weapon in pairs(self.items) do
-		if self.items[i] then
-			self:update_weapon(weapon, selections[i].unit:base(), managers.hud._hud.selected_weapon == i)
-		end
-	end
-end
-
-function CustomAmmoPanelClass:update_weapon(weapon, weapon_base, selected)
-	if not alive(weapon.icon) then
-		return
-	end
-
-	local ammo_full = weapon_base:ammo_full()
-	local clip_full = weapon_base:clip_full()
-	local clip_empty = weapon_base:clip_empty()
-	local out_of_ammo = weapon_base:out_of_ammo()
-	local max_clip, current_clip, ammo_amount = weapon_base:ammo_info()
-
-	weapon.clip:set_text(tostring(current_clip))
-
-	local ammo_total = ammo_amount
-	if D:conf("_hud_ammo_panel_show_real_ammo") then
-		ammo_total = ammo_amount - current_clip
-	end
-
-	weapon.total:set_text(tostring(ammo_total))
-
-	local color_alpha = selected and 1 or 0.4
-	local color_icon = selected and tweak_data.hud.prime_color or self.colors.default
-	local color_clip = clip_full and self.colors.full or clip_empty and self.colors.empty or self.colors.default
-	local color_total = ammo_full and self.colors.full or out_of_ammo and self.colors.empty or self.colors.default
-
-	weapon.icon:set_color(color_icon:with_alpha(color_alpha))
-	weapon.clip:set_color(color_clip:with_alpha(color_alpha))
-	weapon.total:set_color(color_total:with_alpha(color_alpha))
-end
-
 local module = ... or D:module("_hud")
 module:hook("OnSetupHUD", "_hud.init_custom_weapon_panel", function(self, panels)
 	module.initialize_panel("custom_weapon_panel", CustomAmmoPanelClass, panels.PLAYER_HUD)
