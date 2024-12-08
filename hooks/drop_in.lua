@@ -46,7 +46,7 @@ function CustomDropInclass:get_peer_panel(peer_id)
 end
 
 function CustomDropInclass:show_person_joining(peer)
-	if self:get_peer_panel(peer:id()) then
+	if not peer or self:get_peer_panel(tablex.get(peer, "_id")) then
 		return
 	end
 
