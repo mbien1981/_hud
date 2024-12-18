@@ -1050,11 +1050,15 @@ function PlayerHealthPanel:update_health_and_armor()
 	self.info_panels.player_downs:set_text(managers.hud._hud_health_downs:text())
 
 	self.info_panels.health_points:set_text(string.format("%.0f", p_damage._health * 10 or 0))
+	self._toolbox:make_pretty_text(self.info_panels.health_points)
+
 	self.info_panels.armor_points:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
+	self._toolbox:make_pretty_text(self.info_panels.armor_points)
 
 	local regen_timer = p_damage._regenerate_timer
 	if regen_timer then
 		self.info_panels.armor_timer:set_text(string.format("%.2fs", regen_timer))
+		self._toolbox:make_pretty_text(self.info_panels.armor_timer)
 	end
 
 	self.info_panels.armor_timer:set_visible(
