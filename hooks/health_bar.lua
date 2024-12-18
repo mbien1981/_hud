@@ -946,7 +946,9 @@ function PlayerHealthPanel:update_player_data()
 
 	self._toolbox:make_pretty_text(self.info_panels.player_level)
 	self._toolbox:make_pretty_text(self.info_panels.player_downs)
+
 	self._toolbox:make_pretty_text(self.info_panels.respawn_delay)
+	self.info_panels.respawn_delay:set_center(self.info_panels.mugshot:center()) -- temp fix
 end
 
 function PlayerHealthPanel:update_health_and_armor()
