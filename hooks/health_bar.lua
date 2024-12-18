@@ -207,13 +207,13 @@ function PlayerHealthPanel:create_mugshot()
 		["spanish"] = 4,
 	}
 
-	local mask_id = mugshot_ids[managers.criminals:local_character_name()]
-	local mask_set = tweak_data.mask_sets[self.data.peer:mask_set()][mask_id]
-	local image, texture_rect = tweak_data.hud_icons:get_icon_data(mask_set and mask_set.mask_icon or "mugshot_random")
+	local mask_id = mugshot_ids[managers.criminals:local_character_name()] or 2
+	local mask_icon = tablex.get(tweak_data.mask_sets, self.data.peer:mask_set(), mask_id, "mask_icon")
+	local icon, texture_rect = tweak_data.hud_icons:get_icon_data(mask_icon or "mugshot_random")
 
 	self.info_panels.mugshot = self.main_panel:bitmap({
 		name = "player_mugshot",
-		texture = image,
+		texture = icon,
 		texture_rect = texture_rect,
 		layer = 1,
 		x = 0,
@@ -224,9 +224,9 @@ function PlayerHealthPanel:create_mugshot()
 
 	self.data.mugshot_rect = deep_clone(texture_rect)
 
-	image, texture_rect = tweak_data.hud_icons:get_icon_data("mugshot_in_custody")
+	icon, texture_rect = tweak_data.hud_icons:get_icon_data("mugshot_in_custody")
 	self.info_panels.mugshot_status = self.main_panel:bitmap({
-		texture = image,
+		texture = icon,
 		texture_rect = texture_rect,
 		alpha = 0,
 		layer = 3,
