@@ -207,7 +207,7 @@ function PlayerHealthPanel:create_mugshot()
 		["spanish"] = 4,
 	}
 
-	local mask_id = mugshot_ids[managers.criminals:local_character_name()] or 2
+	local mask_id = mugshot_ids[managers.criminals:local_character_name()]
 	local mask_icon = tablex.get(tweak_data.mask_sets, self.data.peer:mask_set(), mask_id, "mask_icon")
 	local icon, texture_rect = tweak_data.hud_icons:get_icon_data(mask_icon or "mugshot_random")
 
