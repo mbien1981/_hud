@@ -227,6 +227,11 @@ module:add_config_option("_hud_armor_color", Color("1e90ff"))
 module:add_config_option("_hud_peer_contour_colors", false)
 module:add_config_option("_hud_ai_contour_color", Color(0.1, 1, 0.5))
 
+module:add_config_option("_hud_peer1_color", Color(0.6, 0.6, 1)) -- purple (slot 1/host)
+module:add_config_option("_hud_peer2_color", Color(1, 0.6, 0.6)) -- red (slot 2)
+module:add_config_option("_hud_peer4_color", Color(1, 1, 0.6)) -- yellow (slot 4)
+module:add_config_option("_hud_peer3_color", Color(0.6, 1, 0.6)) -- green (slot 3)
+
 module:add_config_option("_hud_use_custom_name_labels", false)
 
 -- menu nodes

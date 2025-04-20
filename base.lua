@@ -39,6 +39,8 @@ module:hook_post_require("lib/units/equipment/doctor_bag/doctorbagbase", "hooks/
 module:hook_post_require("lib/managers/hudmanager", "hooks/name_labels")
 module:hook_post_require("lib/network/handlers/unitnetworkhandler", "hooks/name_labels")
 
+module:hook_post_require("lib/tweak_data/tweakdata", "hooks/peer_colors")
+
 module:hook_post_require("lib/managers/hudmanager", "hooks/control_panel")
 
 module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/loadout_dropdowns")
