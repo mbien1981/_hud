@@ -1241,7 +1241,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 			return
 		end
 
-		if D:version() <= "1.17.0.0-beta4" then
+		if type(dahm_cached_vars.hud_vis_health_panel) == "nil" then
 			dahm_cached_vars.hud_vis_mugshots = false
 			return
 		end
@@ -1250,7 +1250,7 @@ if RequiredScript == "lib/managers/hudmanager" then
 	end)
 
 	module:hook("OnUpdateHUDVisibility", "_hud.override_teammate_mugshots_visibility", function(self, hud)
-		if D:version() >= "1.17.0.0-beta5" then
+		if type(self._cached_conf_vars.hud_vis_health_panel) ~= "nil" then
 			return
 		end
 
