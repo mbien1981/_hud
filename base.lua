@@ -47,6 +47,10 @@ module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/loadout_dr
 module:hook_post_require("lib/managers/menu/menunodekitgui", "hooks/loadout_dropdowns")
 module:hook_post_require("lib/managers/menumanager", "hooks/loadout_dropdowns")
 
+module:hook_post_require("lib/setups/setup", "hooks/mask_selector")
+module:hook_post_require("lib/states/ingamewaitingforplayers", "hooks/mask_selector")
+module:hook_post_require("lib/managers/menumanager", "hooks/mask_selector")
+
 module:hook_post_require("lib/setups/setup", "classes/toolbox")
 module:hook_post_require("lib/setups/setup", "classes/updater")
 module:hook_post_require("core/lib/setups/coresetup", "classes/updater")
