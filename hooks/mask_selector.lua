@@ -569,18 +569,24 @@ function MaskSelectorGUIClass:mouse_move(o, x, y)
 	self:check_character_hover()
 end
 
-function MaskSelectorGUIClass:do_over_scroll(panel, amount, target)
+function MaskSelectorGUIClass:do_over_scroll(panel, amount, target, skip_check)
 	panel:stop()
 	panel:animate(function(o)
 		self:animate_ui(0.1, function(p)
 			o:set_y(math.lerp(o:y(), target + amount, p))
-			self:check_item_hover()
+			if not skip_check then
+				self:check_item_hover()
+				self:check_character_hover()
+			end
 		end)
 
 		panel:animate(function(o)
 			self:animate_ui(0.1, function(p)
 				o:set_y(math.lerp(o:y(), target, p))
-				self:check_item_hover()
+				if not skip_check then
+					self:check_item_hover()
+					self:check_character_hover()
+				end
 			end)
 		end)
 	end)
@@ -593,7 +599,7 @@ function MaskSelectorGUIClass:do_scroll(panel, target, amount, skip_check)
 
 	if (target + amount) > 0 then
 		if target == 0 then
-			self:do_over_scroll(panel, amount, target)
+			self:do_over_scroll(panel, amount, target, skip_check)
 			return target
 		end
 
@@ -603,7 +609,7 @@ function MaskSelectorGUIClass:do_scroll(panel, target, amount, skip_check)
 
 	if ((target + panel:h()) + amount) < panel:parent():h() then
 		if target + panel:h() == panel:parent():h() then
-			self:do_over_scroll(panel, amount, target)
+			self:do_over_scroll(panel, amount, target, skip_check)
 			return target
 		end
 
