@@ -12,6 +12,8 @@ return {
 	_hud_raid_alt_style = "Alternative Raid Style",
 	_hud_display_armor_and_health_values = "Display armor and health values",
 	_hud_display_armor_and_health_values_help = "Show text items that indicate your raw armor and health values.",
+	_hud_display_armor_regen_timer = "Display armor regen timer",
+	_hud_display_armor_regen_timer_help = "Shows a timer that indicates the how long is left for your armor to regenerate.",
 	_hud_reposition_chat_input = "Reposition chat input panel",
 	_hud_reposition_chat_input_help = "Move the chat input panel above the top player mugshot.",
 	_hud_use_custom_inventory_panel = "Use custom inventory panel",
