@@ -1,6 +1,9 @@
 local module = ... or D:module("_hud")
 
 local visibility_nodes = {
+	["_hud_use_custom_name_labels"] = {
+		"_hud_name_label_health_display",
+	},
 	["_hud_use_custom_health_panel"] = {
 		"_hud_custom_health_panel_layout",
 		"_hud_mugshot_name",
@@ -156,84 +159,6 @@ module:hook("OnModulePostBuildOptions", "OnModulePostBuildOptions__hud", functio
 	end
 end)
 
--- scaling settings
-module:add_config_option("_hud_scaling", 1.2)
-module:add_config_option("_hud_font_scaling", 1.2)
-
--- other gui stuff
-module:add_config_option("_hud_use_loadout_dropdowns", D:version() >= "1.16.1.1")
-
--- health panel
-module:add_config_option("_hud_use_custom_health_panel", true)
-module:add_config_option("_hud_custom_health_panel_layout", "raid")
-module:add_config_option("_hud_mugshot_name", "steam_username")
-module:add_config_option("_hud_custom_mugshot_name", "<name>")
-module:add_config_option("_hud_display_name_in_upper_cases", false)
-module:add_config_option("_hud_name_use_peer_color", false)
-
--- health panel armor
-module:add_config_option("_hud_display_armor_and_health_values", false)
-module:add_config_option("_hud_display_armor_regen_timer", false)
-
-module:add_config_option("_hud_reposition_chat_input", true)
-
--- inventory panel
-module:add_config_option("_hud_use_custom_inventory_panel", true)
-
--- custom ammo panel and deployable spy
-module:add_config_option("_hud_enable_custom_ammo_panel", true)
-module:add_config_option("_hud_custom_ammo_panel_style", "custom")
-module:add_config_option("_hud_ammo_panel_show_real_ammo", true)
-
-module:add_config_option("_hud_enable_deployable_spy", true)
-module:add_config_option("_hud_medic_bag_spy", "$CHARGES;x")
-module:add_config_option("_hud_ammo_bag_spy", "$PERCENT;%")
-module:add_config_option("_hud_sentry_gun_spy", "$AMMO;/$AMMO_MAX; | [#7FFF7F]$HEALTH;[]%")
-
--- custom drop-in panel
-module:add_config_option("_hud_use_custom_drop_in_panel", true)
-module:add_config_option("_hud_drop_in_show_peer_info", true)
-module:add_config_option("_hud_mod_list_position", "righttop")
-
--- custom control and point of no return panels
-module:add_config_option("_hud_use_custom_control_panel", true)
-module:add_config_option("_hud_assault_text", {
-	{ "///", "$ASSAULT_TITLE;", "///", "$DIFFICULTY_NAME;" },
-	-- { "///", "SWAT ASSAULT IN PROGRESS", "///", "$DIFFICULTY_NAME;" },
-})
-
-module:add_config_option("_hud_use_custom_use_ponr_panel", true)
-
-module:add_config_option("_hud_mod_whitelist", {
-	["ovk_193"] = true,
-	["crybaby"] = true,
-	["overdrill7200"] = true,
-	["corpse_despawn"] = true,
-	["interact_toggle"] = true,
-	["restart_end_job"] = true,
-	["restore_deployables"] = true,
-})
-
--- custom colors
-module:add_config_option("_hud_name_color", Color("ECECEC"))
-module:add_config_option("_hud_vanilla_health_color", Color(0.5, 0.8, 0.4))
-module:add_config_option("_hud_health_color", Color("ECECEC"))
-module:add_config_option("_hud_hurt_color", Color("b8392e"))
-module:add_config_option("_hud_patch_color", Color(0.5, 1, 0.5))
-module:add_config_option("_hud_vanilla_armor_color", Color.white)
-module:add_config_option("_hud_armor_color", Color("1e90ff"))
-
--- contours and name labels
-module:add_config_option("_hud_peer_contour_colors", false)
-module:add_config_option("_hud_ai_contour_color", Color(0.1, 1, 0.5))
-
-module:add_config_option("_hud_peer1_color", Color(0.6, 0.6, 1)) -- purple (slot 1/host)
-module:add_config_option("_hud_peer2_color", Color(1, 0.6, 0.6)) -- red (slot 2)
-module:add_config_option("_hud_peer4_color", Color(1, 1, 0.6)) -- yellow (slot 4)
-module:add_config_option("_hud_peer3_color", Color(0.6, 1, 0.6)) -- green (slot 3)
-
-module:add_config_option("_hud_use_custom_name_labels", false)
-
 -- menu nodes
 module:add_menu_option("_hud_scaling", {
 	type = "slider",
@@ -259,6 +184,17 @@ module:add_menu_option("_hud_use_custom_name_labels", {
 	type = "boolean",
 	text_id = "_hud_use_custom_name_labels",
 	localize = true,
+})
+module:add_menu_option("_hud_name_label_health_display", {
+	type = "multi_choice",
+	text_id = "_hud_name_label_health_display",
+	help_id = "_hud_name_label_health_display_help",
+	choices = {
+		{ "none", "_hud_none" },
+		{ "simple", "_hud_simple" },
+		{ "detailed", "_hud_detailed" },
+	},
+	default_value = "detailed",
 })
 module:add_menu_option("_hud_peer_contour_colors", {
 	type = "boolean",
@@ -450,3 +386,10 @@ module:add_menu_option("_hud_shotgun_fire_timer", {
 	text_id = "_hud_shotgun_fire_timer",
 	localize = true,
 })
+
+-- load localization file
+for _, lang in ipairs({ DLocalizer:system_language(true) or nil, "english" }) do
+	if module:load_localization_file(module:path() .. string.format("loc/%s.lua", lang)) then
+		break
+	end
+end
