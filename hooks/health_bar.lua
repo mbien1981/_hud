@@ -38,8 +38,6 @@ function PlayerHealthPanel:init(super)
 	self.data = {
 		is_open = true,
 		peer = managers.network:session():local_peer(),
-		current_health = 0,
-		current_armor = 0,
 	}
 	self._cached_conf_vars = {}
 
@@ -176,8 +174,6 @@ function PlayerHealthPanel:update_settings()
 	if refresh_required then
 		self:layout()
 		self:update_panel_visibility()
-		self.data.current_health = 0
-		self.data.current_armor = 0
 	end
 end
 
@@ -332,7 +328,7 @@ function PlayerHealthPanel:create_health_and_armor()
 					texture = health_bar_icon,
 					layer = 2,
 					texture_rect = health_bar_rect,
-					color = Color.green,
+					color = self.colors.vanilla_health,
 					w = health_bar_rect[3],
 					h = self.main_panel:child("player_mugshot"):h(),
 				}),
@@ -742,6 +738,14 @@ function PlayerHealthPanel:layout()
 
 	self:update_player_data()
 
+	if self.data.current_armor then
+		self:set_armor(self.data.current_armor)
+	end
+
+	if self.data.current_health then
+		self:set_health(self.data.current_health)
+	end
+
 	self.data.workspace_width = self.info_panels.mugshot:w() + 8 + (176 * self.scales.panel)
 
 	self.main_panel:set_h(self.info_panels.mugshot:h() + 8)
@@ -951,7 +955,7 @@ function PlayerHealthPanel:update_player_data()
 	self.info_panels.respawn_delay:set_center(self.info_panels.mugshot:center())
 end
 
-function PlayerHealthPanel:update_health_and_armor()
+function PlayerHealthPanel:update_armor_regen_timer()
 	local p_unit = managers.player:player_unit()
 	if not alive(p_unit) then
 		return
@@ -959,113 +963,135 @@ function PlayerHealthPanel:update_health_and_armor()
 
 	local var_cache = self._cached_conf_vars
 
+	if var_cache.selected_layout == "vanilla" or not var_cache.display_armor_regen_timer then
+		self.info_panels.armor_timer:hide()
+		return
+	end
+
 	local p_damage = p_unit:character_damage()
 
-	local current_health = math.ceil((p_damage._health or 0) * 10)
-	local max_health = math.ceil((p_damage:_max_health() or 0) * 10)
-	local health_percentage = math.clamp(current_health / max_health, 0, 1)
+	local regen_timer = p_damage._regenerate_timer
+	if type(regen_timer) ~= "number" then
+		self.info_panels.armor_timer:hide()
+		return
+	end
 
-	local current_armor = math.ceil((p_damage._armor or 0) * 10)
-	local max_armor = math.ceil((p_damage:_max_armor() or 0) * 10)
-	local armor_percentage = math.clamp(current_armor / max_armor, 0, 1)
+	self.info_panels.armor_timer:show()
+	self.info_panels.armor_timer:set_text(string.format("%.2fs", regen_timer))
+	self._toolbox:make_pretty_text(self.info_panels.armor_timer)
+end
 
-	if self.data.current_health ~= current_health then
-		local lower = self.data.current_health > current_health
+function PlayerHealthPanel:set_armor(data)
+	local new_armor = data.current / data.total
 
-		local container = self.armor_health_panels[var_cache.selected_layout].health
-		local health_color_key = var_cache.selected_layout == "vanilla" and "vanilla_health" or "health"
-		container.bar:stop()
-		container.bar:animate(function(o)
+	self.data.current_armor = data
+
+	local selected_layout = self._cached_conf_vars.selected_layout
+	local layout = self.armor_health_panels[selected_layout]
+	local armor_panel = layout.armor
+	local background = armor_panel.background or layout.health.background
+
+	local animate_func
+	if selected_layout == "vanilla" then
+		local x, y = self.data.armor_bar_rect[1], self.data.armor_bar_rect[2]
+		local h = background:h()
+		local y_offset = self.data.armor_bar_rect[4] * (1 - new_armor)
+		local h_offset = h * (1 - new_armor)
+		animate_func = function(o)
 			self._toolbox:animate_ui(1, function(p)
-				if var_cache.selected_layout ~= "vanilla" then
-					o:set_w(math.lerp(o:w(), container.background:w() * health_percentage, p))
-				else
-					o:set_h(math.lerp(o:h(), container.background:h() * health_percentage, p))
-					o:set_bottom(container.background:bottom())
-				end
+				o:set_texture_rect(x, y + y_offset, self.data.armor_bar_rect[3], self.data.armor_bar_rect[4] - y_offset)
 
-				local health_color = ((health_percentage > 0.33) and self.colors[health_color_key]) or self.colors.hurt
-				local damage_color = lower and self.colors.hurt or self.colors.patch
+				o:set_h(math.lerp(o:h(), h - h_offset, p))
+				o:set_bottom(background:bottom())
+			end)
+
+			o:set_texture_rect(x, y + y_offset, self.data.armor_bar_rect[3], self.data.armor_bar_rect[4] - y_offset)
+			o:set_h(h - h_offset)
+			o:set_bottom(background:bottom())
+		end
+	else
+		animate_func = function(o)
+			self._toolbox:animate_ui(1, function(p)
+				o:set_w(math.lerp(o:w(), background:w() * new_armor, p))
+			end)
+
+			o:set_w(background:w() * new_armor)
+		end
+	end
+
+	armor_panel.bar:stop()
+	armor_panel.bar:animate(animate_func)
+
+	local p_unit = managers.player:player_unit()
+	if not alive(p_unit) then
+		return
+	end
+
+	local p_damage = p_unit:character_damage()
+	self.info_panels.armor_points:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
+	self._toolbox:make_pretty_text(self.info_panels.armor_points)
+end
+
+function PlayerHealthPanel:set_health(data)
+	local current_health = self.data.current_health
+	current_health = current_health and current_health.current / current_health.total or 0
+
+	local new_health = data.current / data.total
+	local is_lower = current_health > new_health
+
+	self.data.current_health = data
+
+	local selected_layout = self._cached_conf_vars.selected_layout
+	local panel = self.armor_health_panels[selected_layout].health
+
+	local damage_color = is_lower and self.colors.hurt or self.colors.patch
+
+	local animate_func
+	if selected_layout == "vanilla" then
+		local health_color = ((new_health > 0.33) and self.colors["vanilla_health"]) or self.colors.hurt
+		animate_func = function(o)
+			self._toolbox:animate_ui(1, function(p)
+				o:set_h(math.lerp(o:h(), panel.background:h() * new_health, p))
+				o:set_bottom(panel.background:bottom())
+
 				o:set_color(self._toolbox:blend_colors(health_color, damage_color, p))
 			end)
 
-			if var_cache.selected_layout ~= "vanilla" then
-				o:set_w(container.background:w() * health_percentage)
-			else
-				o:set_h(container.background:h() * health_percentage)
-				o:set_bottom(container.background:bottom())
-			end
-		end)
+			o:set_h(panel.background:h() * new_health)
+			o:set_bottom(panel.background:bottom())
+		end
+	else
+		local health_color = ((new_health > 0.33) and self.colors["health"]) or self.colors.hurt
+		animate_func = function(o)
+			self._toolbox:animate_ui(1, function(p)
+				o:set_w(math.lerp(o:w(), panel.background:w() * new_health, p))
 
-		self.data.current_health = current_health
-	end
-
-	if self.data.current_armor ~= current_armor then
-		local layout = self.armor_health_panels[var_cache.selected_layout]
-		local armor_container = layout.armor
-		local health_container = armor_container.background and armor_container or layout.health
-		local armor_color_key = var_cache.selected_layout == "vanilla" and "vanilla_armor" or "armor"
-		armor_container.bar:set_color(self.colors[armor_color_key])
-
-		armor_container.bar:animate(function(o)
-			self._toolbox:animate_ui(0.2, function(p)
-				if var_cache.selected_layout ~= "vanilla" then
-					o:set_w(math.lerp(o:w(), health_container.background:w() * armor_percentage, p))
-				else
-					local x = self.data.armor_bar_rect[1]
-					local y = self.data.armor_bar_rect[2]
-					local h = health_container.background:h()
-					local y_offset = self.data.armor_bar_rect[4] * (1 - armor_percentage)
-					local h_offset = h * (1 - armor_percentage)
-					o:set_texture_rect(
-						x,
-						y + y_offset,
-						self.data.armor_bar_rect[3],
-						self.data.armor_bar_rect[4] - y_offset
-					)
-
-					o:set_h(math.lerp(o:h(), h - h_offset, p))
-					o:set_bottom(health_container.background:bottom())
-				end
+				o:set_color(self._toolbox:blend_colors(health_color, damage_color, p))
 			end)
 
-			if var_cache.selected_layout ~= "vanilla" then
-				o:set_w(health_container.background:w() * armor_percentage)
-			else
-				local x = self.data.armor_bar_rect[1]
-				local y = self.data.armor_bar_rect[2]
-				local h = health_container.background:h()
-				local y_offset = self.data.armor_bar_rect[4] * (1 - armor_percentage)
-				local h_offset = h * (1 - armor_percentage)
-				o:set_texture_rect(x, y + y_offset, self.data.armor_bar_rect[3], self.data.armor_bar_rect[4] - y_offset)
-				o:set_h(h - h_offset)
-				o:set_bottom(health_container.background:bottom())
-			end
-		end)
-
-		self.data.current_armor = current_armor
+			o:set_w(panel.background:w() * new_health)
+		end
 	end
 
-	-- we use dahm's down counter instead of implementing a custom one.
-	self.info_panels.player_downs:set_text(managers.hud._hud_health_downs:text())
+	panel.bar:stop()
+	panel.bar:animate(animate_func)
 
+	local p_unit = managers.player:player_unit()
+	if not alive(p_unit) then
+		return
+	end
+
+	local p_damage = p_unit:character_damage()
 	self.info_panels.health_points:set_text(string.format("%.0f", p_damage._health * 10 or 0))
 	self._toolbox:make_pretty_text(self.info_panels.health_points)
 
-	self.info_panels.armor_points:set_text(string.format("%.0f", p_damage._armor * 10 or 0))
-	self._toolbox:make_pretty_text(self.info_panels.armor_points)
-
-	local regen_timer = p_damage._regenerate_timer
-	if regen_timer then
-		self.info_panels.armor_timer:set_text(string.format("%.2fs", regen_timer))
-		self._toolbox:make_pretty_text(self.info_panels.armor_timer)
+	if is_lower then
+		self:anim_take_damage()
 	end
+end
 
-	self.info_panels.armor_timer:set_visible(
-		(type(regen_timer) == "number")
-			and (var_cache.selected_layout ~= "vanilla")
-			and var_cache.display_armor_regen_timer
-	)
+function PlayerHealthPanel:set_downs(downs)
+	self.info_panels.player_downs:set_text(downs)
 end
 
 function PlayerHealthPanel:is_panel_open()
@@ -1098,9 +1124,6 @@ function PlayerHealthPanel:open_panel()
 			o:set_w(math.lerp(o:w(), self.data.workspace_width, p))
 		end)
 
-		self.data.current_health = 0
-		self.data.current_armor = 0
-
 		o:set_w(self.data.workspace_width)
 	end)
 end
@@ -1121,8 +1144,6 @@ function PlayerHealthPanel:update_mugshot()
 		self.main_panel:stop()
 		self.main_panel:set_w(self.data.workspace_width)
 		self:layout()
-		self.data.current_health = 0
-		self.data.current_armor = 0
 	end
 
 	local states = {
@@ -1200,7 +1221,7 @@ function PlayerHealthPanel:update()
 	end
 
 	self:update_player_data()
-	self:update_health_and_armor()
+	self:update_armor_regen_timer()
 
 	self:layout_team_mugshots()
 	self:layout_vanilla_chat()
@@ -1266,17 +1287,44 @@ if RequiredScript == "lib/managers/hudmanager" then
 			end
 		end
 	end)
-end
 
-if RequiredScript == "lib/units/beings/player/playerdamage" then
-	local PlayerDamage = module:hook_class("PlayerDamage")
-	for _, func in pairs({ "damage_bullet", "damage_killzone", "damage_explosion" }) do
-		module:post_hook(50, PlayerDamage, func, function(...)
-			if not managers.hud._hud.custom_health_panel then
-				return
-			end
+	local HUDManager = module:hook_class("HUDManager")
+	module:post_hook(HUDManager, "set_player_armor", function(self, data)
+		if not self._hud.custom_health_panel then
+			return
+		end
 
-			managers.hud._hud.custom_health_panel:anim_take_damage()
-		end, false)
-	end
+		self._hud.custom_health_panel:set_armor(data)
+	end)
+
+	module:post_hook(HUDManager, "set_player_health", function(self, data)
+		if not self._hud.custom_health_panel then
+			return
+		end
+
+		self._hud.custom_health_panel:set_health(data)
+	end)
+
+	module:post_hook(HUDManager, "reset_player_hpbar", function(self)
+		if not self._hud.custom_health_panel then
+			return
+		end
+
+		local data = { current = 1, total = 1 }
+		self._hud.custom_health_panel:set_armor(data)
+		self._hud.custom_health_panel:set_health(data)
+	end)
+
+	module:post_hook(HUDManager, "update_mugshot_downs", function(self, data)
+		if not self._hud.custom_health_panel then
+			return
+		end
+
+		local local_player = data.criminal_name_id == managers.criminals:local_character_name()
+		if not local_player then
+			return
+		end
+
+		self._hud.custom_health_panel:set_downs(data.downs)
+	end)
 end
