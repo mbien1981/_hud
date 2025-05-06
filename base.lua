@@ -1,7 +1,7 @@
 return DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.7.2",
+	version = "1.7.3",
 	dependencies = { "hud", "[drop_in_menu]", "[loadout_dropdowns]", "[holiday_special]" },
 	includes = {
 		{ "dev/base" },
@@ -28,7 +28,6 @@ return DMod:new("_hud", {
 		{ "post_require", "lib/units/weapons/trip_mine/tripminebase", "hooks/deployable_contours" },
 
 		{ "post_require", "lib/managers/hudmanager", "hooks/health_bar", 50 },
-		{ "post_require", "lib/units/beings/player/playerdamage", "hooks/health_bar", 50 },
 		{ "post_require", "lib/managers/hudmanager", "hooks/inventory_panel", 51 },
 
 		{ "post_require", "lib/states/ingamewaitingforplayers", "hooks/drop_in" },
