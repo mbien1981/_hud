@@ -3,7 +3,7 @@
 	["dialog_dropin_title"] = { english = "[peer_color]$NAME;[] is joining the game"}
 	
 	To apply color tags on peer drop-in info you must implement a localization override to '_hud_drop_in_peer_info'
-	The string template can be found @_hud/mod_localization.lua
+	The string template can be found @_hud/modlocalization.lua
 --]]
 
 _M.CustomDropInclass = rawget(_M, "CustomDropInclass") or class()

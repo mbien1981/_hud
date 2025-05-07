@@ -1,12 +1,13 @@
 return DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.7.3",
+	version = "1.7.4",
 	dependencies = { "hud", "[drop_in_menu]", "[loadout_dropdowns]", "[holiday_special]" },
 	includes = {
 		{ "dev/base" },
 		{ "common" },
 		{ "modoptions", { type = "menu_options", lazy_load = true } },
+		{ "modlocalization", { type = "localization" } },
 	},
 	hooks = {
 		{ "post_require", "lib/setups/setup", "classes/toolbox" },
