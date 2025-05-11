@@ -1,7 +1,7 @@
 return DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.7.4",
+	version = "1.7.5",
 	dependencies = { "hud", "[drop_in_menu]", "[loadout_dropdowns]", "[holiday_special]" },
 	includes = {
 		{ "dev/base" },
@@ -136,7 +136,7 @@ return DMod:new("_hud", {
 		{ "_hud_assault_text", { { "///", "$ASSAULT_TITLE;", "///", "$DIFFICULTY_NAME;" } } },
 
 		-- custom point of no return panel
-		{ "_hud_use_custom_use_ponr_panel", true },
+		{ "_hud_use_custom_ponr_panel", true },
 	},
 	update = { id = "_hud", url = "https://raw.githubusercontent.com/mbien1981/dahm-modules/main/version.json" },
 })
