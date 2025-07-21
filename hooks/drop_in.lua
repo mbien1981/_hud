@@ -5,6 +5,8 @@
 	To apply color tags on peer drop-in info you must implement a localization override to '_hud_drop_in_peer_info'
 	The string template can be found @_hud/modlocalization.lua
 --]]
+local module = ... or D:module("_hud")
+local _M = module._ENV
 
 _M.CustomDropInclass = rawget(_M, "CustomDropInclass") or class()
 local CustomDropInclass = _M.CustomDropInclass
@@ -375,8 +377,6 @@ function CustomDropInclass:destroy()
 	self._panel:parent():clear()
 	self._ws:gui():destroy_workspace(self._ws)
 end
-
-local module = ... or D:module("_hud")
 
 -- https://gist.github.com/zneix/fb99059520fe94cfcfaaefe8d02af6db#file-user-lua-L736
 D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, function(peer, _, data)
