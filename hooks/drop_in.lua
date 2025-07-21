@@ -10,6 +10,8 @@ _M.CustomDropInclass = rawget(_M, "CustomDropInclass") or class()
 local CustomDropInclass = _M.CustomDropInclass
 
 function CustomDropInclass:init()
+	self._updator = _M._hudUpdator
+
 	self._ws = Overlay:newgui():create_screen_workspace()
 	self._panel = self._ws:panel():panel({ layer = 150 })
 
@@ -124,11 +126,18 @@ function CustomDropInclass:show_person_joining(peer)
 	})
 	self._toolbox:make_pretty_text(mod_list)
 
+	local peer_id = peer:id()
 	table.insert(self.data.peers, {
-		peer_id = peer:id(),
+		peer_id = peer_id,
 		join_start_t = os.clock(),
 		panel = panel,
 	})
+
+	self._updator:add(function()
+		if not peer or not alive(peer) then
+			self:close_person_joining(peer_id)
+		end
+	end, "failsafe" .. tostring(peer_id), 0.125)
 
 	self:layout()
 end
@@ -146,6 +155,8 @@ function CustomDropInclass:close_person_joining(peer_id)
 
 	self.data.mods[peer_id] = nil
 	table.remove(self.data.peers, index)
+
+	self._updator:remove("failsafe" .. tostring(peer_id))
 
 	self:layout()
 end
