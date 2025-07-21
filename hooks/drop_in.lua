@@ -12,7 +12,7 @@ _M.CustomDropInclass = rawget(_M, "CustomDropInclass") or class()
 local CustomDropInclass = _M.CustomDropInclass
 
 function CustomDropInclass:init()
-	self._updator = _M._hudUpdator
+	self._updator = rawget(_M, "_hudUpdator")
 
 	self._ws = Overlay:newgui():create_screen_workspace()
 	self._panel = self._ws:panel():panel({ layer = 150 })
