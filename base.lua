@@ -117,6 +117,9 @@ return DMod:new("_hud", {
 		{ "_hud_drop_in_show_peer_info", true },
 		{ "_hud_mod_list_position", "righttop" },
 
+		{ "_hud_shotgun_fire_timer", false },
+		{ "_hud_reload_timer", false },
+
 		-- gameplay changing mods exclusion list
 		{
 			"_hud_mod_whitelist",
