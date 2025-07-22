@@ -136,7 +136,7 @@ function CustomDropInclass:show_person_joining(peer)
 	})
 
 	self._updater:add(function()
-		if not peer or not alive(peer) then
+		if not peer then
 			self:close_person_joining(peer_id)
 		end
 	end, "failsafe" .. tostring(peer_id), 0.125)
