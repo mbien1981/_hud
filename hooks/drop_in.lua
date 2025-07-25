@@ -235,32 +235,33 @@ end
 
 function CustomDropInclass:layout()
 	local n_peers = table.size(self.data.peers)
-
 	local container = self.player_container
-	local h = container:h()
-	if n_peers > 1 then
-		h = container:h() * 0.5
+	local container_w, container_h = container:size()
+
+	local panel_h = (n_peers > 1) and (container_h * 0.5) or container_h
+
+	local panel_widths = {}
+	if n_peers > 2 then
+		panel_widths = { container_w * 0.5, container_w * 0.5, container_w }
+	else
+		for i = 1, n_peers do
+			panel_widths[i] = container_w
+		end
 	end
 
-	local w = container:w()
-	local widths = {
-		n_peers > 2 and w * 0.5 or w,
-		n_peers > 2 and w * 0.5 or w,
-		w,
-	}
-
 	local positions = {
-		y = { 0, n_peers == 2 and h or 0, h },
-		x = { 0, n_peers > 2 and w * 0.5 or 0, 0 },
+		y = { 0, (n_peers == 2) and panel_h or 0, panel_h },
+		x = { 0, (n_peers > 2) and (container_w * 0.5) or 0, 0 },
 	}
 
 	for i, item in pairs(self.data.peers) do
-		item.panel:set_h(h)
-		item.panel:set_w(widths[i])
-		item.panel:set_y(positions.y[i])
-		item.panel:set_x(positions.x[i])
+		local panel = item.panel
+		panel:set_w(panel_widths[i] or container_w)
+		panel:set_h(panel_h)
+		panel:set_x(positions.x[i] or 0)
+		panel:set_y(positions.y[i] or 0)
 
-		self:layout_peer_panel(item.panel)
+		self:layout_peer_panel(panel)
 	end
 end
 
@@ -389,45 +390,64 @@ D:hook("OnNetworkDataRecv", "OnNetworkDataRecv_hud_drop_in", { "GAMods" }, funct
 		return
 	end
 
-	local mod_list_str = ""
 	local whitelist = D:conf("_hud_mod_whitelist") or {}
-	for k, _ in pairs(data) do
-		if not whitelist[k:lower()] then
-			mod_list_str = string.format("%s\n%s", mod_list_str, k)
+	local mod_list = {}
+
+	for mod_name in pairs(data) do
+		if not whitelist[mod_name:lower()] then
+			table.insert(mod_list, mod_name)
 		end
 	end
+
+	local mod_list_str = #mod_list > 0 and table.concat(mod_list, "\n") or ""
 
 	drop_in.data.mods[peer:id()] = mod_list_str
 end)
 
 if RequiredScript == "lib/states/ingamewaitingforplayers" then
+	local initialize = function()
+		if not rawget(_M, "CustomDropInPanel") then
+			rawset(_M, "CustomDropInPanel", CustomDropInclass:new())
+		end
+	end
+
 	local IngameWaitingForPlayersState = module:hook_class("IngameWaitingForPlayersState")
+	module:pre_hook(IngameWaitingForPlayersState, "sync_start", function(...)
+		initialize()
+	end)
+
 	module:post_hook(50, IngameWaitingForPlayersState, "at_exit", function(...)
-		rawset(_M, "CustomDropInPanel", CustomDropInclass:new())
-	end, false)
+		initialize()
+	end)
 end
 
 if RequiredScript == "lib/managers/menumanager" then
 	local MenuManager = module:hook_class("MenuManager")
 	module:hook(50, MenuManager, "show_person_joining", function(self, peer_id, nick)
 		local drop_in = rawget(_M, "CustomDropInPanel")
-		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
-			module:call_orig(MenuManager, "show_person_joining", self, peer_id, nick)
-			return
+		local use_custom_panel = D:conf("_hud_use_custom_drop_in_panel")
+
+		if drop_in and use_custom_panel then
+			return drop_in:show_person_joining(managers.network:session():peer(peer_id))
 		end
 
-		drop_in:show_person_joining(managers.network:session():peer(peer_id))
+		module:call_orig(MenuManager, "show_person_joining", self, peer_id, nick)
 	end, false)
 
 	module:hook(50, MenuManager, "close_person_joining", function(self, peer_id)
 		local drop_in = rawget(_M, "CustomDropInPanel")
-		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
-			module:call_orig(MenuManager, "close_person_joining", self, peer_id)
-			return
+		local use_custom_panel = D:conf("_hud_use_custom_drop_in_panel")
+		if not drop_in or not use_custom_panel then
+			if drop_in and drop_in:get_peer_panel(peer_id) then
+				drop_in:close_person_joining(peer_id)
+			end
+
+			return module:call_orig(MenuManager, "close_person_joining", self, peer_id)
 		end
 
-		if managers.system_menu:get_dialog("user_dropin" .. peer_id) then
-			managers.system_menu:close("user_dropin" .. peer_id)
+		local dialog_id = "user_dropin" .. peer_id
+		if managers.system_menu:get_dialog(dialog_id) then
+			managers.system_menu:close(dialog_id)
 		end
 
 		drop_in:close_person_joining(peer_id)
@@ -435,13 +455,14 @@ if RequiredScript == "lib/managers/menumanager" then
 
 	module:hook(50, MenuManager, "update_person_joining", function(self, peer_id, progress)
 		local peer = managers.network:session():peer(peer_id)
-
 		local drop_in = rawget(_M, "CustomDropInPanel")
-		if not drop_in or not D:conf("_hud_use_custom_drop_in_panel") then
+		local using_custom_panel = drop_in and D:conf("_hud_use_custom_drop_in_panel")
+
+		if not using_custom_panel then
 			if drop_in and drop_in:get_peer_panel(peer_id) then
 				drop_in:close_person_joining(peer_id)
 
-				if managers.system_menu:get_dialog("user_dropin" .. peer_id) then
+				if not managers.system_menu:get_dialog("user_dropin" .. peer_id) then
 					self:show_person_joining(peer_id, peer:name())
 				end
 			end
