@@ -78,7 +78,7 @@ local function _hud_option_changed(k, value, old_value, old_value_was_user_set, 
 		local child = _get_item("_hud_custom_mugshot_name")
 
 		if child then
-			local visible = master:value() == "user_defined"
+			local visible = master:visible() and master:value() == "user_defined"
 			local previous_visibility = child:visible()
 
 			child:set_visible(visible)
