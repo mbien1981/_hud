@@ -1,7 +1,7 @@
 return DMod:new("_hud", {
 	name = "_hud",
 	author = "_atom",
-	version = "1.7.10",
+	version = "1.7.11",
 	dependencies = { "hud", "[drop_in_menu]", "[loadout_dropdowns]", "[holiday_special]" },
 	includes = {
 		{ "dev/base" },
