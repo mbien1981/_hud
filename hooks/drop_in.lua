@@ -457,3 +457,23 @@ if RequiredScript == "lib/managers/menumanager" then
 		drop_in:update_person_joining(peer, progress)
 	end, false)
 end
+
+if RequiredScript == "lib/managers/menu/menulobbyrenderer" then
+	local MenuLobbyRenderer = module:hook_class("MenuLobbyRenderer")
+	module:hook(MenuLobbyRenderer, "set_dropin_progress", function(self, peer_id, progress_percentage)
+		local slot = self._player_slots[peer_id]
+		if not slot then
+			return
+		end
+
+		if alive(slot.status) then
+			local text = managers.localization:text("menu_waiting_is_joining")
+				.. " "
+				.. tostring(progress_percentage)
+				.. "%"
+			slot.status:set_text(utf8.to_upper(text))
+		end
+
+		managers.menu:update_person_joining(peer_id, progress_percentage)
+	end)
+end

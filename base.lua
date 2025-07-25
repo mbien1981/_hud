@@ -33,6 +33,7 @@ return DMod:new("_hud", {
 
 		{ "post_require", "lib/states/ingamewaitingforplayers", "hooks/drop_in" },
 		{ "post_require", "lib/managers/menumanager", "hooks/drop_in" },
+		{ "post_require", "lib/managers/menu/menulobbyrenderer", "hooks/drop_in" },
 
 		{ "post_require", "lib/managers/hudmanager", "hooks/ammo_panel" },
 
